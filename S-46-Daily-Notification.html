@@ -1,0 +1,147 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-46 Daily Notification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:dark}
+  html,body{margin:0;padding:0;background:#0A0A12;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .lbl{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.30),0 0 0 1px rgba(255,255,255,.08);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#1A1A2E;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+</style>
+</head><body>
+<div class="stage">
+  <div class="lbl" style="color:#6B6B80">S-46 · Daily Notification</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const PATHS={
+  dumbbell:"M6 4v16M18 4v16M8 8h8M8 16h8M3 8h3M18 8h3M3 16h3M18 16h3",
+  flame:"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z",
+  'message-circle':"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+  calendar:["M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z","M16 2v4","M8 2v4","M3 10h18"],
+  music:["M9 18V5l12-2v13","M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z","M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"],
+  lock:["M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z","M17 11V7a5 5 0 0 0-10 0v4"],
+  wifi:["M5 12.55a11 11 0 0 1 14.08 0","M1.42 9a16 16 0 0 1 21.16 0","M8.53 16.11a6 6 0 0 1 6.95 0","M12 20h.01"],
+};
+function Icon({name,size=16,color='currentColor',style:s}){
+  const p=PATHS[name];if(!p)return null;
+  const paths=Array.isArray(p)?p:[p];
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-flex',flexShrink:0,...s}}>{paths.map((d,i)=><path key={i} d={d}/>)}</svg>;
+}
+
+function App(){
+  const [notNow,setNotNow]=React.useState(false);
+
+  return(
+    <div style={{width:'100%',height:'100%',background:'#1A1A2E',display:'flex',flexDirection:'column',fontFamily:"'Inter',system-ui,sans-serif"}}>
+
+      {/* Status bar — dark version */}
+      <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',flexShrink:0}}>
+        <span style={{paddingTop:10,fontSize:15,fontWeight:600,color:'#fff'}}>9:41</span>
+        <span style={{fontSize:11,color:'rgba(255,255,255,0.5)',position:'absolute',left:'50%',transform:'translateX(-50%)',paddingTop:10}}>Notification Centre</span>
+        <div style={{display:'flex',gap:8,alignItems:'center',paddingTop:10}}>
+          <Icon name="wifi" size={15} color="rgba(255,255,255,0.8)"/>
+          <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="rgba(255,255,255,0.4)" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="white"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="white" opacity=".4"/></svg>
+        </div>
+      </div>
+
+      {/* Notification list */}
+      <div style={{flex:1,overflowY:'auto',padding:'8px 16px 20px',display:'flex',flexDirection:'column',gap:8}}>
+
+        {/* WhatsApp */}
+        <div style={{background:'rgba(255,255,255,0.08)',borderRadius:12,padding:'12px 14px',opacity:0.7}}>
+          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:5}}>
+            <div style={{width:32,height:32,borderRadius:8,background:'#25D366',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <Icon name="message-circle" size={16} color="#fff"/>
+            </div>
+            <span style={{fontSize:11,color:'rgba(255,255,255,0.6)'}}>WhatsApp · 3 min ago</span>
+          </div>
+          <div style={{fontSize:13,color:'rgba(255,255,255,0.9)',lineHeight:1.4}}>Sarah: "Are we still going for a run this evening?"</div>
+        </div>
+
+        {/* Calendar */}
+        <div style={{background:'rgba(255,255,255,0.08)',borderRadius:12,padding:'12px 14px',opacity:0.7}}>
+          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:5}}>
+            <div style={{width:32,height:32,borderRadius:8,background:'#FF3B30',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <Icon name="calendar" size={16} color="#fff"/>
+            </div>
+            <span style={{fontSize:11,color:'rgba(255,255,255,0.6)'}}>Calendar · 15 min ago</span>
+          </div>
+          <div style={{fontSize:13,color:'rgba(255,255,255,0.9)',lineHeight:1.4}}>Reminder: Team meeting at 10:30 AM</div>
+        </div>
+
+        {/* WiseWorkout FEATURED */}
+        <div style={{background:'rgba(108,126,232,0.25)',borderRadius:14,padding:14,border:'1px solid rgba(108,126,232,0.5)',opacity:notNow?0.4:1,transition:'opacity .3s'}}>
+          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
+            <div style={{width:32,height:32,borderRadius:8,background:'#6C7EE8',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <Icon name="dumbbell" size={16} color="#fff"/>
+            </div>
+            <span style={{fontSize:11,color:'rgba(255,255,255,0.8)',fontWeight:600}}>WiseWorkout · Now</span>
+            <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:4}}>
+              <Icon name="lock" size={10} color="rgba(255,255,255,0.4)"/>
+            </div>
+          </div>
+          <div style={{fontSize:14,color:'rgba(255,255,255,0.95)',fontWeight:500,lineHeight:1.4,marginBottom:2}}>
+            Time to get ready — today is Push B, Upper Body.
+          </div>
+          <div style={{fontSize:12,color:'rgba(255,255,255,0.7)',marginBottom:10}}>
+            Your session is in 20 minutes. Ready to go?
+          </div>
+          <div style={{display:'flex',gap:8,marginBottom:8}}>
+            <button onClick={()=>window.location.href='S-17-Gym-Session-Active.html'} style={{height:30,borderRadius:10,padding:'0 14px',background:'rgba(108,126,232,0.4)',border:'1px solid rgba(255,255,255,0.6)',color:'#fff',fontSize:12,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Start workout</button>
+            <button onClick={()=>setNotNow(true)} style={{height:30,borderRadius:10,padding:'0 14px',background:'rgba(255,255,255,0.1)',border:'none',color:'#fff',fontSize:12,cursor:'pointer',fontFamily:'inherit'}}>Not now</button>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:5}}>
+            <Icon name="flame" size={10} color="#4BB8CC"/>
+            <span style={{fontSize:10,color:'#4BB8CC'}}>7-day streak at risk</span>
+          </div>
+        </div>
+
+        {/* Spotify */}
+        <div style={{background:'rgba(255,255,255,0.08)',borderRadius:12,padding:'12px 14px',opacity:0.7}}>
+          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:5}}>
+            <div style={{width:32,height:32,borderRadius:8,background:'#1DB954',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <Icon name="music" size={16} color="#fff"/>
+            </div>
+            <span style={{fontSize:11,color:'rgba(255,255,255,0.6)'}}>Spotify · 1 hr ago</span>
+          </div>
+          <div style={{fontSize:13,color:'rgba(255,255,255,0.9)',lineHeight:1.4}}>Now playing: Training Beats Playlist</div>
+        </div>
+
+        {/* WiseWorkout streak warning */}
+        <div style={{background:'rgba(255,255,255,0.06)',borderRadius:12,padding:'12px 14px',opacity:0.65}}>
+          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:5}}>
+            <div style={{width:32,height:32,borderRadius:8,background:'#6C7EE8',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <Icon name="flame" size={16} color="#fff"/>
+            </div>
+            <span style={{fontSize:11,color:'rgba(255,255,255,0.8)',fontWeight:600}}>WiseWorkout · 6:00 PM</span>
+          </div>
+          <div style={{fontSize:12,color:'rgba(255,255,255,0.7)',lineHeight:1.4}}>Your 7-day streak resets at midnight — log a session today to protect it.</div>
+        </div>
+      </div>
+
+      {/* Bottom note */}
+      <div style={{padding:'0 20px 8px',textAlign:'center'}}>
+        <div style={{fontSize:12,color:'rgba(255,255,255,0.5)',fontStyle:'italic',lineHeight:1.5}}>
+          WiseWorkout sends workout nudges 20 minutes before your set workout time. Streak alerts go out at 8 PM if no session logged.
+        </div>
+      </div>
+
+      {/* Demo label */}
+      <div style={{textAlign:'center',fontSize:10,color:'rgba(255,255,255,0.3)',paddingBottom:16}}>
+        S-46 · DAILY NOTIFICATION SIMULATION
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

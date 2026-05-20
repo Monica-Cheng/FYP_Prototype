@@ -43,6 +43,7 @@
   </div>
   <div class="tweak-row"><label>Calorie goal on</label><input type="checkbox" id="tw-cal" checked/></div>
   <div class="tweak-row"><label>Unread notifications</label><input type="checkbox" id="tw-notif" checked/></div>
+  <div class="tweak-row"><label>Missed workout card</label><input type="checkbox" id="tw-missed"/></div>
 </div>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
@@ -298,14 +299,16 @@ function App() {
   const [homeState, setHomeState] = React.useState('plan');
   const [calGoal, setCalGoal] = React.useState(true);
   const [hasNotif, setHasNotif] = React.useState(true);
+  const [showMissed, setShowMissed] = React.useState(false);
 
   React.useEffect(() => {
-    ['tw-state', 'tw-cal', 'tw-notif'].forEach(id => {
+    ['tw-state', 'tw-cal', 'tw-notif', 'tw-missed'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       if (id === 'tw-state') el.addEventListener('change', e => setHomeState(e.target.value));
       if (id === 'tw-cal') { el.checked = true; el.addEventListener('change', e => setCalGoal(e.target.checked)); }
       if (id === 'tw-notif') { el.checked = true; el.addEventListener('change', e => setHasNotif(e.target.checked)); }
+      if (id === 'tw-missed') el.addEventListener('change', e => setShowMissed(e.target.checked));
     });
     const panel = document.getElementById('tweaks');
     if (panel) panel.style.display = 'none';
@@ -346,6 +349,20 @@ function App() {
 
       {/* Scrollable content */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '0 16px', paddingBottom: 100 }}>
+
+        {/* Missed workout card */}
+        {showMissed && (
+          <a href="S-45-Missed-Workout-Checkin.html" style={{ textDecoration: 'none', display: 'block', marginBottom: 12 }}>
+            <div style={{ background: '#FEF3C7', borderRadius: 16, border: '0.5px solid #FDE68A', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M12 9v4M12 17h.01" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#92400E' }}>Missed: Legs A on Wednesday</div>
+                <div style={{ fontSize: 12, color: '#B45309', marginTop: 2 }}>Tap to log what happened and adjust your plan.</div>
+              </div>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#F59E0B', flexShrink: 0 }}>Check in →</span>
+            </div>
+          </a>
+        )}
 
         {/* WiseCoach card */}
         <a href="S-25-Coach-Chat.html" style={{ textDecoration: 'none', display: 'block', marginBottom: 12 }}>

@@ -91,7 +91,30 @@ function App(){
   const [notifOpen,setNotifOpen]=React.useState(false);
   const [leaderboard,setLeaderboard]=React.useState(true);
   const [notifs,setNotifs]=React.useState({workout:true,streak:true,squad:true,missed:true,overtrain:true,plan:true});
-  const toggleNotif=k=>setNotifs(p=>({...p,[k]:!p[k]}));
+  const [workoutReminderTime,setWorkoutReminderTime]=React.useState('19:00');
+  const [workoutReminderDraft,setWorkoutReminderDraft]=React.useState('19:00');
+  const [workoutReminderSave,setWorkoutReminderSave]=React.useState('idle');
+  const toggleNotif=k=>{
+    setNotifs(p=>({...p,[k]:!p[k]}));
+    if(k==='workout'){
+      setWorkoutReminderSave('idle');
+      setWorkoutReminderDraft(workoutReminderTime);
+    }
+  };
+
+  function handleWorkoutReminderSave(){
+    if(workoutReminderSave==='saving' || workoutReminderDraft===workoutReminderTime) return;
+    setWorkoutReminderSave('saving');
+    setTimeout(()=>{
+      setWorkoutReminderTime(workoutReminderDraft);
+      setWorkoutReminderSave('saved');
+    },700);
+  }
+
+  const workoutReminderDirty=workoutReminderDraft!==workoutReminderTime;
+  const workoutReminderBtnBg=workoutReminderSave==='saved'?'#22C55E':workoutReminderDirty?WW.primary:'#E8EAF8';
+  const workoutReminderBtnFg=workoutReminderSave==='saved'||workoutReminderDirty?'#fff':'#8A8A9E';
+  const workoutReminderBtnTxt=workoutReminderSave==='saving'?'Saving...':workoutReminderSave==='saved'?'Saved!':'Save';
 
   const NotifRow=({k,label,sub})=>(
     <div style={{display:'flex',alignItems:'flex-start',gap:12,padding:'12px 16px',borderTop:`0.5px solid #E8EAF8`}}>
@@ -140,6 +163,29 @@ function App(){
             {notifOpen&&(
               <div style={{background:WW.bg}}>
                 <NotifRow k="workout" label="Workout reminders"/>
+                {notifs.workout&&(
+                  <div style={{padding:'12px 16px 14px',borderTop:`0.5px solid #E8EAF8`}}>
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,padding:'2px 0 0'}}>
+                      <span style={{fontSize:13,color:WW.text}}>Set timer</span>
+                      <input
+                        type="time"
+                        value={workoutReminderDraft}
+                        onChange={e=>{
+                          setWorkoutReminderDraft(e.target.value);
+                          setWorkoutReminderSave('idle');
+                        }}
+                        style={{border:'none',borderBottom:`1.5px solid ${WW.primary}`,background:'transparent',fontSize:14,fontWeight:600,color:WW.text,fontFamily:'Inter, sans-serif',outline:'none',padding:'2px 0',minWidth:92,textAlign:'right'}}
+                      />
+                    </div>
+                    <button
+                      onClick={handleWorkoutReminderSave}
+                      disabled={!workoutReminderDirty || workoutReminderSave==='saving'}
+                      style={{width:'100%',height:40,borderRadius:12,border:'none',background:workoutReminderBtnBg,color:workoutReminderBtnFg,fontSize:14,fontWeight:600,fontFamily:'inherit',cursor:workoutReminderDirty && workoutReminderSave!=='saving'?'pointer':'not-allowed',marginTop:12,transition:'background .2s'}}
+                    >
+                      {workoutReminderBtnTxt}
+                    </button>
+                  </div>
+                )}
                 <NotifRow k="streak" label="Streak at risk alerts"/>
                 <NotifRow k="squad" label="Squad updates"/>
                 <NotifRow k="missed" label="Missed workout checkup" sub="Send a check-in if I haven't logged a session by my usual workout time."/>
