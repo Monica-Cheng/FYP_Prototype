@@ -1,0 +1,250 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-29 Add Friends</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  .tweaks-panel{position:fixed;bottom:20px;right:20px;width:240px;background:#fff;border-radius:14px;padding:14px 16px 16px;box-shadow:0 10px 40px rgba(20,25,60,.18),0 0 0 .5px rgba(0,0,0,.08);color:#3D3D5C;display:none;z-index:100}
+  .tweaks-panel.open{display:block}.tweaks-panel h3{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:#8A8A9E}
+  .tweak-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:10px}
+  .tweak-row label{font-size:13px;color:#3D3D5C;flex:1}.tweak-row input[type="checkbox"]{accent-color:#6C7EE8}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-29 · Add Friends</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<div class="tweaks-panel" id="tweaks">
+  <h3>State</h3>
+  <div class="tweak-row"><label>Show search results</label><input type="checkbox" id="tw-results" checked/></div>
+  <div class="tweak-row"><label>Show incoming requests</label><input type="checkbox" id="tw-requests" checked/></div>
+</div>
+<button onclick="document.getElementById('tweaks').classList.toggle('open')" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:#6C7EE8;color:#fff;border:none;font-size:18px;cursor:pointer;box-shadow:0 4px 12px rgba(108,126,232,.4);z-index:200">⚙</button>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+const Ico={
+  home:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill={c}/></svg>,
+  plans:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="20" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill={c}/></svg>,
+  coach:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke={c} strokeWidth="1.5" strokeLinejoin="round"/></svg>,
+  club:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke={c} strokeWidth="1.5"/><circle cx="17" cy="10" r="2.2" stroke={c} strokeWidth="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke={c} strokeWidth="1.5" strokeLinecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  progress:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+};
+const NAV=[{id:'home',label:'Home',icon:Ico.home,href:'S-09-Home.html'},{id:'plans',label:'Plans',icon:Ico.plans,href:'S-10-Plans-Hub.html'},{id:'coach',label:'Coach',icon:Ico.coach,href:'S-25-Coach-Chat.html'},{id:'club',label:'Club',icon:Ico.club,href:'S-28-Club-Tab.html'},{id:'progress',label:'Progress',icon:Ico.progress,href:'S-32-Progress-Tab.html'}];
+function StatusBar(){return(<div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}><div style={{paddingTop:10}}>9:41</div><div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg></div></div>);}
+function BottomNav({active}){return(<div style={{position:'absolute',bottom:0,left:0,right:0,height:84,background:WW.card,borderTop:'0.5px solid #E8EAF8',display:'flex',zIndex:30}}>{NAV.map(n=>{const a=n.id===active,c=a?WW.primary:WW.textSec;return(<a key={n.id} href={n.href} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,textDecoration:'none',paddingBottom:8}}>{n.icon(c)}<span style={{fontSize:10,fontWeight:600,color:c}}>{n.label}</span></a>);})}</div>);}
+
+const SEARCH_RESULTS=[
+  {id:1,initials:'CL',color:'#6C7EE8',username:'@chrislee92',name:'Chris Lee',mutual:2,pending:false},
+  {id:2,initials:'PW',color:'#4BB8CC',username:'@priya.w',name:'Priya Wong',mutual:0,pending:true},
+  {id:3,initials:'DN',color:'#9B84E8',username:'@dannyng_fit',name:'Danny Ng',mutual:5,pending:false},
+];
+
+const INCOMING_REQUESTS=[
+  {id:4,initials:'KY',color:'#F59E0B',username:'@kyle.y',name:'Kyle Yeo',mutual:1},
+  {id:5,initials:'RS',color:'#10B981',username:'@rachels',name:'Rachel Sim',mutual:3},
+];
+
+function App(){
+  const [showResults,setShowResults]=React.useState(true);
+  const [showRequests,setShowRequests]=React.useState(true);
+  const [query,setQuery]=React.useState('chris');
+  const [added,setAdded]=React.useState({});
+  const [accepted,setAccepted]=React.useState({});
+  const [declined,setDeclined]=React.useState({});
+  const [activeMode,setActiveMode]=React.useState('search'); // 'search' | 'contacts'
+  const [contactsGranted,setContactsGranted]=React.useState(false);
+
+  React.useEffect(()=>{
+    const cb=()=>{
+      setShowResults(document.getElementById('tw-results')?.checked??true);
+      setShowRequests(document.getElementById('tw-requests')?.checked??true);
+    };
+    document.querySelectorAll('#tweaks input').forEach(el=>el.addEventListener('change',cb));
+    cb();
+  },[]);
+
+  const handleAdd=(id)=>setAdded(p=>({...p,[id]:true}));
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,position:'relative'}}>
+      <StatusBar/>
+
+      {/* Top bar */}
+      <div style={{display:'flex',alignItems:'center',padding:'10px 18px 14px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',gap:12,flexShrink:0}}>
+        <a href="S-28-Club-Tab.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,textDecoration:'none',flexShrink:0}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke={WW.primaryDark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </a>
+        <div style={{fontSize:18,fontWeight:800,color:WW.primaryDark,flex:1}}>Add Friends</div>
+      </div>
+
+      <div style={{flex:1,overflowY:'auto',paddingBottom:100}}>
+
+        {/* Mode selector */}
+        <div style={{display:'flex',gap:10,padding:'16px 18px 4px'}}>
+          {[{id:'search',icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8"/><path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>,label:'Search username'},
+            {id:'contacts',icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.8"/><circle cx="9" cy="11" r="2" stroke="currentColor" strokeWidth="1.5"/><path d="M5 20c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M15 9h3M15 13h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,label:'From contacts'}
+          ].map(m=>{
+            const active=activeMode===m.id;
+            return(
+              <button key={m.id} onClick={()=>setActiveMode(m.id)} style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:7,padding:'11px 12px',borderRadius:12,border:`1.5px solid ${active?WW.primary:WW.border}`,background:active?WW.chipBg:WW.card,color:active?WW.primary:WW.textSec,fontSize:13,fontWeight:700,cursor:'pointer'}}>
+                {m.icon}{m.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Search mode */}
+        {activeMode==='search'&&(
+          <div style={{padding:'14px 18px 0'}}>
+            {/* Search input */}
+            <div style={{display:'flex',gap:8,marginBottom:16}}>
+              <div style={{flex:1,display:'flex',alignItems:'center',gap:8,background:WW.card,borderRadius:12,border:`1.5px solid ${WW.border}`,padding:'0 12px',height:44}}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke={WW.textSec} strokeWidth="1.8"/><path d="M20 20l-3.5-3.5" stroke={WW.textSec} strokeWidth="1.8" strokeLinecap="round"/></svg>
+                <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search by username or name"
+                  style={{flex:1,border:'none',outline:'none',fontSize:14,color:WW.text,background:'transparent',fontFamily:'inherit'}}/>
+                {query&&<button onClick={()=>setQuery('')} style={{border:'none',background:'none',padding:0,cursor:'pointer',color:WW.textSec,fontSize:16,lineHeight:1}}>×</button>}
+              </div>
+              <button style={{padding:'0 16px',borderRadius:12,background:WW.primary,color:'#fff',border:'none',fontSize:14,fontWeight:700,cursor:'pointer'}}>Search</button>
+            </div>
+
+            {/* Results */}
+            {showResults&&query&&(
+              <div>
+                <div style={{fontSize:12,fontWeight:700,color:WW.textSec,letterSpacing:.4,textTransform:'uppercase',marginBottom:10}}>Results for "{query}"</div>
+                <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                  {SEARCH_RESULTS.map(p=>{
+                    const isPending=p.pending||added[p.id];
+                    return(
+                      <div key={p.id} style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'12px 14px',display:'flex',alignItems:'center',gap:12,boxShadow:WW.shadow}}>
+                        {/* Avatar */}
+                        <div style={{width:46,height:46,borderRadius:23,background:p.color,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                          <span style={{fontSize:16,fontWeight:800,color:'#fff'}}>{p.initials}</span>
+                        </div>
+                        {/* Info */}
+                        <div style={{flex:1,minWidth:0}}>
+                          <div style={{fontSize:14,fontWeight:700,color:WW.text}}>{p.name}</div>
+                          <div style={{fontSize:12,color:WW.textSec}}>{p.username}</div>
+                          {p.mutual>0&&<div style={{fontSize:11,color:WW.textSec,marginTop:2}}>{p.mutual} mutual friend{p.mutual>1?'s':''}</div>}
+                        </div>
+                        {/* Action */}
+                        <button onClick={()=>!isPending&&handleAdd(p.id)}
+                          style={{padding:'8px 14px',borderRadius:10,background:isPending?WW.elevated:'#E6EAFE',color:isPending?WW.textSec:WW.primary,border:`1.5px solid ${isPending?WW.border:WW.primary}`,fontSize:13,fontWeight:700,cursor:isPending?'default':'pointer',flexShrink:0}}>
+                          {isPending?'Sent':'+ Add'}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Empty search hint */}
+            {!query&&(
+              <div style={{textAlign:'center',padding:'40px 20px'}}>
+                <div style={{width:56,height:56,borderRadius:28,background:WW.chipBg,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px'}}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke={WW.primary} strokeWidth="1.8"/><path d="M20 20l-3.5-3.5" stroke={WW.primary} strokeWidth="1.8" strokeLinecap="round"/></svg>
+                </div>
+                <div style={{fontSize:15,fontWeight:700,color:WW.text,marginBottom:6}}>Find your friends</div>
+                <div style={{fontSize:13,color:WW.textSec,lineHeight:1.5}}>Search by username or display name to connect with friends on WiseWorkout.</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Contacts mode */}
+        {activeMode==='contacts'&&(
+          <div style={{padding:'20px 18px 0'}}>
+            {!contactsGranted?(
+              <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'24px 20px',textAlign:'center',boxShadow:WW.shadow}}>
+                <div style={{width:56,height:56,borderRadius:28,background:WW.chipBg,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px'}}>
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke={WW.primary} strokeWidth="1.8"/><circle cx="9" cy="11" r="2" stroke={WW.primary} strokeWidth="1.5"/><path d="M5 20c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke={WW.primary} strokeWidth="1.5" strokeLinecap="round"/><path d="M15 9h3M15 13h2" stroke={WW.primary} strokeWidth="1.5" strokeLinecap="round"/></svg>
+                </div>
+                <div style={{fontSize:15,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>Access your contacts</div>
+                <div style={{fontSize:13,color:WW.textSec,lineHeight:1.6,marginBottom:20}}>WiseWorkout can suggest friends from your contacts who are already on the app. Your contacts are never uploaded or stored.</div>
+                <button onClick={()=>setContactsGranted(true)} style={{width:'100%',height:48,borderRadius:14,background:WW.primary,color:'#fff',border:'none',fontSize:15,fontWeight:700,cursor:'pointer'}}>Allow Access</button>
+                <button style={{width:'100%',height:40,border:'none',background:'none',fontSize:13,color:WW.textSec,cursor:'pointer',marginTop:4}}>Not now</button>
+              </div>
+            ):(
+              <div>
+                <div style={{fontSize:12,fontWeight:700,color:WW.textSec,letterSpacing:.4,textTransform:'uppercase',marginBottom:10}}>From your contacts · 3 on WiseWorkout</div>
+                {[{initials:'TH',color:'#6C7EE8',name:'Tom Huang',username:'@tomh_run',mutual:0},
+                  {initials:'FY',color:'#4BB8CC',name:'Fiona Yap',username:'@fionayap',mutual:1},
+                  {initials:'MZ',color:'#9B84E8',name:'Marcus Zhao',username:'@mzhao_lifts',mutual:2},
+                ].map((p,i)=>(
+                  <div key={i} style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'12px 14px',display:'flex',alignItems:'center',gap:12,boxShadow:WW.shadow,marginBottom:10}}>
+                    <div style={{width:46,height:46,borderRadius:23,background:p.color,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                      <span style={{fontSize:16,fontWeight:800,color:'#fff'}}>{p.initials}</span>
+                    </div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:14,fontWeight:700,color:WW.text}}>{p.name}</div>
+                      <div style={{fontSize:12,color:WW.textSec}}>{p.username}</div>
+                      {p.mutual>0&&<div style={{fontSize:11,color:WW.textSec,marginTop:2}}>{p.mutual} mutual friend{p.mutual>1?'s':''}</div>}
+                    </div>
+                    <button style={{padding:'8px 14px',borderRadius:10,background:'#E6EAFE',color:WW.primary,border:`1.5px solid ${WW.primary}`,fontSize:13,fontWeight:700,cursor:'pointer',flexShrink:0}}>+ Add</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Incoming requests */}
+        {showRequests&&(
+          <div style={{padding:'20px 18px 0'}}>
+            <div style={{fontSize:12,fontWeight:700,color:WW.textSec,letterSpacing:.4,textTransform:'uppercase',marginBottom:10}}>Friend Requests <span style={{background:'#EF4444',color:'#fff',borderRadius:10,padding:'1px 7px',fontSize:11,fontWeight:700,marginLeft:4}}>{INCOMING_REQUESTS.filter(r=>!accepted[r.id]&&!declined[r.id]).length}</span></div>
+            <div style={{display:'flex',flexDirection:'column',gap:10}}>
+              {INCOMING_REQUESTS.map(r=>{
+                if(declined[r.id])return null;
+                if(accepted[r.id])return(
+                  <div key={r.id} style={{background:WW.tealBg,borderRadius:16,padding:'12px 14px',display:'flex',alignItems:'center',gap:12,border:`0.5px solid rgba(75,184,204,.25)`}}>
+                    <div style={{width:46,height:46,borderRadius:23,background:r.color,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                      <span style={{fontSize:16,fontWeight:800,color:'#fff'}}>{r.initials}</span>
+                    </div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:14,fontWeight:700,color:WW.text}}>{r.name}</div>
+                      <div style={{fontSize:12,color:'#1A7A8C',fontWeight:600}}>Now friends!</div>
+                    </div>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill={WW.teal}/><path d="M7 12l3.5 3.5L17 8" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </div>
+                );
+                return(
+                  <div key={r.id} style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'12px 14px',display:'flex',alignItems:'center',gap:12,boxShadow:WW.shadow}}>
+                    <div style={{width:46,height:46,borderRadius:23,background:r.color,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                      <span style={{fontSize:16,fontWeight:800,color:'#fff'}}>{r.initials}</span>
+                    </div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:14,fontWeight:700,color:WW.text}}>{r.name}</div>
+                      <div style={{fontSize:12,color:WW.textSec}}>{r.username} · {r.mutual} mutual</div>
+                    </div>
+                    <div style={{display:'flex',gap:7,flexShrink:0}}>
+                      <button onClick={()=>setDeclined(p=>({...p,[r.id]:true}))}
+                        style={{padding:'8px 12px',borderRadius:10,background:WW.elevated,color:WW.text,border:`1.5px solid ${WW.border}`,fontSize:13,fontWeight:700,cursor:'pointer'}}>Decline</button>
+                      <button onClick={()=>setAccepted(p=>({...p,[r.id]:true}))}
+                        style={{padding:'8px 12px',borderRadius:10,background:WW.primary,color:'#fff',border:'none',fontSize:13,fontWeight:700,cursor:'pointer'}}>Accept</button>
+                    </div>
+                  </div>
+                );
+              })}
+              {INCOMING_REQUESTS.every(r=>declined[r.id])&&(
+                <div style={{textAlign:'center',padding:'16px 0',color:WW.textSec,fontSize:13}}>No pending requests</div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <BottomNav active="club"/>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

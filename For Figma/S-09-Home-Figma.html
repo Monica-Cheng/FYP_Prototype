@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiseWorkout · S-09 Home · For Figma</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F7F8FF;
+      --canvas: #EDEEF5;
+      --card: #FFFFFF;
+      --elevated: #EEF0FB;
+      --primary: #6C7EE8;
+      --primary-dark: #2D3A8C;
+      --lavender: #9B84E8;
+      --lavender-bg: #F0EEFE;
+      --lavender-dark: #7B5CB8;
+      --lavender-text: #5B3F9E;
+      --teal: #4BB8CC;
+      --teal-bg: #E0F4F8;
+      --text: #3D3D5C;
+      --text-sec: #8A8A9E;
+      --border: #C8C8D8;
+      --chip-bg: #E6EAFE;
+      --gold: #F59E0B;
+      --shadow: 0 2px 8px rgba(45,58,140,0.06);
+      --frame-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    }
+    body { min-height: 100vh; padding: 48px 40px 64px; }
+    .page-title { margin: 0 0 10px; font-size: 28px; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.04em; }
+    .page-subtitle { margin: 0 0 32px; color: var(--text-sec); font-size: 15px; line-height: 1.6; max-width: 920px; }
+    .storyboard { display: flex; gap: 36px; align-items: flex-start; flex-wrap: wrap; }
+    .frame-block { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+    .frame-label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 700; text-align: center; }
+    .phone-shell { width: 390px; height: auto; min-height: 844px; border-radius: 52px; background: #0A0A12; padding: 5px; box-shadow: var(--frame-shadow); position: relative; }
+    .phone-inner { width: 100%; height: auto; min-height: 834px; border-radius: 47px; overflow: hidden; background: var(--bg); position: relative; display: flex; flex-direction: column; }
+    .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 3; }
+    .app { width: 100%; height: auto; min-height: 834px; background: var(--bg); display: flex; flex-direction: column; position: relative; }
+    .status-bar { height: 47px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; font-size: 15px; font-weight: 600; color: var(--text); flex-shrink: 0; position: relative; z-index: 2; }
+    .status-time, .status-icons { padding-top: 10px; }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .topbar { padding: 4px 20px 12px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .hello-small { font-size: 13px; color: var(--text-sec); font-weight: 500; }
+    .hello-name { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.4px; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .bell-shell { position: relative; width: 40px; height: 40px; border-radius: 20px; background: var(--card); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); }
+    .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 4px; background: var(--primary); border: 1.5px solid #F7F8FF; }
+    .avatar { width: 40px; height: 40px; border-radius: 20px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: #fff; box-shadow: 0 2px 8px rgba(108,126,232,0.3); }
+    .scroll { overflow: visible; padding: 0 16px 0; }
+    .card { background: var(--card); border-radius: 16px; border: 0.5px solid var(--border); box-shadow: var(--shadow); margin-bottom: 12px; }
+    .coach-card { background: var(--lavender-bg); border-radius: 16px; border: 0.5px solid rgba(155,132,232,0.25); border-left: 3px solid var(--lavender); padding: 13px 14px; display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
+    .coach-avatar { width: 30px; height: 30px; border-radius: 15px; background: var(--lavender); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .coach-label { font-size: 12px; font-weight: 700; color: var(--lavender-dark); margin-right: 6px; }
+    .coach-time { font-size: 11px; color: var(--text-sec); }
+    .coach-copy { font-size: 13.5px; color: var(--lavender-text); line-height: 1.5; font-weight: 500; margin-top: 4px; }
+    .calorie { padding: 16px 18px; display: flex; align-items: center; gap: 18px; }
+    .ring { position: relative; width: 104px; height: 104px; flex-shrink: 0; }
+    .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .ring-val { font-size: 20px; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.5px; line-height: 1; }
+    .ring-sub { font-size: 10px; color: var(--text-sec); font-weight: 600; }
+    .energy-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .energy-sub { font-size: 12px; color: var(--text-sec); margin-bottom: 12px; }
+    .stat-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .stat-dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+    .stat-label { font-size: 12px; color: var(--text-sec); flex: 1; }
+    .stat-val { font-size: 13px; font-weight: 700; color: var(--text); }
+    .goal-cta { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
+    .setup-pill { padding: 6px 14px; border-radius: 10px; background: var(--chip-bg); color: var(--primary); font-size: 13px; font-weight: 700; }
+    .streak { padding: 13px 16px; }
+    .streak-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .streak-left { display: flex; align-items: center; gap: 8px; }
+    .lvl-pill { padding: 3px 10px; border-radius: 10px; background: var(--chip-bg); font-size: 12px; font-weight: 700; color: var(--primary); }
+    .xp-bar { height: 6px; border-radius: 3px; background: var(--chip-bg); overflow: hidden; }
+    .xp-fill { height: 100%; width: 62%; border-radius: 3px; background: var(--primary); }
+    .xp-sub { font-size: 11px; color: var(--text-sec); margin-top: 4px; }
+    .week { padding: 13px 14px; }
+    .week-label { font-size: 12px; font-weight: 700; color: var(--text-sec); letter-spacing: 0.4px; text-transform: uppercase; margin-bottom: 10px; }
+    .week-row { display: flex; justify-content: space-between; padding: 0 2px; }
+    .day-col { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .day-letter { font-size: 11px; font-weight: 600; color: var(--text-sec); }
+    .day-letter.today { color: var(--primary); }
+    .day-box { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--border); background: transparent; }
+    .day-box.completed { background: var(--teal); border-color: var(--teal); }
+    .day-box.today { border-color: var(--primary); }
+    .day-box.missed { border-color: var(--gold); }
+    .day-dot { width: 8px; height: 8px; border-radius: 4px; background: var(--border); }
+    .day-box.completed .day-dot { background: #fff; }
+    .day-box.today .day-dot { background: var(--primary); }
+    .day-box.scheduled .day-dot { background: var(--text-sec); }
+    .day-box.missed .day-dot { background: var(--gold); }
+    .plan-head { background: var(--primary-dark); padding: 10px 16px 9px; display: flex; align-items: center; justify-content: space-between; }
+    .plan-overline { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.65); letter-spacing: 0.8px; }
+    .plan-day { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; }
+    .plan-body { padding: 14px 16px; }
+    .plan-title { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.2px; margin-bottom: 8px; }
+    .mini-stats { display: flex; gap: 14px; margin-bottom: 12px; }
+    .mini-num { font-size: 14px; font-weight: 700; color: var(--text); }
+    .mini-unit { font-size: 11px; color: var(--text-sec); }
+    .ex-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .ex-row { display: flex; align-items: center; gap: 8px; }
+    .ex-bullet { width: 5px; height: 5px; border-radius: 3px; background: var(--primary); flex-shrink: 0; }
+    .ex-copy { font-size: 13px; color: var(--text-sec); font-weight: 500; }
+    .start-btn { height: 46px; border-radius: 12px; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; box-shadow: 0 3px 10px rgba(108,126,232,0.3); }
+    .rest-card { padding: 18px; text-align: center; }
+    .rest-emoji { font-size: 32px; margin-bottom: 8px; }
+    .rest-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .rest-copy { font-size: 13px; color: var(--text-sec); line-height: 1.5; margin-bottom: 14px; }
+    .missed-card { padding: 16px; }
+    .missed-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .missed-chiprow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .reason-chip { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--card); color: var(--text); font-size: 13px; font-weight: 500; }
+    .reason-chip.selected { border-color: var(--gold); background: #FEF3C7; color: #92400E; font-weight: 700; }
+    .log-btn { margin-top: 12px; width: 100%; height: 42px; border-radius: 12px; background: var(--primary); color: #fff; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .noplan { background: var(--lavender-bg); border-radius: 16px; border: 0.5px solid rgba(155,132,232,0.3); padding: 18px; }
+    .noplan-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .noplan-icon { width: 32px; height: 32px; border-radius: 10px; background: var(--lavender); display: flex; align-items: center; justify-content: center; color: #fff; }
+    .noplan-title { font-size: 15px; font-weight: 700; color: var(--lavender-dark); }
+    .noplan-copy { font-size: 13px; color: var(--lavender-text); line-height: 1.55; margin-bottom: 14px; }
+    .btn-col { display: flex; flex-direction: column; gap: 8px; }
+    .btn-row { display: flex; gap: 8px; }
+    .btn-main, .btn-sec, .btn-sec-muted { display: flex; align-items: center; justify-content: center; text-decoration: none; font-weight: 700; }
+    .btn-main { height: 44px; border-radius: 12px; background: var(--primary); color: #fff; font-size: 14px; }
+    .btn-sec, .btn-sec-muted { flex: 1; height: 38px; border-radius: 10px; font-size: 13px; }
+    .btn-sec { border: 1.5px solid var(--primary); color: var(--primary); }
+    .btn-sec-muted { border: 1.5px solid var(--border); color: var(--text); }
+    .fab { position: absolute; right: 18px; bottom: 96px; width: 52px; height: 52px; border-radius: 26px; background: var(--primary); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(108,126,232,0.45); z-index: 25; }
+    .bottom-nav { position: static; height: 84px; background: var(--card); border-top: 0.5px solid #E8EAF8; display: flex; z-index: 30; }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding-bottom: 8px; }
+    .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1px; }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">S-09 Home for Figma</h1>
+  <p class="page-subtitle">
+    This rebuilt version preserves the original Home screen icons and component styling more closely. It includes the 4 main states: plan active, rest day, missed workout, and no plan yet.
+  </p>
+
+  <div class="storyboard">
+    <section class="frame-block">
+      <div class="frame-label">Plan Active<br>Today</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar"><div class="status-time">9:41</div><div class="status-icons"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill="#3D3D5C"/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill="#3D3D5C" opacity="0.4"/></svg></div></div>
+        <div class="topbar">
+          <div><div class="hello-small">Good morning</div><div class="hello-name">Marcus</div></div>
+          <div class="top-actions">
+            <div class="bell-shell">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8z" stroke="#3D3D5C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.3 20a1.9 1.9 0 003.4 0" stroke="#3D3D5C" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <div class="notif-dot"></div>
+            </div>
+            <div class="avatar">M</div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="coach-card"><div class="coach-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.2" fill="#fff"/></svg></div><div style="flex:1;min-width:0;"><div><span class="coach-label">WiseCoach</span><span class="coach-time">· 8 min ago</span></div><div class="coach-copy">Great week so far! Your Push A volume is up 12% — shoulders are responding well. Ready to hit it again?</div></div><div style="padding-top:6px;flex-shrink:0;"><svg width="7" height="12" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="#9B84E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card calorie">
+            <div class="ring"><svg width="104" height="104" viewBox="0 0 104 104"><circle cx="52" cy="52" r="44" fill="none" stroke="#E6EAFE" stroke-width="7"/><circle cx="52" cy="52" r="44" fill="none" stroke="#6C7EE8" stroke-width="7" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="82.94" transform="rotate(-90 52 52)"/></svg><div class="ring-center"><div class="ring-val">420</div><div class="ring-sub">kcal</div></div></div>
+            <div style="flex:1;"><div class="energy-title">Today's energy</div><div class="energy-sub">Goal 600 kcal</div><div class="stat-row"><div class="stat-dot" style="background:#6C7EE8;"></div><div class="stat-label">Gym</div><div class="stat-val">280 kcal</div></div><div class="stat-row"><div class="stat-dot" style="background:#4BB8CC;"></div><div class="stat-label">Cardio</div><div class="stat-val">140 kcal</div></div><div class="stat-row"><div class="stat-dot" style="background:#8A8A9E;"></div><div class="stat-label">Left</div><div class="stat-val">180 kcal</div></div></div>
+          </div>
+          <div class="card streak"><div class="streak-top"><div class="streak-left"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3s5 4 5 9a5 5 0 01-10 0c0-2 1-3 2-4-.5 1.5.5 3 2 3-.5-3 1-5 1-8z" fill="#4BB8CC" stroke="#4BB8CC" stroke-width="1.2" stroke-linejoin="round"/></svg><div><span style="font-size:17px;font-weight:800;color:#3D3D5C;">12</span><span style="font-size:13px;color:#8A8A9E;font-weight:500;"> day streak</span></div></div><div style="display:flex;align-items:center;gap:6px;"><div class="lvl-pill">Lvl 7</div><div style="font-size:12px;color:#8A8A9E;font-weight:500;">2,340 XP</div></div></div><div class="xp-bar"><div class="xp-fill"></div></div><div class="xp-sub">660 XP to Level 8</div></div>
+          <div class="card week"><div class="week-label">This Week</div><div class="week-row"><div class="day-col"><div class="day-letter">S</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">M</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">T</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter today">W</div><div class="day-box today"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">T</div><div class="day-box scheduled"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">F</div><div class="day-box"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">S</div><div class="day-box"><div class="day-dot"></div></div></div></div></div>
+          <div class="card"><div class="plan-head"><div class="plan-overline">TODAY · PUSH A</div><div class="plan-day">Day 5 of 24</div></div><div class="plan-body"><div class="plan-title">Chest, Shoulders &amp; Triceps</div><div class="mini-stats"><div><span class="mini-num">45</span> <span class="mini-unit">min</span></div><div><span class="mini-num">5</span> <span class="mini-unit">exercises</span></div><div><span class="mini-num">~280</span> <span class="mini-unit">kcal</span></div></div><div class="ex-list"><div class="ex-row"><div class="ex-bullet"></div><div class="ex-copy">Bench Press · 4×8</div></div><div class="ex-row"><div class="ex-bullet"></div><div class="ex-copy">Overhead Press · 3×10</div></div><div class="ex-row"><div class="ex-bullet"></div><div class="ex-copy">Tricep Pushdown · 3×12</div></div><div style="font-size:12px;color:#8A8A9E;padding-left:13px;">+2 more exercises</div></div><div class="start-btn">Start Workout</div></div></div>
+        </div>
+        <div class="fab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        <div class="bottom-nav">
+          <div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a0.5 0.5 0 01-0.5 0.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A0.5 0.5 0 013 21V10.5z" fill="#6C7EE8" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#6C7EE8;">Home</span></div>
+          <div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="20" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="6.5" y="11.5" width="2" height="4" rx="0.5" fill="#8A8A9E"/><rect x="17.5" y="11.5" width="2" height="4" rx="0.5" fill="#8A8A9E"/><rect x="8.5" y="12" width="9" height="3" rx="0.8" fill="#8A8A9E"/></svg><span class="nav-label" style="color:#8A8A9E;">Plans</span></div>
+          <div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Coach</span></div>
+          <div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#8A8A9E" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Club</span></div>
+          <div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Progress</span></div>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Plan Active<br>Rest Day</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar"><div class="status-time">9:41</div><div class="status-icons"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill="#3D3D5C"/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill="#3D3D5C" opacity="0.4"/></svg></div></div>
+        <div class="topbar"><div><div class="hello-small">Good morning</div><div class="hello-name">Marcus</div></div><div class="top-actions"><div class="bell-shell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8z" stroke="#3D3D5C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.3 20a1.9 1.9 0 003.4 0" stroke="#3D3D5C" stroke-width="1.6" stroke-linecap="round"/></svg><div class="notif-dot"></div></div><div class="avatar">M</div></div></div>
+        <div class="scroll">
+          <div class="coach-card"><div class="coach-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.2" fill="#fff"/></svg></div><div style="flex:1;"><div><span class="coach-label">WiseCoach</span><span class="coach-time">· 8 min ago</span></div><div class="coach-copy">Great week so far! Your Push A volume is up 12% — shoulders are responding well. Ready to hit it again?</div></div><div style="padding-top:6px;"><svg width="7" height="12" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="#9B84E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card calorie"><div class="ring"><svg width="104" height="104" viewBox="0 0 104 104"><circle cx="52" cy="52" r="44" fill="none" stroke="#E6EAFE" stroke-width="7"/><circle cx="52" cy="52" r="44" fill="none" stroke="#6C7EE8" stroke-width="7" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="82.94" transform="rotate(-90 52 52)"/></svg><div class="ring-center"><div class="ring-val">420</div><div class="ring-sub">kcal</div></div></div><div style="flex:1;"><div class="energy-title">Today's energy</div><div class="energy-sub">Goal 600 kcal</div><div class="stat-row"><div class="stat-dot" style="background:#6C7EE8;"></div><div class="stat-label">Gym</div><div class="stat-val">280 kcal</div></div><div class="stat-row"><div class="stat-dot" style="background:#4BB8CC;"></div><div class="stat-label">Cardio</div><div class="stat-val">140 kcal</div></div><div class="stat-row"><div class="stat-dot" style="background:#8A8A9E;"></div><div class="stat-label">Left</div><div class="stat-val">180 kcal</div></div></div></div>
+          <div class="card streak"><div class="streak-top"><div class="streak-left"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3s5 4 5 9a5 5 0 01-10 0c0-2 1-3 2-4-.5 1.5.5 3 2 3-.5-3 1-5 1-8z" fill="#4BB8CC" stroke="#4BB8CC" stroke-width="1.2" stroke-linejoin="round"/></svg><div><span style="font-size:17px;font-weight:800;color:#3D3D5C;">12</span><span style="font-size:13px;color:#8A8A9E;font-weight:500;"> day streak</span></div></div><div style="display:flex;align-items:center;gap:6px;"><div class="lvl-pill">Lvl 7</div><div style="font-size:12px;color:#8A8A9E;font-weight:500;">2,340 XP</div></div></div><div class="xp-bar"><div class="xp-fill"></div></div><div class="xp-sub">660 XP to Level 8</div></div>
+          <div class="card week"><div class="week-label">This Week</div><div class="week-row"><div class="day-col"><div class="day-letter">S</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">M</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">T</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter today">W</div><div class="day-box today"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">T</div><div class="day-box scheduled"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">F</div><div class="day-box"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">S</div><div class="day-box"><div class="day-dot"></div></div></div></div></div>
+          <div class="card"><div class="rest-card"><div class="rest-emoji">😴</div><div class="rest-title">Rest Day</div><div class="rest-copy">Recovery is part of the plan. Your next session is tomorrow — Legs A.</div><div style="font-size:13px;color:#6C7EE8;font-weight:700;">View Full Schedule →</div></div></div>
+        </div>
+        <div class="fab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        <div class="bottom-nav"><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a0.5 0.5 0 01-0.5 0.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A0.5 0.5 0 013 21V10.5z" fill="#6C7EE8" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#6C7EE8;">Home</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="20" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="6.5" y="11.5" width="2" height="4" rx="0.5" fill="#8A8A9E"/><rect x="17.5" y="11.5" width="2" height="4" rx="0.5" fill="#8A8A9E"/><rect x="8.5" y="12" width="9" height="3" rx="0.8" fill="#8A8A9E"/></svg><span class="nav-label" style="color:#8A8A9E;">Plans</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Coach</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#8A8A9E" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Club</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Progress</span></div></div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Missed Workout</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar"><div class="status-time">9:41</div><div class="status-icons"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill="#3D3D5C"/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill="#3D3D5C" opacity="0.4"/></svg></div></div>
+        <div class="topbar"><div><div class="hello-small">Good morning</div><div class="hello-name">Marcus</div></div><div class="top-actions"><div class="bell-shell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8z" stroke="#3D3D5C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.3 20a1.9 1.9 0 003.4 0" stroke="#3D3D5C" stroke-width="1.6" stroke-linecap="round"/></svg><div class="notif-dot"></div></div><div class="avatar">M</div></div></div>
+        <div class="scroll">
+          <div class="coach-card"><div class="coach-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.2" fill="#fff"/></svg></div><div style="flex:1;"><div><span class="coach-label">WiseCoach</span><span class="coach-time">· 8 min ago</span></div><div class="coach-copy">Great week so far! Your Push A volume is up 12% — shoulders are responding well. Ready to hit it again?</div></div><div style="padding-top:6px;"><svg width="7" height="12" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="#9B84E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card goal-cta"><div><div style="font-size:14px;font-weight:700;color:#3D3D5C;">Set a calorie goal</div><div style="font-size:12px;color:#8A8A9E;margin-top:2px;">Track your energy burn each day</div></div><div class="setup-pill">Set up</div></div>
+          <div class="card streak"><div class="streak-top"><div class="streak-left"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3s5 4 5 9a5 5 0 01-10 0c0-2 1-3 2-4-.5 1.5.5 3 2 3-.5-3 1-5 1-8z" fill="#4BB8CC" stroke="#4BB8CC" stroke-width="1.2" stroke-linejoin="round"/></svg><div><span style="font-size:17px;font-weight:800;color:#3D3D5C;">12</span><span style="font-size:13px;color:#8A8A9E;font-weight:500;"> day streak</span></div></div><div style="display:flex;align-items:center;gap:6px;"><div class="lvl-pill">Lvl 7</div><div style="font-size:12px;color:#8A8A9E;font-weight:500;">2,340 XP</div></div></div><div class="xp-bar"><div class="xp-fill"></div></div><div class="xp-sub">660 XP to Level 8</div></div>
+          <div class="card week"><div class="week-label">This Week</div><div class="week-row"><div class="day-col"><div class="day-letter">S</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">M</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">T</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter today">W</div><div class="day-box missed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">T</div><div class="day-box scheduled"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">F</div><div class="day-box"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">S</div><div class="day-box"><div class="day-dot"></div></div></div></div></div>
+          <div class="card missed-card"><div class="missed-top"><div style="width:8px;height:8px;border-radius:4px;background:#F59E0B;"></div><div style="font-size:14px;font-weight:700;color:#3D3D5C;">Looks like you missed a workout</div></div><div style="font-size:13px;color:#8A8A9E;">What happened? We'll adjust your plan accordingly.</div><div class="missed-chiprow"><div class="reason-chip">Busy</div><div class="reason-chip selected">Tired</div><div class="reason-chip">Injured</div><div class="reason-chip">Other</div></div><div class="log-btn">Log &amp; Continue Plan</div></div>
+        </div>
+        <div class="fab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        <div class="bottom-nav"><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a0.5 0.5 0 01-0.5 0.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A0.5 0.5 0 013 21V10.5z" fill="#6C7EE8" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#6C7EE8;">Home</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="20" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="6.5" y="11.5" width="2" height="4" rx="0.5" fill="#8A8A9E"/><rect x="17.5" y="11.5" width="2" height="4" rx="0.5" fill="#8A8A9E"/><rect x="8.5" y="12" width="9" height="3" rx="0.8" fill="#8A8A9E"/></svg><span class="nav-label" style="color:#8A8A9E;">Plans</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Coach</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#8A8A9E" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Club</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Progress</span></div></div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">No Plan Yet</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar"><div class="status-time">9:41</div><div class="status-icons"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill="#3D3D5C"/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill="#3D3D5C" opacity="0.4"/></svg></div></div>
+        <div class="topbar"><div><div class="hello-small">Good morning</div><div class="hello-name">Marcus</div></div><div class="top-actions"><div class="bell-shell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8z" stroke="#3D3D5C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.3 20a1.9 1.9 0 003.4 0" stroke="#3D3D5C" stroke-width="1.6" stroke-linecap="round"/></svg><div class="notif-dot"></div></div><div class="avatar">M</div></div></div>
+        <div class="scroll">
+          <div class="coach-card"><div class="coach-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.2" fill="#fff"/></svg></div><div style="flex:1;"><div><span class="coach-label">WiseCoach</span><span class="coach-time">· 8 min ago</span></div><div class="coach-copy">Great week so far! Your Push A volume is up 12% — shoulders are responding well. Ready to hit it again?</div></div><div style="padding-top:6px;"><svg width="7" height="12" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="#9B84E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card goal-cta"><div><div style="font-size:14px;font-weight:700;color:#3D3D5C;">Set a calorie goal</div><div style="font-size:12px;color:#8A8A9E;margin-top:2px;">Track your energy burn each day</div></div><div class="setup-pill">Set up</div></div>
+          <div class="card streak"><div class="streak-top"><div class="streak-left"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3s5 4 5 9a5 5 0 01-10 0c0-2 1-3 2-4-.5 1.5.5 3 2 3-.5-3 1-5 1-8z" fill="#4BB8CC" stroke="#4BB8CC" stroke-width="1.2" stroke-linejoin="round"/></svg><div><span style="font-size:17px;font-weight:800;color:#3D3D5C;">12</span><span style="font-size:13px;color:#8A8A9E;font-weight:500;"> day streak</span></div></div><div style="display:flex;align-items:center;gap:6px;"><div class="lvl-pill">Lvl 7</div><div style="font-size:12px;color:#8A8A9E;font-weight:500;">2,340 XP</div></div></div><div class="xp-bar"><div class="xp-fill"></div></div><div class="xp-sub">660 XP to Level 8</div></div>
+          <div class="card week"><div class="week-label">This Week</div><div class="week-row"><div class="day-col"><div class="day-letter">S</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">M</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">T</div><div class="day-box completed"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter today">W</div><div class="day-box today"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">T</div><div class="day-box scheduled"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">F</div><div class="day-box"><div class="day-dot"></div></div></div><div class="day-col"><div class="day-letter">S</div><div class="day-box"><div class="day-dot"></div></div></div></div></div>
+          <div class="noplan"><div class="noplan-top"><div class="noplan-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.2" fill="#fff"/></svg></div><div class="noplan-title">Welcome to WiseWorkout!</div></div><div class="noplan-copy">Let's get you set up with a training plan. Answer a few questions and WiseCoach will match you with the perfect plan.</div><div class="btn-col"><div class="btn-main">Take Plan Match Quiz</div><div class="btn-row"><div class="btn-sec">Explore Plans</div><div class="btn-sec-muted">Build Routine</div></div></div></div>
+        </div>
+        <div class="fab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        <div class="bottom-nav"><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a0.5 0.5 0 01-0.5 0.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A0.5 0.5 0 013 21V10.5z" fill="#6C7EE8" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#6C7EE8;">Home</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="20" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="6.5" y="11.5" width="2" height="4" rx="0.5" fill="#8A8A9E"/><rect x="17.5" y="11.5" width="2" height="4" rx="0.5" fill="#8A8A9E"/><rect x="8.5" y="12" width="9" height="3" rx="0.8" fill="#8A8A9E"/></svg><span class="nav-label" style="color:#8A8A9E;">Plans</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Coach</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#8A8A9E" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Club</span></div><div class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Progress</span></div></div>
+      </div></div></div>
+    </section>
+  </div>
+</body>
+</html>

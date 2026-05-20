@@ -1,0 +1,157 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-44 Your Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0;padding:0;background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .lbl{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+</style>
+</head><body>
+<div class="stage">
+  <div class="lbl">S-44 · Your Plan</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+const GOLD='#F59E0B';
+const PATHS={
+  'chevron-left':"M15 18l-6-6 6-6",
+  check:"M20 6L9 17l-5-5",
+  crown:"M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
+  zap:"M13 2L3 14h9l-1 8 10-12h-9l1-8z",
+  'bar-chart':"M12 20V10M18 20V4M6 20v-4",
+  users:"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
+  activity:"M22 12h-4l-3 9L9 3l-3 9H2",
+  lock:"M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2zM17 11V7a5 5 0 0 0-10 0v4",
+  'message-circle':"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+  'rotate-ccw':"M1 4v6h6M3.51 15a9 9 0 1 0 .49-3.95",
+};
+function Icon({name,size=16,color='currentColor',style:s}){
+  const p=PATHS[name];if(!p)return null;
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-flex',flexShrink:0,...s}}><path d={p}/></svg>;
+}
+function StatusBar(){
+  return <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0,background:WW.card}}>
+    <span style={{paddingTop:10}}>9:41</span>
+    <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+      <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+      <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+    </div>
+  </div>;
+}
+
+const PREMIUM_FEATURES=[
+  {icon:'message-circle',text:'Unlimited WiseCoach messages'},
+  {icon:'bar-chart',text:'Advanced progress charts & insights'},
+  {icon:'users',text:'Unlimited friend connections'},
+  {icon:'activity',text:'All workout plan templates'},
+  {icon:'zap',text:'Priority AI workout generation'},
+  {icon:'lock',text:'Custom private club challenges'},
+  {icon:'crown',text:'Premium badge & profile flair'},
+];
+
+function App(){
+  const [upgrading,setUpgrading]=React.useState(false);
+
+  function handleUpgrade(){
+    setUpgrading(true);
+    setTimeout(()=>{
+      alert('In-app purchase flow would open here.\n\n(WiseWorkout Premium — $9.99/month)');
+      setUpgrading(false);
+    },600);
+  }
+
+  const CheckItem=({icon,text})=>(
+    <div style={{display:'flex',alignItems:'center',gap:10,padding:'6px 0'}}>
+      <div style={{width:28,height:28,borderRadius:8,background:'rgba(245,158,11,.12)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+        <Icon name={icon} size={14} color={GOLD}/>
+      </div>
+      <span style={{fontSize:14,color:WW.text,lineHeight:1.3}}>{text}</span>
+    </div>
+  );
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,fontFamily:"'Inter',system-ui,sans-serif"}}>
+      <StatusBar/>
+      <div style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',flexShrink:0,position:'relative'}}>
+        <a href="S-35-Settings.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,textDecoration:'none',flexShrink:0}}>
+          <Icon name="chevron-left" size={18} color={WW.textSec}/>
+        </a>
+        <span style={{position:'absolute',left:'50%',transform:'translateX(-50%)',fontSize:18,fontWeight:600,color:WW.primaryDark}}>Your Plan</span>
+      </div>
+
+      <div style={{flex:1,overflowY:'auto',padding:'20px 16px 40px',display:'flex',flexDirection:'column',gap:14}}>
+
+        {/* Current plan — Free */}
+        <div style={{background:WW.card,borderRadius:16,padding:'18px 16px',border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}}>
+            <div style={{fontSize:18,fontWeight:700,color:WW.primaryDark}}>Free</div>
+            <div style={{padding:'4px 10px',borderRadius:20,background:'#E6EAFE',color:WW.primaryDark,fontSize:12,fontWeight:600}}>Current plan</div>
+          </div>
+          <div style={{fontSize:13,color:WW.textSec,marginBottom:12,lineHeight:1.5}}>Basic access to workouts, manual logging, and limited WiseCoach messages.</div>
+          <div style={{display:'flex',flexDirection:'column',gap:4}}>
+            {['Log workouts manually','10 WiseCoach messages/month','Access community club (read-only)','Basic progress charts'].map(f=>(
+              <div key={f} style={{display:'flex',alignItems:'center',gap:8}}>
+                <Icon name="check" size={14} color={WW.textSec}/>
+                <span style={{fontSize:13,color:WW.textSec}}>{f}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Premium plan */}
+        <div style={{background:WW.card,borderRadius:16,padding:'18px 16px',border:`2px solid ${GOLD}`,boxShadow:`0 4px 16px rgba(245,158,11,.12)`}}>
+          {/* Header */}
+          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
+            <div style={{width:30,height:30,borderRadius:8,background:`rgba(245,158,11,.12)`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <Icon name="crown" size={16} color={GOLD}/>
+            </div>
+            <div style={{fontSize:18,fontWeight:700,color:'#92400E'}}>Premium</div>
+            <div style={{marginLeft:'auto',padding:'4px 10px',borderRadius:20,background:`rgba(245,158,11,.1)`,color:GOLD,fontSize:12,fontWeight:700}}>BEST VALUE</div>
+          </div>
+          <div style={{fontSize:13,color:WW.textSec,marginBottom:14,lineHeight:1.5}}>Unlock the full WiseWorkout experience with unlimited coaching and advanced insights.</div>
+
+          {/* Feature list */}
+          <div style={{display:'flex',flexDirection:'column',gap:2,marginBottom:16}}>
+            {PREMIUM_FEATURES.map(f=><CheckItem key={f.text} icon={f.icon} text={f.text}/>)}
+          </div>
+
+          {/* Pricing */}
+          <div style={{display:'flex',alignItems:'baseline',gap:6,marginBottom:16}}>
+            <span style={{fontSize:28,fontWeight:700,color:'#92400E'}}>$9.99</span>
+            <span style={{fontSize:14,color:WW.textSec}}>/ month</span>
+            <span style={{fontSize:13,color:WW.textSec,marginLeft:4}}>or $79.99 / year</span>
+          </div>
+
+          {/* Upgrade button */}
+          <button onClick={handleUpgrade} style={{width:'100%',height:52,borderRadius:16,border:'none',background:upgrading?'#D97706':GOLD,color:'#fff',fontSize:16,fontWeight:600,cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center',gap:8,transition:'background .2s'}}>
+            <Icon name="crown" size={18} color="#fff"/>
+            {upgrading?'Opening…':'Upgrade to Premium'}
+          </button>
+
+          {/* 7-day trial note */}
+          <div style={{textAlign:'center',fontSize:12,color:WW.textSec,marginTop:10}}>7-day free trial · Cancel anytime</div>
+        </div>
+
+        {/* Restore purchase */}
+        <button onClick={()=>alert('Restore purchase flow would open here.')} style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,padding:'14px',borderRadius:12,border:`0.5px solid ${WW.border}`,background:WW.card,color:WW.textSec,fontSize:14,cursor:'pointer',fontFamily:'inherit',boxShadow:WW.shadow}}>
+          <Icon name="rotate-ccw" size={15} color={WW.textSec}/>
+          Restore Purchase
+        </button>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

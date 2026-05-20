@@ -1,0 +1,280 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-39 BP Profile Management</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-39 · BP Profile Management</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+function StatusBar(){return(<div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}><div style={{paddingTop:10}}>9:41</div><div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg></div></div>);}
+
+const VIEWS_DATA=[{l:'M',v:3},{l:'T',v:7},{l:'W',v:5},{l:'T',v:12},{l:'F',v:9},{l:'S',v:15},{l:'S',v:11}];
+
+const INIT_CERTS=[
+  {id:1,name:'NASM Certified Personal Trainer',issuer:'NASM',expiry:'Mar 2028',pending:false},
+  {id:2,name:'CPR & First Aid',issuer:'Singapore Red Cross',expiry:'Aug 2026',pending:true},
+];
+
+function App(){
+  const [visible,setVisible]=React.useState(true);
+  const [visModal,setVisModal]=React.useState(false);
+  const [about,setAbout]=React.useState('Certified personal trainer with 6+ years helping clients build strength, lose weight, and improve overall fitness. Specialising in corrective exercise and functional movement.');
+  const [editAbout,setEditAbout]=React.useState(false);
+  const [aboutDraft,setAboutDraft]=React.useState(about);
+  const [aboutSaved,setAboutSaved]=React.useState(false);
+  const [desc,setDesc]=React.useState('Offering personalised 1-on-1 PT sessions, online coaching, and group fitness classes. Packages available from 8 to 24 sessions. Flexible scheduling including early mornings and weekends.');
+  const [descSaved,setDescSaved]=React.useState(false);
+  const [certs,setCerts]=React.useState(INIT_CERTS);
+  const [addCertSheet,setAddCertSheet]=React.useState(false);
+  const [editCert,setEditCert]=React.useState(null);
+  const [newCert,setNewCert]=React.useState({name:'',issuer:'',expiry:''});
+  const [removeConfirm,setRemoveConfirm]=React.useState(null);
+  const [saved,setSaved]=React.useState(false);
+
+  const maxDesc=300;
+  const maxViews=Math.max(...VIEWS_DATA.map(d=>d.v),1);
+  const totalViews=VIEWS_DATA.reduce((s,d)=>s+d.v,0);
+
+  const handleVisToggle=()=>{
+    if(visible){setVisModal(true);}
+    else{setVisible(true);}
+  };
+
+  const confirmHide=()=>{setVisible(false);setVisModal(false);};
+
+  const saveAbout=()=>{setAbout(aboutDraft);setEditAbout(false);setAboutSaved(true);setTimeout(()=>setAboutSaved(false),2000);};
+
+  const submitNewCert=()=>{
+    if(!newCert.name||!newCert.issuer||!newCert.expiry)return;
+    if(editCert){
+      setCerts(p=>p.map(c=>c.id===editCert?{...c,...newCert,pending:true}:c));
+      setEditCert(null);
+    } else {
+      setCerts(p=>[...p,{id:Date.now(),...newCert,pending:true}]);
+    }
+    setNewCert({name:'',issuer:'',expiry:''});
+    setAddCertSheet(false);
+  };
+
+  const openEdit=(cert)=>{setEditCert(cert.id);setNewCert({name:cert.name,issuer:cert.issuer,expiry:cert.expiry});setAddCertSheet(true);};
+  const removeCert=(id)=>{setCerts(p=>p.filter(c=>c.id!==id));setRemoveConfirm(null);};
+
+  const handleSaveAll=()=>{setSaved(true);setTimeout(()=>setSaved(false),2000);};
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,position:'relative'}}>
+      <StatusBar/>
+
+      {/* Profile header */}
+      <div style={{background:WW.card,borderBottom:'0.5px solid #E8EAF8',flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',padding:'10px 18px 14px',gap:12}}>
+          <a href="S-38-BP-Status.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,textDecoration:'none',flexShrink:0}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke={WW.primaryDark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </a>
+          {/* Avatar */}
+          <div style={{position:'relative',flexShrink:0}}>
+            <div style={{width:52,height:52,borderRadius:26,background:`linear-gradient(135deg,${WW.primary},${WW.lavender})`,display:'flex',alignItems:'center',justifyContent:'center',boxShadow:`0 0 0 3px ${WW.chipBg}`}}>
+              <span style={{fontSize:20,fontWeight:800,color:'#fff'}}>JC</span>
+            </div>
+            <button style={{position:'absolute',bottom:0,right:-2,width:20,height:20,borderRadius:10,background:WW.primary,border:'2px solid #fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
+            </button>
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:16,fontWeight:800,color:WW.primaryDark}}>James Chen</div>
+            <div style={{fontSize:12,color:WW.textSec}}>Personal Trainer</div>
+          </div>
+          {/* Verified badge */}
+          <div style={{display:'flex',alignItems:'center',gap:4,background:'#D1FAE5',border:'0.5px solid rgba(5,150,105,.3)',borderRadius:20,padding:'4px 10px',flexShrink:0}}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#D1FAE5" stroke="#059669" strokeWidth="1.5"/><path d="M9 12l2 2 4-4" stroke="#059669" strokeWidth="1.8" strokeLinecap="round"/></svg>
+            <span style={{fontSize:11,fontWeight:700,color:'#059669'}}>Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{flex:1,overflowY:'auto',padding:'14px 18px 100px'}}>
+
+        {/* Stats card */}
+        <div style={{background:WW.elevated,borderRadius:16,padding:'14px 16px',marginBottom:14,border:`0.5px solid ${WW.border}`}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+            <div>
+              <div style={{fontSize:22,fontWeight:900,color:WW.primaryDark}}>{totalViews}</div>
+              <div style={{fontSize:12,color:WW.textSec}}>profile views this week</div>
+            </div>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke={WW.primary} strokeWidth="1.8" strokeLinecap="round"/></svg>
+          </div>
+          {/* Mini bar chart */}
+          <div style={{display:'flex',alignItems:'flex-end',gap:4,height:40}}>
+            {VIEWS_DATA.map((d,i)=>(
+              <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2}}>
+                <div style={{width:'100%',borderRadius:'2px 2px 0 0',background:WW.primary,height:`${(d.v/maxViews)*36}px`,opacity:.7+d.v/maxViews*.3,minHeight:3}}/>
+                <div style={{fontSize:9,color:WW.textSec}}>{d.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Visibility toggle */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'14px 16px',marginBottom:14,boxShadow:WW.shadow}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <div>
+              <div style={{fontSize:14,fontWeight:700,color:WW.text}}>Profile visibility</div>
+              <div style={{fontSize:12,color:visible?'#10B981':'#EF4444',fontWeight:600,marginTop:2}}>{visible?'Active — visible to users':'Unavailable — hidden from users'}</div>
+            </div>
+            <button onClick={handleVisToggle} style={{width:52,height:30,borderRadius:15,background:visible?WW.primary:WW.border,border:'none',cursor:'pointer',position:'relative',transition:'background .2s',flexShrink:0}}>
+              <div style={{position:'absolute',top:4,left:visible?26:4,width:22,height:22,borderRadius:11,background:'#fff',transition:'left .2s',boxShadow:'0 1px 4px rgba(0,0,0,.2)'}}/>
+            </button>
+          </div>
+        </div>
+
+        {/* About section */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'14px 16px',marginBottom:14,boxShadow:WW.shadow}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
+            <div style={{fontSize:13,fontWeight:700,color:WW.primaryDark}}>About</div>
+            <button onClick={()=>{setAboutDraft(about);setEditAbout(p=>!p);}} style={{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',cursor:'pointer',color:WW.primary,fontSize:12,fontWeight:700}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke={WW.primary} strokeWidth="1.8" strokeLinecap="round"/></svg>
+              {editAbout?'Cancel':'Edit'}
+            </button>
+          </div>
+          {editAbout?(
+            <>
+              <textarea value={aboutDraft} onChange={e=>setAboutDraft(e.target.value)}
+                style={{width:'100%',height:100,borderRadius:12,border:`1.5px solid ${WW.border}`,padding:'10px 12px',fontSize:13,color:WW.text,outline:'none',resize:'none',boxSizing:'border-box',fontFamily:'inherit'}}/>
+              <button onClick={saveAbout} style={{width:'100%',height:40,borderRadius:10,background:WW.primary,color:'#fff',border:'none',fontSize:13,fontWeight:700,cursor:'pointer',marginTop:8}}>
+                {aboutSaved?'✓ Saved':'Save'}
+              </button>
+            </>
+          ):(
+            <div style={{fontSize:13,color:WW.text,lineHeight:1.6,whiteSpace:'pre-wrap'}}>{about}</div>
+          )}
+        </div>
+
+        {/* Certifications */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'14px 16px',marginBottom:14,boxShadow:WW.shadow}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+            <div style={{fontSize:13,fontWeight:700,color:WW.primaryDark}}>Certifications</div>
+          </div>
+          {certs.map((cert,i)=>(
+            <div key={cert.id} style={{borderTop:i>0?`0.5px solid ${WW.border}`:'none',paddingTop:i>0?12:0,marginTop:i>0?12:0}}>
+              <div style={{display:'flex',alignItems:'flex-start',gap:10}}>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap',marginBottom:3}}>
+                    <span style={{fontSize:13,fontWeight:700,color:WW.text}}>{cert.name}</span>
+                    {cert.pending&&(
+                      <span style={{fontSize:10,fontWeight:700,background:'#FEF3C7',color:'#92400E',padding:'2px 7px',borderRadius:8,flexShrink:0}}>Pending Review</span>
+                    )}
+                  </div>
+                  <div style={{fontSize:11,color:WW.textSec}}>{cert.issuer}</div>
+                  <div style={{fontSize:11,color:WW.textSec,marginTop:1}}>Expires {cert.expiry}</div>
+                </div>
+                <div style={{display:'flex',gap:8,flexShrink:0}}>
+                  <button onClick={()=>openEdit(cert)} style={{background:'none',border:'none',color:WW.primary,fontSize:12,fontWeight:700,cursor:'pointer',padding:0}}>Edit</button>
+                  <button onClick={()=>setRemoveConfirm(cert.id)} style={{background:'none',border:'none',color:'#EF4444',fontSize:12,fontWeight:700,cursor:'pointer',padding:0}}>Remove</button>
+                </div>
+              </div>
+            </div>
+          ))}
+          {/* Add cert button */}
+          <button onClick={()=>{setEditCert(null);setNewCert({name:'',issuer:'',expiry:''});setAddCertSheet(true);}}
+            style={{display:'flex',alignItems:'center',gap:8,marginTop:14,padding:'10px 14px',borderRadius:12,border:`1.5px dashed ${WW.primary}`,background:WW.chipBg,color:WW.primary,fontSize:13,fontWeight:700,cursor:'pointer',width:'100%',justifyContent:'center'}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke={WW.primary} strokeWidth="1.8"/><path d="M12 8v8M8 12h8" stroke={WW.primary} strokeWidth="1.8" strokeLinecap="round"/></svg>
+            Add Certification
+          </button>
+        </div>
+
+        {/* Service description */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'14px 16px',marginBottom:20,boxShadow:WW.shadow}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
+            <div style={{fontSize:13,fontWeight:700,color:WW.primaryDark}}>Service Description</div>
+            <div style={{fontSize:11,color:desc.length>270?'#EF4444':WW.textSec}}>{desc.length}/{maxDesc}</div>
+          </div>
+          <div style={{position:'relative'}}>
+            <textarea value={desc} onChange={e=>setDesc(e.target.value.slice(0,maxDesc))}
+              style={{width:'100%',height:100,borderRadius:12,border:`1.5px solid ${WW.border}`,padding:'10px 12px',fontSize:13,color:WW.text,outline:'none',resize:'none',boxSizing:'border-box',fontFamily:'inherit'}}/>
+          </div>
+        </div>
+
+        {/* Save changes button */}
+        <button onClick={handleSaveAll} style={{width:'100%',height:52,borderRadius:14,background:WW.primary,color:'#fff',border:'none',fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'0 4px 14px rgba(108,126,232,.3)'}}>
+          {saved?'✓ Changes Saved!':'Save Changes'}
+        </button>
+      </div>
+
+      {/* Visibility confirmation modal */}
+      {visModal&&(
+        <div style={{position:'absolute',inset:0,background:'rgba(10,10,18,.5)',zIndex:50,display:'flex',alignItems:'flex-end'}}>
+          <div style={{width:'100%',background:WW.card,borderRadius:'22px 22px 0 0',padding:'20px 20px 40px',boxShadow:'0 -8px 40px rgba(20,25,60,.2)',textAlign:'center'}}>
+            <div style={{width:36,height:4,borderRadius:2,background:WW.border,margin:'0 auto 20px'}}/>
+            <div style={{fontSize:32,marginBottom:10}}>👁️</div>
+            <div style={{fontSize:18,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>Hide your profile?</div>
+            <div style={{fontSize:14,color:WW.textSec,lineHeight:1.5,marginBottom:20}}>Your profile will be hidden from users. You will not receive new contact requests while unavailable.</div>
+            <button onClick={confirmHide} style={{width:'100%',height:50,borderRadius:14,background:'#FEE2E2',color:'#DC2626',border:'none',fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:10}}>Yes, set as unavailable</button>
+            <button onClick={()=>setVisModal(false)} style={{width:'100%',height:50,borderRadius:14,background:WW.elevated,color:WW.text,border:`1.5px solid ${WW.border}`,fontSize:15,fontWeight:700,cursor:'pointer'}}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Add / edit cert sheet */}
+      {addCertSheet&&(
+        <div style={{position:'absolute',inset:0,background:'rgba(10,10,18,.5)',zIndex:50,display:'flex',alignItems:'flex-end'}}>
+          <div style={{width:'100%',background:WW.card,borderRadius:'22px 22px 0 0',padding:'20px 20px 40px',boxShadow:'0 -8px 40px rgba(20,25,60,.2)'}}>
+            <div style={{width:36,height:4,borderRadius:2,background:WW.border,margin:'0 auto 16px'}}/>
+            <div style={{fontSize:17,fontWeight:800,color:WW.primaryDark,marginBottom:14}}>{editCert?'Edit Certification':'Add Certification'}</div>
+            {[{l:'Certification name',k:'name',p:'e.g. NASM Certified PT'},{l:'Issuing body',k:'issuer',p:'e.g. NASM'}].map(f=>(
+              <div key={f.k} style={{marginBottom:10}}>
+                <div style={{fontSize:11,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.4,marginBottom:5}}>{f.l}</div>
+                <input value={newCert[f.k]} onChange={e=>setNewCert(p=>({...p,[f.k]:e.target.value}))} placeholder={f.p}
+                  style={{width:'100%',height:44,borderRadius:12,border:`1.5px solid ${WW.border}`,padding:'0 14px',fontSize:14,color:WW.text,outline:'none',boxSizing:'border-box',fontFamily:'inherit'}}/>
+              </div>
+            ))}
+            <div style={{marginBottom:14}}>
+              <div style={{fontSize:11,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.4,marginBottom:5}}>Expiry date</div>
+              <input type="date" value={newCert.expiry} onChange={e=>setNewCert(p=>({...p,expiry:e.target.value}))}
+                style={{width:'100%',height:44,borderRadius:12,border:`1.5px solid ${WW.border}`,padding:'0 14px',fontSize:14,color:WW.text,outline:'none',boxSizing:'border-box'}}/>
+            </div>
+            {editCert&&(
+              <div style={{background:'#FEF3C7',borderRadius:10,padding:'8px 12px',marginBottom:12,fontSize:12,color:'#92400E'}}>
+                ⚠️ Edited certifications will be marked as Pending Review until re-verified.
+              </div>
+            )}
+            <div style={{display:'flex',gap:10}}>
+              <button onClick={()=>{setAddCertSheet(false);setEditCert(null);}} style={{flex:1,height:48,borderRadius:12,background:WW.elevated,color:WW.text,border:`1.5px solid ${WW.border}`,fontSize:14,fontWeight:700,cursor:'pointer'}}>Cancel</button>
+              <button onClick={submitNewCert} style={{flex:2,height:48,borderRadius:12,background:newCert.name&&newCert.issuer&&newCert.expiry?WW.primary:'#C8C8D8',color:newCert.name&&newCert.issuer&&newCert.expiry?'#fff':'#8A8A9E',border:'none',fontSize:14,fontWeight:700,cursor:'pointer'}}>
+                {editCert?'Save Changes':'Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remove confirmation */}
+      {removeConfirm&&(
+        <div style={{position:'absolute',inset:0,background:'rgba(10,10,18,.5)',zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',padding:'0 24px'}}>
+          <div style={{background:WW.card,borderRadius:20,padding:'24px 20px',textAlign:'center',width:'100%',boxShadow:'0 20px 60px rgba(20,25,60,.25)'}}>
+            <div style={{fontSize:18,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>Remove certification?</div>
+            <div style={{fontSize:13,color:WW.textSec,lineHeight:1.6,marginBottom:20}}>This will remove the certification from your public profile.</div>
+            <button onClick={()=>removeCert(removeConfirm)} style={{width:'100%',height:46,borderRadius:12,background:'#FEE2E2',color:'#DC2626',border:'none',fontSize:14,fontWeight:700,cursor:'pointer',marginBottom:10}}>Remove</button>
+            <button onClick={()=>setRemoveConfirm(null)} style={{width:'100%',height:46,borderRadius:12,background:WW.elevated,color:WW.text,border:`1.5px solid ${WW.border}`,fontSize:14,fontWeight:700,cursor:'pointer'}}>Cancel</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

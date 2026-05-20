@@ -1,0 +1,182 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-27 Professional Profile</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-27 · Professional Profile Detail</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+const Ico={
+  home:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill={c}/></svg>,
+  plans:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="20" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill={c}/></svg>,
+  coach:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke={c} strokeWidth="1.5" strokeLinejoin="round"/></svg>,
+  club:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke={c} strokeWidth="1.5"/><circle cx="17" cy="10" r="2.2" stroke={c} strokeWidth="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke={c} strokeWidth="1.5" strokeLinecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  progress:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+};
+
+const NAV=[
+  {id:'home',label:'Home',icon:Ico.home,href:'S-09-Home.html'},
+  {id:'plans',label:'Plans',icon:Ico.plans,href:'S-10-Plans-Hub.html'},
+  {id:'coach',label:'Coach',icon:Ico.coach,href:'S-25-Coach-Chat.html'},
+  {id:'club',label:'Club',icon:Ico.club,href:'S-28-Club-Tab.html'},
+  {id:'progress',label:'Progress',icon:Ico.progress,href:'S-32-Progress-Tab.html'},
+];
+
+function BottomNav({active}){
+  return(
+    <div style={{position:'absolute',bottom:0,left:0,right:0,height:84,background:WW.card,borderTop:'0.5px solid #E8EAF8',display:'flex',zIndex:30}}>
+      {NAV.map(n=>{const a=n.id===active,c=a?WW.primary:WW.textSec;return(
+        <a key={n.id} href={n.href} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,textDecoration:'none',paddingBottom:8}}>
+          {n.icon(c)}<span style={{fontSize:10,fontWeight:600,color:c}}>{n.label}</span>
+        </a>
+      );})}
+    </div>
+  );
+}
+
+function StatusBar(){
+  return(
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+const PRO={
+  initials:'SL',
+  avatarColor:'#6C7EE8',
+  name:'Sarah Lim',
+  type:'Personal Trainer',
+  email:'sarah.lim@wiseworkout.com',
+  bio:`I specialise in strength training and body recomposition for beginners and intermediate athletes. With 8 years of coaching experience across commercial gyms and private settings, I help clients build sustainable habits, improve their form, and reach their physique goals safely.\n\nMy sessions are tailored to your schedule and current fitness level. I work with clients dealing with minor injuries and can design programmes around limitations while keeping progress moving forward.`,
+  area:'Central & East Singapore · Online sessions available',
+  services:'Strength training · Body recomposition · Beginner programming · Form coaching · Nutrition guidance (basic)',
+  certs:[
+    {name:'NASM Certified Personal Trainer (CPT)',body:'National Academy of Sports Medicine',expiry:'Dec 2026'},
+    {name:'CrossFit Level 2 Trainer',body:'CrossFit Inc.',expiry:'Mar 2025'},
+    {name:'First Aid & CPR',body:'Singapore Red Cross',expiry:'Aug 2026'},
+  ],
+};
+
+function App(){
+  const contact=()=>{
+    window.location.href=`mailto:${PRO.email}?subject=WiseWorkout%20Enquiry%20%E2%80%94%20Personal%20Training&body=Hi%20${encodeURIComponent(PRO.name)}%2C%0A%0AI%20found%20your%20profile%20on%20WiseWorkout%20and%20I%27d%20like%20to%20enquire%20about%20your%20services.%0A%0A`;
+  };
+
+  return(
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',position:'relative'}}>
+      <StatusBar/>
+
+      {/* Top bar */}
+      <div style={{display:'flex',alignItems:'center',gap:10,padding:'4px 16px 12px',flexShrink:0}}>
+        <a href="S-26-Find-A-Professional.html" style={{width:38,height:38,borderRadius:19,background:'rgba(61,61,92,.07)',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none',flexShrink:0}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke={WW.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </a>
+        <div style={{fontSize:17,fontWeight:800,color:WW.primaryDark,flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{PRO.name}</div>
+      </div>
+
+      <div style={{flex:1,overflowY:'auto',padding:'0 16px',paddingBottom:148}}>
+
+        {/* Profile header card */}
+        <div style={{background:WW.card,borderRadius:20,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'22px 16px 18px',marginBottom:14,display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
+          {/* Avatar */}
+          <div style={{width:80,height:80,borderRadius:40,background:PRO.avatarColor,display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,boxShadow:`0 4px 20px ${PRO.avatarColor}55`}}>
+            <span style={{fontSize:28,fontWeight:800,color:'#fff'}}>{PRO.initials}</span>
+          </div>
+          {/* Name */}
+          <div style={{fontSize:20,fontWeight:800,color:WW.primaryDark,letterSpacing:'-.3px',marginBottom:4}}>{PRO.name}</div>
+          {/* Type + verified */}
+          <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:12}}>
+            <span style={{fontSize:13,fontWeight:700,color:PRO.avatarColor}}>{PRO.type}</span>
+            <div style={{display:'flex',alignItems:'center',gap:3,background:'#D1FAE5',borderRadius:8,padding:'3px 8px'}}>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-9" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <span style={{fontSize:10,fontWeight:800,color:'#059669',letterSpacing:.2}}>Verified</span>
+            </div>
+          </div>
+          {/* Service area */}
+          <div style={{display:'flex',alignItems:'center',gap:5}}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke={WW.textSec} strokeWidth="1.5"/><circle cx="12" cy="9" r="2.5" stroke={WW.textSec} strokeWidth="1.5"/></svg>
+            <span style={{fontSize:12,color:WW.textSec,fontWeight:500}}>{PRO.area}</span>
+          </div>
+        </div>
+
+        {/* Bio */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'14px 16px',marginBottom:14}}>
+          <div style={{fontSize:13,fontWeight:700,color:WW.textSec,letterSpacing:.3,textTransform:'uppercase',marginBottom:10}}>About</div>
+          <div style={{fontSize:13.5,color:WW.text,lineHeight:1.65,whiteSpace:'pre-line'}}>{PRO.bio}</div>
+        </div>
+
+        {/* Services */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'14px 16px',marginBottom:14}}>
+          <div style={{fontSize:13,fontWeight:700,color:WW.textSec,letterSpacing:.3,textTransform:'uppercase',marginBottom:10}}>Services</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+            {PRO.services.split(' · ').map(s=>(
+              <div key={s} style={{padding:'5px 10px',borderRadius:20,background:WW.chipBg,border:`0.5px solid ${WW.primary}30`,fontSize:12,fontWeight:600,color:WW.primaryDark}}>{s}</div>
+            ))}
+          </div>
+        </div>
+
+        {/* Certifications */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'14px 16px',marginBottom:14}}>
+          <div style={{fontSize:13,fontWeight:700,color:WW.textSec,letterSpacing:.3,textTransform:'uppercase',marginBottom:10}}>Certifications</div>
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            {PRO.certs.map((cert,i)=>(
+              <div key={i} style={{background:WW.bg,borderRadius:12,border:`0.5px solid ${WW.border}`,padding:'11px 13px'}}>
+                <div style={{display:'flex',alignItems:'flex-start',gap:10}}>
+                  <div style={{width:32,height:32,borderRadius:8,background:WW.chipBg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.2L12 16.5l-6.2 4.4 2.4-7.2L2 9.2h7.6L12 2z" fill={WW.primary}/></svg>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:13,fontWeight:700,color:WW.text,marginBottom:2}}>{cert.name}</div>
+                    <div style={{fontSize:11,color:WW.textSec,marginBottom:4}}>{cert.body}</div>
+                    <div style={{display:'flex',alignItems:'center',gap:4}}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="3" stroke={WW.textSec} strokeWidth="1.5"/><path d="M16 2v4M8 2v4M3 9h18" stroke={WW.textSec} strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      <span style={{fontSize:10,color:WW.textSec,fontWeight:600}}>Expires {cert.expiry}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Note about contact */}
+        <div style={{background:WW.lavenderBg,borderRadius:12,border:`0.5px solid rgba(155,132,232,.25)`,padding:'10px 13px',marginBottom:14,display:'flex',gap:8,alignItems:'flex-start'}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{flexShrink:0,marginTop:1}}><circle cx="12" cy="12" r="9" stroke={WW.lavender} strokeWidth="1.5"/><path d="M12 8v5M12 16v.5" stroke={WW.lavender} strokeWidth="2" strokeLinecap="round"/></svg>
+          <div style={{fontSize:12,color:'#5B3F9E',lineHeight:1.5}}>Contacting opens your email app. Booking and payments are handled directly between you and the professional.</div>
+        </div>
+      </div>
+
+      {/* Contact button — pinned above nav */}
+      <div style={{position:'absolute',bottom:84,left:0,right:0,padding:'10px 16px',background:WW.card,borderTop:`0.5px solid ${WW.border}`,zIndex:20}}>
+        <button onClick={contact} style={{width:'100%',height:52,borderRadius:14,background:WW.primary,border:'none',color:'#fff',fontSize:16,fontWeight:800,cursor:'pointer',boxShadow:'0 4px 16px rgba(108,126,232,.4)',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#fff" strokeWidth="1.8"/><polyline points="22,6 12,13 2,6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round"/></svg>
+          Contact Sarah Lim
+        </button>
+      </div>
+
+      <BottomNav active="coach"/>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

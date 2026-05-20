@@ -1,0 +1,484 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-24 Manual Activity Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0;padding:0;background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .lbl{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  .spin{animation:spin .8s linear infinite;display:inline-flex}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+  input[type=number]{-moz-appearance:textfield}
+  *::-webkit-scrollbar{display:none}
+</style>
+</head><body>
+<div class="stage">
+  <div class="lbl">S-24 · Manual Activity Log</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+/* ── Design tokens ─────────────────────────────────────────────────── */
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+/* ── Inline SVG icons (Lucide paths, stroke-based) ─────────────────── */
+const PATHS={
+  info:       {d:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 9v4m0 4h.01",fill:false},
+  activity:   {d:"M22 12h-4l-3 9L9 3l-3 9H2",fill:false},
+  footprints: {d:"M4 16s-1-1-1-3 1-4 3-5M20 16s1-1 1-3-1-4-3-5M8 6.5A2.5 2.5 0 1 0 13 6.5M11 6.5A2.5 2.5 0 1 0 16 6.5M7 16v4M17 16v4M7 12l5 2 5-2",fill:false},
+  bike:       {d:"M5 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm14 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-9.5-7H14l3 3.5M9.5 12 7 7.5H5M9.5 12 12 7.5h3.5l1 4",fill:false},
+  waves:      {d:"M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1",fill:false},
+  mountain:   {d:"M8 3l4 8 5-5 5 9H2L8 3z",fill:false},
+  'circle-dot':{d:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 9a1 1 0 1 0 0 2 1 1 0 0 0 0-2z",fill:false},
+  circle:     {d:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z",fill:false},
+  zap:        {d:"M13 2 3 14h9l-1 8 10-12h-9l1-8z",fill:false},
+  'layout-grid':{d:"M3 3h7v7H3V3zm11 0h7v7h-7V3zM3 14h7v7H3v-7zm11 0h7v7h-7v-7z",fill:false},
+  table:      {d:"M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18",fill:false},
+  'more-horizontal':{multi:[{cx:5,cy:12,r:1},{cx:12,cy:12,r:1},{cx:19,cy:12,r:1}],circles:true},
+  dumbbell:   {d:"M6.5 6.5h.01M17.5 6.5h.01M6.5 17.5h.01M17.5 17.5h.01M5 8l1.5-1.5M17.5 6.5l1.5 1.5M5 16l1.5 1.5M17.5 17.5l1.5-1.5M2 12h20M12 2v20M6 6h12M6 18h12",fill:false},
+  leaf:       {d:"M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z M2 21c0-3 1.85-5.36 5.08-6",fill:false},
+  sparkles:   {d:"M12 3l1.45 4.05H18l-3.5 2.55 1.35 4.15L12 11.3 8.15 13.75l1.35-4.15L6 7.05h4.55L12 3zM5 20v-4M19 20v-4M5 15h.01M19 15h.01",fill:false},
+  shield:     {d:"M12 2l8 4v6c0 5.5-3.5 10.74-8 12-4.5-1.26-8-6.5-8-12V6l8-4z",fill:false},
+  triangle:   {d:"M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z",fill:false},
+  music:      {d:"M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0z",fill:false},
+  'plus-circle':{d:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 4v8m-4-4h8",fill:false},
+  'minus-circle':{d:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-4 10h8",fill:false},
+  search:     {d:"M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z",fill:false},
+  x:          {d:"M18 6 6 18M6 6l12 12",fill:false},
+  check:      {d:"M20 6 9 17l-5-5",fill:false},
+  'chevron-right':{d:"M9 18l6-6-6-6",fill:false},
+  timer:      {d:"M10 2h4M12 2v4M12 6a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 4v4l2.5 2.5",fill:false},
+  route:      {d:"M3 11l19-9-9 19-2-8-8-2z",fill:false},
+  'message-circle':{d:"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",fill:false},
+  calendar:   {d:"M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",fill:false},
+  clock:      {d:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 4v6l4 2",fill:false},
+  'loader-circle':{d:"M21 12a9 9 0 1 1-6.22-8.56",fill:false},
+  'check-circle':{d:"M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3",fill:false},
+  'x-circle':  {d:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm3-3-6 6m0-6 6 6",fill:false},
+  pencil:     {d:"M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z",fill:false},
+  info2:      {d:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 9v5m0-8v.01",fill:false},
+};
+
+function Icon({name,size=16,color='currentColor',style:s,className}){
+  const p=PATHS[name]||PATHS.circle;
+  if(p.circles){
+    return(
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{display:'inline-flex',flexShrink:0,...s}} className={className}>
+        {p.multi.map((c,i)=><circle key={i} cx={c.cx} cy={c.cy} r={c.r} fill={color}/>)}
+      </svg>
+    );
+  }
+  const paths=p.d ? p.d.split('M').filter(Boolean).map((seg,i)=>i===0?'M'+seg:'M'+seg) : [];
+  return(
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-flex',flexShrink:0,...s}} className={className}>
+      {p.multi ? p.multi.map((c,i)=><circle key={i} cx={c.cx} cy={c.cy} r={c.r} fill={color}/>) : <path d={p.d}/>}
+    </svg>
+  );
+}
+
+/* ── MET table ─────────────────────────────────────────────────────── */
+const MET={running:{easy:6,moderate:8,hard:11.5},walking:{easy:2.8,moderate:3.5,hard:5},cycling:{easy:4,moderate:6.8,hard:10},swimming:{easy:5,moderate:7,hard:9.8},hiking:{easy:5,moderate:6,hard:7.8},basketball:{easy:4.5,moderate:6.5,hard:8},football:{easy:5,moderate:7,hard:10},tennis:{easy:5,moderate:7.3,hard:8},badminton:{easy:3.5,moderate:5.5,hard:7},volleyball:{easy:3,moderate:4,hard:7},tableTennis:{easy:3,moderate:4,hard:6},otherCardio:{easy:3.5,moderate:5.5,hard:8},gym:{easy:3,moderate:3.5,hard:5},hiit:{easy:5,moderate:8,hard:12},yoga:{easy:2,moderate:2.5,hard:4},pilates:{easy:2.5,moderate:3,hard:4},martialArts:{easy:4,moderate:5.5,hard:10.5},rockClimbing:{easy:5.5,moderate:8,hard:11},dance:{easy:3.5,moderate:4.8,hard:7.8},other:{easy:3.5,moderate:5,hard:7}};
+const WT=76;
+function calcCals(k,i,d){if(!k||!d||d<=0)return 0;return Math.round((MET[k]||MET.other)[i]*(d/60)*WT);}
+
+/* ── Activity catalogue ────────────────────────────────────────────── */
+const CAT=[
+  {section:'Cardio & Sport',rows:[
+    {key:'running',     label:'Running',           desc:'road, track or trail',    icon:'activity',       color:'#4BB8CC',dist:true, kw:['run','jog','sprint','road','track','trail']},
+    {key:'walking',     label:'Walking',           desc:'casual or brisk walk',    icon:'footprints',     color:'#4BB8CC',dist:true, kw:['walk','stroll']},
+    {key:'cycling',     label:'Cycling',           desc:'outdoor or stationary',   icon:'bike',           color:'#4BB8CC',dist:true, kw:['cycle','bike','bicycle','spin']},
+    {key:'swimming',    label:'Swimming',          desc:'pool or open water',      icon:'waves',          color:'#3B82F6',dist:true, kw:['swim','pool','laps']},
+    {key:'hiking',      label:'Hiking',            desc:'trail or nature walk',    icon:'mountain',       color:'#22C55E',dist:true, kw:['hike','trail','trek','mountain']},
+    {key:'basketball',  label:'Basketball',        desc:'casual or competitive',   icon:'circle-dot',     color:'#F59E0B',dist:false,kw:['basket','bball','hoops']},
+    {key:'football',    label:'Football / Soccer', desc:'casual or competitive',   icon:'circle',         color:'#F59E0B',dist:false,kw:['football','soccer','futsal']},
+    {key:'tennis',      label:'Tennis',            desc:'singles or doubles',      icon:'circle-dot',     color:'#F59E0B',dist:false,kw:['tennis','racket']},
+    {key:'badminton',   label:'Badminton',         desc:'singles or doubles',      icon:'zap',            color:'#8B5CF6',dist:false,kw:['badminton','shuttlecock']},
+    {key:'volleyball',  label:'Volleyball',        desc:'beach or indoor',         icon:'layout-grid',    color:'#8B5CF6',dist:false,kw:['volleyball','beach']},
+    {key:'tableTennis', label:'Table Tennis',      desc:'casual or competitive',   icon:'table',          color:'#EF4444',dist:false,kw:['table tennis','ping pong','paddle']},
+    {key:'otherCardio', label:'Other Cardio',      desc:'jump rope, rowing, dance',icon:'more-horizontal',color:'#6C7EE8',dist:false,kw:['cardio','rope','rowing','dance']},
+  ]},
+  {section:'Gym & Mind-Body',rows:[
+    {key:'gym',         label:'Gym / Weight Training',desc:'free weights, machines',   icon:'dumbbell',    color:'#6C7EE8',dist:false,kw:['gym','weights','lifting','dumbbell','strength']},
+    {key:'hiit',        label:'HIIT / Circuit',     desc:'high intensity intervals',    icon:'zap',         color:'#EF4444',dist:false,kw:['hiit','circuit','interval','crossfit']},
+    {key:'yoga',        label:'Yoga',               desc:'any style',                   icon:'leaf',        color:'#22C55E',dist:false,kw:['yoga','stretch','flexibility']},
+    {key:'pilates',     label:'Pilates',            desc:'mat or reformer',             icon:'sparkles',    color:'#8B5CF6',dist:false,kw:['pilates','mat','reformer']},
+    {key:'martialArts', label:'Martial Arts',       desc:'boxing, karate, judo',        icon:'shield',      color:'#F59E0B',dist:false,kw:['martial','boxing','karate','judo','mma']},
+    {key:'rockClimbing',label:'Rock Climbing',      desc:'indoor or outdoor',           icon:'triangle',    color:'#3B82F6',dist:false,kw:['climb','climbing','bouldering']},
+    {key:'dance',       label:'Dance',              desc:'any style',                   icon:'music',       color:'#EF4444',dist:false,kw:['dance','zumba','ballet','salsa']},
+    {key:'other',       label:'Other',              desc:'any activity not listed',     icon:'plus-circle', color:'#8A8A9E',dist:false,kw:['other','custom','general']},
+  ]},
+];
+const ALL=CAT.flatMap(s=>s.rows);
+const findAct=k=>ALL.find(a=>a.key===k);
+
+/* ── Status bar ────────────────────────────────────────────────────── */
+function StatusBar(){
+  return(
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',flexShrink:0,background:WW.card}}>
+      <span style={{paddingTop:10,fontSize:15,fontWeight:600,color:WW.text}}>9:41</span>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+/* ── Section label helper ──────────────────────────────────────────── */
+function SLabel({children,extra}){
+  return(
+    <div style={{fontSize:11,fontWeight:500,color:WW.textSec,letterSpacing:1,textTransform:'uppercase',marginBottom:6}}>
+      {children}{extra&&<span style={{fontWeight:400,textTransform:'none',letterSpacing:0,marginLeft:4}}>{extra}</span>}
+    </div>
+  );
+}
+
+/* ── Intensity control ─────────────────────────────────────────────── */
+const SEGS=[
+  {key:'easy',    label:'Easy',     icon:'circle',       bg:'#E0F4F8',color:'#22C55E'},
+  {key:'moderate',label:'Moderate', icon:'minus-circle', bg:'#FEF3C7',color:'#F59E0B'},
+  {key:'hard',    label:'Hard',     icon:'zap',          bg:'#FEE2E2',color:'#EF4444'},
+];
+const SUBLABEL={easy:'Light effort — easy conversation',moderate:'Elevated heart rate — some effort',hard:'Heavy breathing — hard to talk'};
+
+function IntensityControl({value,onChange}){
+  return(
+    <div>
+      <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,display:'flex',overflow:'hidden',boxShadow:WW.shadow}}>
+        {SEGS.map((s,i)=>{
+          const on=value===s.key;
+          return(
+            <button key={s.key} onClick={()=>onChange(s.key)}
+              style={{flex:1,height:56,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,
+                background:on?s.bg:WW.card,border:'none',
+                borderLeft:i>0?`0.5px solid ${WW.border}`:'none',
+                outline:on?`1.5px solid ${s.color}`:'none',outlineOffset:'-1.5px',
+                cursor:'pointer',fontFamily:'inherit'}}>
+              <Icon name={s.icon} size={16} color={on?s.color:WW.textSec}/>
+              <span style={{fontSize:13,fontWeight:500,color:on?s.color:WW.textSec}}>{s.label}</span>
+            </button>
+          );
+        })}
+      </div>
+      <div style={{fontSize:11,color:WW.textSec,fontStyle:'italic',marginTop:6}}>{SUBLABEL[value]}</div>
+    </div>
+  );
+}
+
+/* ── Activity row ──────────────────────────────────────────────────── */
+function ARow({act,onSelect,border}){
+  return(
+    <button onClick={()=>onSelect(act)}
+      style={{width:'100%',display:'flex',alignItems:'center',gap:12,padding:'0 16px',height:56,
+        background:'none',border:'none',borderTop:border?`0.5px solid #E8EAF8`:'none',
+        cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>
+      <div style={{width:36,height:36,borderRadius:10,background:act.color,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+        <Icon name={act.icon} size={18} color="#fff"/>
+      </div>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:600,color:WW.text}}>{act.label}</div>
+        <div style={{fontSize:12,color:WW.textSec,marginTop:1}}>{act.desc}</div>
+      </div>
+      <Icon name="chevron-right" size={14} color="#C8C8D8"/>
+    </button>
+  );
+}
+
+/* ── Main App ──────────────────────────────────────────────────────── */
+function App(){
+  const [sel,setSel]=React.useState(null);
+  const [intens,setIntens]=React.useState('moderate');
+  const [dur,setDur]=React.useState(0);
+  const [distV,setDistV]=React.useState('');
+  const [distU,setDistU]=React.useState('km');
+  const [q,setQ]=React.useState('');
+  const [notes,setNotes]=React.useState('');
+  const [cals,setCals]=React.useState(0);
+  const [saveS,setSaveS]=React.useState('idle'); // idle|loading|saved
+  const [toast,setToast]=React.useState(false);
+  const [searchFocused,setSearchFocused]=React.useState(false);
+  const [durErr,setDurErr]=React.useState(false);
+  const [customN,setCustomN]=React.useState('');
+  const timer=React.useRef(null);
+  const bodyRef=React.useRef(null);
+
+  React.useEffect(()=>{
+    clearTimeout(timer.current);
+    timer.current=setTimeout(()=>setCals(sel&&dur>0?calcCals(sel.key,intens,dur):0),300);
+    return()=>clearTimeout(timer.current);
+  },[sel,intens,dur]);
+
+  const canSave=sel!=null&&dur>0&&saveS==='idle';
+
+  function pick(act){setSel(act);setQ('');setTimeout(()=>bodyRef.current?.scrollTo({top:260,behavior:'smooth'}),80);}
+  function clear(){setSel(null);setCals(0);setDur(0);setCustomN('');setDurErr(false);}
+  function adjDur(d){setDur(v=>{const n=Math.max(0,Math.min(480,v+d));if(n>0)setDurErr(false);return n;});}
+  function setDurI(v){const n=Math.max(0,Math.min(480,Number(v)||0));setDur(n);if(n>0)setDurErr(false);}
+
+  function handleSave(){
+    if(!canSave)return;
+    if(dur<=0){setDurErr(true);return;}
+    setDurErr(false);setSaveS('loading');
+    setTimeout(()=>{setSaveS('saved');setToast(true);setTimeout(()=>setToast(false),2000);},800);
+  }
+
+  const results=React.useMemo(()=>{
+    const t=q.trim().toLowerCase();
+    if(!t)return null;
+    return ALL.filter(a=>a.label.toLowerCase().includes(t)||a.kw.some(k=>k.includes(t)));
+  },[q]);
+
+  const saveBg=saveS==='saved'?'#22C55E':canSave?WW.primary:'#E8EAF8';
+  const saveFg=saveS==='saved'||canSave?'#fff':'#8A8A9E';
+  const saveTxt=saveS==='loading'?'Saving…':saveS==='saved'?'Saved!':'Save Activity';
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,position:'relative',fontFamily:"'Inter',system-ui,sans-serif"}}>
+
+      <StatusBar/>
+
+      {/* Toast */}
+      {toast&&(
+        <div style={{position:'absolute',top:58,left:'50%',transform:'translateX(-50%)',zIndex:300,
+          background:'#DCFCE7',borderRadius:12,padding:'10px 16px',display:'flex',alignItems:'center',gap:8,
+          boxShadow:'0 4px 16px rgba(0,0,0,.12)',whiteSpace:'nowrap'}}>
+          <Icon name="check-circle" size={14} color="#22C55E"/>
+          <span style={{fontSize:13,color:'#166534',fontWeight:500}}>Activity logged</span>
+        </div>
+      )}
+
+      {/* Top nav */}
+      <div style={{height:56,display:'flex',alignItems:'center',justifyContent:'space-between',
+        padding:'0 20px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',flexShrink:0,zIndex:10}}>
+        <a href="S-09-Home.html" style={{fontSize:15,fontWeight:500,color:WW.primary,textDecoration:'none'}}>Cancel</a>
+        <span style={{fontSize:17,fontWeight:600,color:WW.primaryDark}}>Log Activity</span>
+        <button onClick={handleSave} disabled={!canSave}
+          style={{fontSize:15,fontWeight:500,color:canSave?WW.primary:'#C8C8D8',background:'none',
+            border:'none',padding:0,cursor:canSave?'pointer':'not-allowed',fontFamily:'inherit'}}>
+          Save
+        </button>
+      </div>
+
+      {/* Scroll body */}
+      <div ref={bodyRef} style={{flex:1,overflowY:'auto',padding:'16px 20px 120px'}}>
+
+        {/* Helper tip */}
+        <div style={{background:WW.elevated,borderRadius:12,padding:12,display:'flex',alignItems:'flex-start',gap:8,marginBottom:16}}>
+          <Icon name="info2" size={14} color={WW.primary} style={{marginTop:1}}/>
+          <span style={{fontSize:13,color:WW.text,lineHeight:1.5}}>Log a past activity to track your calorie burn for the day.</span>
+        </div>
+
+        {/* Activity label + search */}
+        <SLabel>Activity</SLabel>
+
+        {/* Search */}
+        <div style={{background:WW.card,borderRadius:14,border:`1px solid ${searchFocused?WW.primary:WW.border}`,height:48,
+          display:'flex',alignItems:'center',padding:'0 16px',gap:10,marginBottom:10,transition:'border-color .15s'}}>
+          <Icon name="search" size={16} color={searchFocused?WW.primary:WW.textSec}/>
+          <input type="text" value={q} onChange={e=>setQ(e.target.value)}
+            onFocus={()=>setSearchFocused(true)}
+            onBlur={()=>{if(!q)setSearchFocused(false);}}
+            placeholder="Search activity... e.g. Basketball, Hiking, Tennis"
+            style={{flex:1,border:'none',outline:'none',fontSize:14,color:WW.text,background:'transparent',fontFamily:'inherit'}}/>
+          {q&&<button onClick={()=>setQ('')} style={{background:'none',border:'none',padding:0,cursor:'pointer',display:'flex'}}><Icon name="x" size={14} color={WW.textSec}/></button>}
+        </div>
+
+        {/* Recent chips — shown only when search bar is focused and no query typed */}
+        {searchFocused&&!q&&!sel&&(
+          <div style={{marginBottom:12}}>
+            <SLabel>Recent</SLabel>
+            <div style={{display:'flex',gap:8,overflowX:'auto',paddingBottom:2}}>
+              {[{key:'running',label:'Running',icon:'activity'},{key:'basketball',label:'Basketball',icon:'circle-dot'},{key:'walking',label:'Walking',icon:'footprints'}].map(c=>(
+                <button key={c.key} onMouseDown={()=>pick(findAct(c.key))}
+                  style={{display:'flex',alignItems:'center',gap:6,padding:'0 14px',height:36,borderRadius:20,
+                    background:WW.card,border:`1px solid ${WW.border}`,
+                    cursor:'pointer',whiteSpace:'nowrap',flexShrink:0,fontFamily:'inherit'}}>
+                  <Icon name={c.icon} size={14} color={WW.primary}/>
+                  <span style={{fontSize:13,fontWeight:500,color:WW.text}}>{c.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Selected pill */}
+        {sel&&(
+          <div style={{display:'inline-flex',alignItems:'center',gap:8,background:WW.card,
+            border:`1px solid ${WW.primary}`,borderRadius:12,padding:'0 10px',height:32,marginBottom:14}}>
+            <Icon name="check" size={14} color={WW.primary}/>
+            <span style={{fontSize:13,fontWeight:500,color:WW.primary}}>{sel.label}</span>
+            <button onClick={clear} style={{background:'none',border:'none',padding:0,cursor:'pointer',display:'flex',marginLeft:2}}>
+              <Icon name="x" size={14} color={WW.textSec}/>
+            </button>
+          </div>
+        )}
+
+        {/* Activity list */}
+        {!sel&&(
+          results===null?(
+            <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,overflow:'hidden',boxShadow:WW.shadow,marginBottom:16}}>
+              {CAT.map((sec,si)=>(
+                <React.Fragment key={si}>
+                  <div style={{fontSize:12,fontWeight:600,color:WW.textSec,background:WW.bg,padding:'10px 16px',textTransform:'uppercase',letterSpacing:.5}}>{sec.section}</div>
+                  {sec.rows.map((row,ri)=><ARow key={row.key} act={row} onSelect={pick} border={true}/>)}
+                </React.Fragment>
+              ))}
+            </div>
+          ):results.length>0?(
+            <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,overflow:'hidden',boxShadow:WW.shadow,marginBottom:16}}>
+              {results.map((row,ri)=><ARow key={row.key} act={row} onSelect={pick} border={ri>0}/>)}
+            </div>
+          ):(
+            <div style={{textAlign:'center',padding:'24px 0',marginBottom:16}}>
+              <p style={{fontSize:13,color:WW.textSec,fontStyle:'italic',margin:'0 0 8px'}}>Can't find your activity? Log it as 'Other'</p>
+              <button onClick={()=>pick(findAct('other'))} style={{background:'none',border:'none',fontSize:13,color:WW.primary,cursor:'pointer',fontFamily:'inherit'}}>Select Other →</button>
+            </div>
+          )
+        )}
+
+        {/* Form after selection */}
+        {sel&&(
+          <div>
+            {/* Other: custom name */}
+            {sel.key==='other'&&(
+              <div style={{marginBottom:20}}>
+                <SLabel>Activity Name</SLabel>
+                <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:16,display:'flex',alignItems:'center',gap:12,boxShadow:WW.shadow}}>
+                  <Icon name="pencil" size={16} color={WW.textSec}/>
+                  <input type="text" value={customN} onChange={e=>setCustomN(e.target.value)}
+                    placeholder="e.g. Bowling, Surfing, Golf"
+                    style={{flex:1,border:'none',outline:'none',fontSize:14,color:WW.text,background:'transparent',fontFamily:'inherit'}}/>
+                </div>
+                <div style={{fontSize:12,color:WW.textSec,marginTop:6,lineHeight:1.5}}>You can still log this activity even if it is not in our list. We will use a general calorie estimate.</div>
+              </div>
+            )}
+
+            {/* Intensity */}
+            <div style={{marginBottom:20}}>
+              <SLabel>Intensity</SLabel>
+              <IntensityControl value={intens} onChange={setIntens}/>
+            </div>
+
+            {/* When */}
+            <div style={{marginBottom:20}}>
+              <SLabel>When did you do this?</SLabel>
+              <div style={{display:'flex',gap:12}}>
+                {[{icon:'calendar',lbl:'Date',val:'Today, 19 May'},{icon:'clock',lbl:'Time',val:'09:00 AM'}].map(f=>(
+                  <button key={f.lbl} onClick={()=>alert(`${f.lbl} picker would open here`)}
+                    style={{flex:1,background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:16,textAlign:'left',cursor:'pointer',boxShadow:WW.shadow,fontFamily:'inherit'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:4}}>
+                      <Icon name={f.icon} size={14} color={WW.textSec}/>
+                      <span style={{fontSize:11,color:WW.textSec}}>{f.lbl}</span>
+                    </div>
+                    <div style={{fontSize:14,fontWeight:600,color:WW.text}}>{f.val}</div>
+                    <div style={{fontSize:11,color:WW.textSec,marginTop:2}}>Tap to change</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Duration */}
+            <div style={{marginBottom:20}}>
+              <SLabel>Duration</SLabel>
+              <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${durErr?'#EF4444':WW.border}`,padding:16,display:'flex',alignItems:'center',gap:8,boxShadow:WW.shadow}}>
+                <Icon name="timer" size={18} color={WW.primary}/>
+                <button onClick={()=>adjDur(-5)} style={{background:'none',border:'none',padding:0,cursor:'pointer',display:'flex'}}><Icon name="minus-circle" size={24} color={WW.primary}/></button>
+                <input type="number" min="0" max="480" value={dur||''} onChange={e=>setDurI(e.target.value)} placeholder="0"
+                  style={{flex:1,border:'none',outline:'none',fontSize:24,fontWeight:600,color:WW.text,textAlign:'right',background:'transparent',fontFamily:'inherit'}}/>
+                <span style={{fontSize:15,color:WW.textSec}}>min</span>
+                <button onClick={()=>adjDur(5)} style={{background:'none',border:'none',padding:0,cursor:'pointer',display:'flex'}}><Icon name="plus-circle" size={24} color={WW.primary}/></button>
+              </div>
+              {durErr&&(
+                <div style={{display:'flex',alignItems:'center',gap:4,marginTop:6}}>
+                  <Icon name="x-circle" size={12} color="#EF4444"/>
+                  <span style={{fontSize:12,color:'#EF4444'}}>Please enter a duration.</span>
+                </div>
+              )}
+            </div>
+
+            {/* Distance (conditional) */}
+            {sel.dist&&(
+              <div style={{marginBottom:20}}>
+                <SLabel extra="optional">Distance</SLabel>
+                <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:16,display:'flex',alignItems:'center',gap:12,boxShadow:WW.shadow}}>
+                  <Icon name="route" size={18} color={WW.teal}/>
+                  <input type="number" step="0.1" value={distV} onChange={e=>setDistV(e.target.value)} placeholder="0.0"
+                    style={{flex:1,minWidth:0,border:'none',outline:'none',fontSize:18,fontWeight:600,color:WW.text,textAlign:'right',background:'transparent',fontFamily:'inherit'}}/>
+                  <div style={{display:'flex',borderRadius:20,overflow:'hidden',border:`1px solid ${WW.border}`}}>
+                    {['km','mi'].map(u=>(
+                      <button key={u} onClick={()=>setDistU(u)}
+                        style={{padding:'5px 10px',fontSize:12,fontWeight:500,background:distU===u?WW.primary:WW.card,color:distU===u?'#fff':WW.textSec,border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+                        {u}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Notes */}
+            <div style={{marginBottom:20}}>
+              <SLabel extra="optional">Notes</SLabel>
+              <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:16,display:'flex',gap:12,boxShadow:WW.shadow}}>
+                <Icon name="message-circle" size={18} color={WW.textSec} style={{marginTop:2}}/>
+                <div style={{flex:1}}>
+                  <textarea value={notes} onChange={e=>setNotes(e.target.value.slice(0,280))} maxLength={280}
+                    placeholder="How did it feel? Any details to remember?"
+                    style={{width:'100%',border:'none',outline:'none',resize:'none',minHeight:72,fontSize:14,color:WW.text,background:'transparent',fontFamily:'inherit',lineHeight:1.5,boxSizing:'border-box'}}/>
+                  <div style={{textAlign:'right',fontSize:11,color:WW.textSec}}>{notes.length} / 280</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Calorie card */}
+            {cals>0&&(
+              <div style={{background:WW.tealBg,borderRadius:16,padding:16,marginBottom:20}}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}}>
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    <Icon name="zap" size={18} color={WW.teal}/>
+                    <span style={{fontSize:12,fontWeight:500,color:'#1A7A8C'}}>Estimated</span>
+                  </div>
+                  <div style={{display:'flex',alignItems:'baseline',gap:4}}>
+                    <span style={{fontSize:28,fontWeight:700,color:'#1A7A8C'}}>{cals}</span>
+                    <span style={{fontSize:14,fontWeight:500,color:'#1A7A8C'}}>kcal</span>
+                  </div>
+                </div>
+                <div style={{fontSize:12,color:WW.teal,lineHeight:1.5,marginBottom:4}}>
+                  Based on {sel.label} · {intens.charAt(0).toUpperCase()+intens.slice(1)} · {dur} min · your body weight ({WT} kg)
+                </div>
+                <div style={{fontSize:11,color:WW.teal,fontStyle:'italic'}}>This estimate uses the MET formula, the same method used by Strava and MyFitnessPal.</div>
+              </div>
+            )}
+          </div>
+        )}
+
+      </div>
+
+      {/* Sticky save */}
+      <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,padding:'16px 20px',paddingBottom:'calc(16px + env(safe-area-inset-bottom,0px))',borderTop:'0.5px solid #E8EAF8',zIndex:20}}>
+        <button onClick={handleSave}
+          style={{width:'100%',height:52,borderRadius:14,border:'none',cursor:canSave?'pointer':'not-allowed',
+            background:saveBg,display:'flex',alignItems:'center',justifyContent:'center',gap:8,
+            fontSize:16,fontWeight:500,color:saveFg,transition:'background .3s',fontFamily:'inherit'}}>
+          {saveS==='loading'&&<Icon name="loader-circle" size={16} color="#fff" className="spin"/>}
+          {saveS==='saved'&&<Icon name="check" size={16} color="#fff"/>}
+          <span>{saveTxt}</span>
+        </button>
+      </div>
+
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

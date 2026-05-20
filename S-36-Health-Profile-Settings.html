@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-36 Health Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{color-scheme:light;}
+html,body{background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.stage{display:flex;flex-direction:column;align-items:center;gap:18px;}
+.screen-label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600;}
+.phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box;}
+.phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative;display:flex;flex-direction:column;}
+.island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none;}
+
+/* Status bar */
+.status-bar{height:47px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;color:#3D3D5C;flex-shrink:0;}
+.status-time{padding-top:10px;}
+.status-icons{display:flex;gap:6px;align-items:center;padding-top:10px;}
+
+/* Top bar */
+.top-bar{display:flex;align-items:center;padding:10px 20px 12px;gap:0;flex-shrink:0;border-bottom:.5px solid #E8EAF8;background:#fff;position:relative;}
+.back-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;text-decoration:none;flex-shrink:0;}
+.top-bar-title{position:absolute;left:50%;transform:translateX(-50%);font-size:18px;font-weight:600;color:#2D3A8C;pointer-events:none;}
+
+/* Scroll area */
+.screen-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 40px;-webkit-overflow-scrolling:touch;}
+.screen-scroll::-webkit-scrollbar{display:none;}
+
+/* Section header row */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:20px;}
+.section-hdr:first-child{margin-top:0;}
+.section-hdr-label{font-size:11px;font-weight:500;color:#8A8A9E;letter-spacing:.6px;text-transform:uppercase;}
+.section-hdr-edit{font-size:13px;font-weight:600;color:#6C7EE8;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:0;}
+
+/* Card */
+.card{background:#fff;border-radius:16px;border:.5px solid #C8C8D8;box-shadow:0 2px 8px rgba(45,58,140,.06);overflow:hidden;}
+
+/* Avatar */
+.avatar-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 0 16px;border-bottom:.5px solid #E8EAF8;position:relative;}
+.avatar-circle{width:72px;height:72px;border-radius:50%;background:#6C7EE8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;position:relative;}
+.avatar-cam-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;}
+.avatar-change-link{font-size:12px;color:#6C7EE8;font-weight:500;margin-top:8px;cursor:pointer;display:none;}
+
+/* Field rows */
+.field-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid #E8EAF8;min-height:48px;}
+.field-row:last-child{border-bottom:none;}
+.field-label{font-size:13px;color:#8A8A9E;display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.field-value{font-size:14px;font-weight:600;color:#3D3D5C;text-align:right;max-width:55%;}
+.encrypted-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:#8A8A9E;font-weight:400;}
+
+/* Edit mode inputs */
+.field-input{border:none;border-bottom:1.5px solid #6C7EE8;background:transparent;font-size:14px;font-weight:600;color:#3D3D5C;font-family:'Inter',sans-serif;text-align:right;outline:none;width:100%;padding:2px 0;}
+.field-input::placeholder{color:#C8C8D8;font-weight:400;}
+.bp-wrap{display:flex;align-items:center;gap:6px;justify-content:flex-end;}
+.bp-input{width:52px;border:none;border-bottom:1.5px solid #6C7EE8;background:transparent;font-size:14px;font-weight:600;color:#3D3D5C;font-family:'Inter',sans-serif;text-align:center;outline:none;padding:2px 0;}
+.bp-sep{font-size:14px;color:#8A8A9E;font-weight:500;}
+.bp-unit{font-size:12px;color:#8A8A9E;}
+
+/* Segmented control */
+.seg-control{display:flex;background:#EEF0FB;border-radius:10px;padding:3px;gap:2px;}
+.seg-btn{flex:1;padding:7px 4px;border-radius:8px;background:transparent;color:#8A8A9E;font-size:12px;font-weight:500;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;white-space:nowrap;}
+.seg-btn.active{background:#fff;color:#2D3A8C;font-weight:600;box-shadow:0 1px 4px rgba(45,58,140,.10);}
+
+/* Save / Cancel */
+.save-btn{width:100%;height:52px;border-radius:14px;background:#6C7EE8;color:#fff;border:none;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;margin-top:12px;}
+.cancel-link{display:block;text-align:center;font-size:13px;color:#8A8A9E;cursor:pointer;margin-top:10px;font-weight:500;}
+
+/* Success banner */
+.success-banner{display:flex;align-items:center;gap:8px;background:#F0FDF4;border:.5px solid #86EFAC;border-radius:10px;padding:10px 12px;margin-top:10px;}
+.success-banner span{font-size:13px;color:#166534;font-weight:500;flex:1;}
+
+/* Placeholder section */
+.placeholder-section{background:#fff;border-radius:16px;border:.5px solid #C8C8D8;padding:16px;margin-top:4px;display:flex;align-items:center;justify-content:center;}
+.placeholder-text{font-size:13px;color:#C8C8D8;font-weight:500;}
+
+/* Condition chips */
+.cond-chip{height:44px;border-radius:12px;border:1px solid #C8C8D8;background:#fff;color:#3D3D5C;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.cond-chip.selected{background:#E6EAFE;border-color:#6C7EE8;color:#6C7EE8;font-weight:600;}
+.cond-chip-none{height:44px;border-radius:12px;border:1px solid #C8C8D8;background:#fff;color:#8A8A9E;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.cond-chip-none.selected{background:#F2F2F7;border-color:#8A8A9E;}
+
+/* Calorie toggle switch */
+.cal-toggle-wrap{display:inline-flex;align-items:center;}
+.cal-toggle-track{width:44px;height:26px;border-radius:13px;background:#22C55E;position:relative;transition:background .2s;}
+.cal-toggle-track.off{background:#C8C8D8;}
+.cal-toggle-thumb{width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:3px;right:3px;transition:right .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.cal-toggle-track.off .cal-toggle-thumb{right:auto;left:3px;}
+
+/* Preference cards (Section D) */
+.pref-card{border-radius:12px;border:1px solid #C8C8D8;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;user-select:none;}
+.pref-card.selected{background:#E6EAFE;border:2px solid #6C7EE8;}
+
+/* Day pills (Section D) */
+.day-pill{width:44px;height:44px;border-radius:22px;border:1px solid #C8C8D8;background:#fff;color:#3D3D5C;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.day-pill.selected{background:#6C7EE8;border-color:#6C7EE8;color:#fff;}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="screen-label">S-36 · Health Profile</div>
+  <div class="phone-shell">
+    <div class="island"></div>
+    <div class="phone-inner">
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <div class="status-time">9:41</div>
+        <div class="status-icons">
+          <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+          <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <!-- Top bar -->
+      <div class="top-bar">
+        <a href="S-35-Settings.html" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <div class="top-bar-title">Health Profile</div>
+      </div>
+
+      <!-- Scrollable content -->
+      <div class="screen-scroll">
+
+        <!-- ═══ SECTION A: BODY METRICS ═══ -->
+        <div class="section-hdr" style="margin-top:0;">
+          <span class="section-hdr-label">Body Metrics</span>
+          <button class="section-hdr-edit" id="body-edit-btn" onclick="toggleBodyEdit()">Edit</button>
+        </div>
+
+        <div class="card" id="body-card">
+
+          <!-- Avatar row -->
+          <div class="avatar-wrap" id="avatar-wrap">
+            <div class="avatar-circle" id="avatar-circle">
+              M
+              <!-- Camera overlay (edit mode only) -->
+              <div class="avatar-cam-overlay" id="avatar-cam" style="display:none;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="13" r="4" stroke="#fff" stroke-width="1.6"/></svg>
+              </div>
+            </div>
+            <span class="avatar-change-link" id="avatar-change-link">Change photo</span>
+          </div>
+
+          <!-- ── VIEW MODE ── -->
+          <div id="body-view">
+            <!-- Display name -->
+            <div class="field-row">
+              <span class="field-label">Display name</span>
+              <span class="field-value">Marcus Tan</span>
+            </div>
+            <!-- Date of birth -->
+            <div class="field-row">
+              <span class="field-label">Date of birth</span>
+              <span class="field-value">12 Mar 1999</span>
+            </div>
+            <!-- Height -->
+            <div class="field-row">
+              <span class="field-label">Height</span>
+              <span class="field-value">178 cm</span>
+            </div>
+            <!-- Weight -->
+            <div class="field-row">
+              <span class="field-label">Weight</span>
+              <span class="field-value">76.2 kg</span>
+            </div>
+            <!-- Biological sex -->
+            <div class="field-row">
+              <span class="field-label">Biological sex</span>
+              <span class="field-value">Male</span>
+            </div>
+            <!-- Blood pressure (encrypted) -->
+            <div class="field-row">
+              <span class="field-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#8A8A9E" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg>
+                Blood pressure
+              </span>
+              <span class="field-value">
+                120 / 80 mmHg
+                <div class="encrypted-badge" style="justify-content:flex-end;margin-top:2px;">encrypted</div>
+              </span>
+            </div>
+            <!-- Resting heart rate (encrypted) -->
+            <div class="field-row">
+              <span class="field-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#8A8A9E" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg>
+                Resting heart rate
+              </span>
+              <span class="field-value">
+                68 bpm
+                <div class="encrypted-badge" style="justify-content:flex-end;margin-top:2px;">encrypted</div>
+              </span>
+            </div>
+          </div><!-- end body-view -->
+
+          <!-- ── EDIT MODE ── -->
+          <div id="body-edit" style="display:none;">
+            <!-- Display name -->
+            <div class="field-row">
+              <span class="field-label">Display name</span>
+              <input class="field-input" type="text" value="Marcus Tan" id="input-name" style="max-width:55%;">
+            </div>
+            <!-- Date of birth -->
+            <div class="field-row">
+              <span class="field-label">Date of birth</span>
+              <input class="field-input" type="date" value="1999-03-12" id="input-dob" style="max-width:55%;">
+            </div>
+            <!-- Height -->
+            <div class="field-row">
+              <span class="field-label">Height (cm)</span>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <input class="field-input" type="number" value="178" id="input-height" style="width:60px;text-align:center;">
+                <span style="font-size:13px;color:#8A8A9E;">cm</span>
+              </div>
+            </div>
+            <!-- Weight -->
+            <div class="field-row">
+              <span class="field-label">Weight (kg)</span>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <input class="field-input" type="number" value="76.2" id="input-weight" step="0.1" style="width:60px;text-align:center;">
+                <span style="font-size:13px;color:#8A8A9E;">kg</span>
+              </div>
+            </div>
+            <!-- Biological sex (segmented control) -->
+            <div class="field-row" style="flex-direction:column;align-items:flex-start;gap:8px;">
+              <span class="field-label">Biological sex</span>
+              <div class="seg-control" style="width:100%;" id="sex-control">
+                <button class="seg-btn active" onclick="setSex(this)">Male</button>
+                <button class="seg-btn" onclick="setSex(this)">Female</button>
+                <button class="seg-btn" onclick="setSex(this)">Prefer not to say</button>
+              </div>
+            </div>
+            <!-- Blood pressure (encrypted) -->
+            <div class="field-row" style="flex-direction:column;align-items:flex-start;gap:8px;">
+              <span class="field-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#8A8A9E" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg>
+                Blood pressure
+                <span style="font-size:11px;color:#8A8A9E;font-weight:400;">(optional)</span>
+              </span>
+              <div class="bp-wrap" style="width:100%;justify-content:flex-start;gap:8px;">
+                <input class="bp-input" type="number" value="120" id="input-bp-sys" placeholder="120" style="width:60px;">
+                <span class="bp-sep">/</span>
+                <input class="bp-input" type="number" value="80" id="input-bp-dia" placeholder="80" style="width:60px;">
+                <span class="bp-unit">mmHg</span>
+                <span style="font-size:11px;color:#8A8A9E;margin-left:4px;">encrypted</span>
+              </div>
+              <div style="font-size:11px;color:#8A8A9E;">Systolic 60–250 · Diastolic 40–180</div>
+            </div>
+            <!-- Resting heart rate (encrypted) -->
+            <div class="field-row">
+              <span class="field-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#8A8A9E" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg>
+                Resting HR
+                <span style="font-size:11px;color:#8A8A9E;font-weight:400;">(optional)</span>
+              </span>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <input class="field-input" type="number" value="68" id="input-rhr" style="width:50px;text-align:center;">
+                <span style="font-size:13px;color:#8A8A9E;">bpm</span>
+                <span style="font-size:11px;color:#8A8A9E;margin-left:4px;">encrypted</span>
+              </div>
+            </div>
+          </div><!-- end body-edit -->
+
+        </div><!-- end card -->
+
+        <!-- Save / Cancel (edit mode only) -->
+        <div id="body-save-row" style="display:none;">
+          <button class="save-btn" onclick="saveBodyMetrics()">Save changes</button>
+          <span class="cancel-link" onclick="cancelBodyEdit()">Cancel</span>
+        </div>
+
+        <!-- Success banner (shown after save) -->
+        <div class="success-banner" id="body-success" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="#22C55E" stroke-width="2" stroke-linecap="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Body metrics saved successfully.</span>
+        </div>
+
+        <!-- ═══ SECTION B: CALORIE GOAL TRACKING ═══ -->
+        <div class="section-hdr">
+          <span class="section-hdr-label">Calorie Goal Tracking</span>
+        </div>
+
+        <!-- Toggle card -->
+        <div class="card" style="padding:16px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <!-- Flame icon square -->
+            <div style="width:36px;height:36px;border-radius:10px;background:#EEF0FB;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3s5 4 5 9a5 5 0 01-10 0c0-2 1-3 2-4-.5 1.5.5 3 2 3-.5-3 1-5 1-8z" fill="#6C7EE8" stroke="#6C7EE8" stroke-width=".5" stroke-linejoin="round"/></svg>
+            </div>
+            <!-- Label + subtext -->
+            <div style="flex:1;">
+              <div style="font-size:15px;font-weight:600;color:#3D3D5C;margin-bottom:3px;">Track calorie burn goals</div>
+              <div style="font-size:12px;color:#8A8A9E;line-height:1.5;">Set daily, weekly, and monthly targets. Tracks your progress and sends daily updates.</div>
+            </div>
+            <!-- iOS-style toggle -->
+            <label class="cal-toggle-wrap" style="flex-shrink:0;cursor:pointer;">
+              <input type="checkbox" id="cal-toggle" onchange="onCalToggle()" checked style="display:none;">
+              <div class="cal-toggle-track" id="cal-toggle-track">
+                <div class="cal-toggle-thumb" id="cal-toggle-thumb"></div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- OFF state note -->
+        <div id="cal-off-note" style="display:none;background:#F7F8FF;border:.5px solid #E8EAF8;border-radius:10px;padding:10px 14px;margin-top:8px;">
+          <span style="font-size:12px;color:#8A8A9E;font-style:italic;">Calorie tracking is off. Home shows calories burned but with no goal ring or notifications.</span>
+        </div>
+
+        <!-- ON state: calorie fields card -->
+        <div id="cal-on-content" style="overflow:hidden;max-height:600px;transition:max-height .35s ease;">
+          <div class="card" style="margin-top:8px;padding:16px;">
+
+            <!-- Calorie targets sub-heading -->
+            <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:12px;">Calorie targets</div>
+
+            <!-- Daily -->
+            <div style="margin-bottom:12px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <span style="font-size:13px;color:#8A8A9E;">Daily burn target</span>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <input type="number" id="cal-daily" value="600" onchange="autoCalc()" style="width:64px;border:none;border-bottom:1.5px solid #6C7EE8;background:transparent;font-size:14px;font-weight:600;color:#3D3D5C;font-family:'Inter',sans-serif;text-align:center;outline:none;padding:2px 0;">
+                  <span style="font-size:13px;color:#8A8A9E;">kcal</span>
+                </div>
+              </div>
+              <div style="font-size:11px;color:#8A8A9E;font-style:italic;">Recommended 400–700 kcal/day for your profile.</div>
+            </div>
+
+            <!-- Divider -->
+            <div style="height:.5px;background:#E8EAF8;margin-bottom:12px;"></div>
+
+            <!-- Weekly -->
+            <div style="margin-bottom:12px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <span style="font-size:13px;color:#8A8A9E;">Weekly burn target</span>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <input type="number" id="cal-weekly" value="2100" style="width:64px;border:none;border-bottom:1.5px solid #6C7EE8;background:transparent;font-size:14px;font-weight:600;color:#3D3D5C;font-family:'Inter',sans-serif;text-align:center;outline:none;padding:2px 0;">
+                  <span style="font-size:13px;color:#8A8A9E;">kcal</span>
+                </div>
+              </div>
+              <div style="font-size:11px;color:#8A8A9E;font-style:italic;">Auto-calculated from daily x 7.</div>
+            </div>
+
+            <!-- Divider -->
+            <div style="height:.5px;background:#E8EAF8;margin-bottom:12px;"></div>
+
+            <!-- Monthly -->
+            <div style="margin-bottom:16px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <span style="font-size:13px;color:#8A8A9E;">Monthly burn target</span>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <input type="number" id="cal-monthly" value="8400" style="width:64px;border:none;border-bottom:1.5px solid #6C7EE8;background:transparent;font-size:14px;font-weight:600;color:#3D3D5C;font-family:'Inter',sans-serif;text-align:center;outline:none;padding:2px 0;">
+                  <span style="font-size:13px;color:#8A8A9E;">kcal</span>
+                </div>
+              </div>
+              <div style="font-size:11px;color:#8A8A9E;font-style:italic;">Auto-calculated from weekly x 4.</div>
+            </div>
+
+            <!-- Divider -->
+            <div style="height:.5px;background:#E8EAF8;margin-bottom:16px;"></div>
+
+            <!-- Weight loss goal sub-heading -->
+            <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:12px;">Weight loss goal <span style="font-weight:400;color:#8A8A9E;">(optional)</span></div>
+
+            <!-- Goal weight -->
+            <div style="margin-bottom:4px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:13px;color:#8A8A9E;">Goal weight (optional)</span>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <input type="number" id="cal-goal-weight" placeholder="—" style="width:56px;border:none;border-bottom:1.5px solid #6C7EE8;background:transparent;font-size:14px;font-weight:600;color:#3D3D5C;font-family:'Inter',sans-serif;text-align:center;outline:none;padding:2px 0;">
+                  <span style="font-size:13px;color:#8A8A9E;">kg</span>
+                </div>
+              </div>
+              <div style="font-size:11px;color:#8A8A9E;font-style:italic;margin-top:4px;">Track body composition changes in Progress.</div>
+            </div>
+
+            <!-- Target date -->
+            <div style="margin-top:12px;margin-bottom:4px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:13px;color:#8A8A9E;">Target date (optional)</span>
+                <input type="date" id="cal-target-date" style="border:none;border-bottom:1.5px solid #6C7EE8;background:transparent;font-size:13px;font-weight:500;color:#3D3D5C;font-family:'Inter',sans-serif;outline:none;padding:2px 0;max-width:140px;">
+              </div>
+              <div style="font-size:11px;color:#8A8A9E;font-style:italic;margin-top:4px;">Shows a countdown on your Home screen.</div>
+            </div>
+
+            <!-- Save button -->
+            <button onclick="saveCalGoals()" id="cal-save-btn" style="width:100%;height:52px;border-radius:14px;background:#6C7EE8;color:#fff;border:none;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;margin-top:16px;">Save calorie goals</button>
+
+            <!-- Success banner -->
+            <div id="cal-success" style="display:none;display:none;align-items:center;gap:8px;background:#F0FDF4;border:.5px solid #86EFAC;border-radius:10px;padding:10px 12px;margin-top:10px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="#22C55E" stroke-width="2" stroke-linecap="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-size:13px;color:#166534;font-weight:500;">Calorie goals saved successfully.</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ═══ SECTION C: INJURIES AND CONDITIONS ═══ -->
+        <div class="section-hdr">
+          <span class="section-hdr-label">Injuries &amp; Conditions</span>
+          <button class="section-hdr-edit" id="inj-edit-btn" onclick="toggleInjEdit()">Edit</button>
+        </div>
+
+        <!-- WiseCoach card (always visible) -->
+        <div style="background:#F0EEFE;border-radius:12px;border-left:3px solid #9B84E8;padding:12px;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z" fill="#9B84E8"/><circle cx="19" cy="5" r="1.5" fill="#9B84E8"/></svg>
+            <span style="font-size:12px;font-weight:600;color:#7B5CB8;">WiseCoach</span>
+          </div>
+          <div style="font-size:13px;color:#5B3F9E;line-height:1.5;">WiseCoach reads your injuries and conditions before every plan recommendation. Exercises that could aggravate your conditions are automatically removed from your plan.</div>
+        </div>
+
+        <!-- VIEW MODE -->
+        <div class="card" id="inj-view" style="padding:16px;">
+          <!-- Injuries -->
+          <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:8px;">Injuries</div>
+          <div id="inj-pills-view" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
+          <!-- Divider -->
+          <div style="height:.5px;background:#E8EAF8;margin-bottom:14px;"></div>
+          <!-- Chronic conditions -->
+          <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:8px;">Chronic conditions</div>
+          <div id="cond-pills-view" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        </div>
+
+        <!-- EDIT MODE -->
+        <div id="inj-edit" style="display:none;">
+          <div class="card" style="padding:16px;">
+
+            <!-- Injuries chips -->
+            <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:10px;">Injuries</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;" id="inj-chip-grid">
+              <button class="cond-chip selected" data-group="inj" data-val="Knee injury" onclick="toggleChip(this)">Knee injury</button>
+              <button class="cond-chip" data-group="inj" data-val="Shoulder injury" onclick="toggleChip(this)">Shoulder injury</button>
+              <button class="cond-chip selected" data-group="inj" data-val="Back pain" onclick="toggleChip(this)">Back pain</button>
+              <button class="cond-chip" data-group="inj" data-val="Hip pain" onclick="toggleChip(this)">Hip pain</button>
+            </div>
+
+            <!-- Divider -->
+            <div style="height:.5px;background:#E8EAF8;margin-bottom:16px;"></div>
+
+            <!-- Conditions chips -->
+            <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:10px;">Chronic conditions</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;" id="cond-chip-grid">
+              <button class="cond-chip" data-group="cond" data-val="Asthma" onclick="toggleChip(this)">Asthma</button>
+              <button class="cond-chip" data-group="cond" data-val="Diabetes" onclick="toggleChip(this)">Diabetes</button>
+              <button class="cond-chip" data-group="cond" data-val="Hypertension" onclick="toggleChip(this)">Hypertension</button>
+              <button class="cond-chip" data-group="cond" data-val="Heart condition" onclick="toggleChip(this)">Heart condition</button>
+            </div>
+
+            <!-- None of the above -->
+            <button class="cond-chip-none" id="chip-none" onclick="selectNone()" style="width:100%;margin-bottom:16px;">None of the above</button>
+
+            <!-- Impact card (shows when any chip selected) -->
+            <div id="impact-card" style="background:#FEF3C7;border:1px solid #F59E0B;border-radius:10px;padding:12px;margin-bottom:16px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" fill="#F59E0B"/><path d="M12 9v4M12 17h.01" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+                <span style="font-size:13px;font-weight:600;color:#92400E;">Plan impact</span>
+              </div>
+              <div style="font-size:13px;color:#92400E;line-height:1.5;">Your active plan will be adjusted to exclude: <strong>High-impact running, Squats, Leg press.</strong></div>
+            </div>
+
+            <!-- Save button -->
+            <button id="inj-save-btn" onclick="saveInjuries()" style="width:100%;height:52px;border-radius:14px;background:#6C7EE8;color:#fff;border:none;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:12px;">Save and re-check my plan</button>
+
+            <!-- Success banner -->
+            <div id="inj-success" style="display:none;align-items:center;gap:8px;background:#F0FDF4;border:.5px solid #86EFAC;border-radius:10px;padding:10px 12px;margin-bottom:12px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="#22C55E" stroke-width="2" stroke-linecap="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-size:13px;color:#166534;font-weight:500;flex:1;">Plan updated — WiseCoach has adjusted your exercises based on your updated conditions.</span>
+              <a href="S-10-Plans-Hub.html" style="font-size:12px;color:#6C7EE8;font-weight:600;text-decoration:none;white-space:nowrap;">View changes</a>
+            </div>
+
+            <!-- Disclaimer -->
+            <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:8px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#8A8A9E" stroke-width="2" stroke-linejoin="round"/><path d="M12 8v4M12 16h.01" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <span style="font-size:12px;color:#8A8A9E;font-style:italic;line-height:1.5;">This app's advice is not a substitute for professional medical guidance.</span>
+            </div>
+
+            <!-- Encryption note -->
+            <div style="display:flex;align-items:flex-start;gap:6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#8A8A9E" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg>
+              <span style="font-size:12px;color:#8A8A9E;font-style:italic;line-height:1.5;">Your injury and condition data is encrypted and stored securely.</span>
+            </div>
+
+            <!-- Cancel -->
+            <span class="cancel-link" onclick="cancelInjEdit()" style="margin-top:12px;">Cancel</span>
+
+          </div>
+        </div>
+
+        <!-- ═══ SECTION D: FITNESS PREFERENCES ═══ -->
+        <div class="section-hdr">
+          <span class="section-hdr-label">Fitness Preferences</span>
+          <button class="section-hdr-edit" id="fit-edit-btn" onclick="toggleFitEdit()">Edit</button>
+        </div>
+        <div style="font-size:12px;color:#8A8A9E;font-style:italic;margin-bottom:10px;">These preferences influence WiseCoach recommendations and plan matching.</div>
+
+        <!-- VIEW MODE -->
+        <div class="card" id="fit-view">
+          <div class="field-row"><span class="field-label">Primary goal</span><span class="field-value">Build muscle</span></div>
+          <div class="field-row"><span class="field-label">Sport</span><span class="field-value">Gym + Running</span></div>
+          <div class="field-row"><span class="field-label">Experience</span><span class="field-value">Intermediate</span></div>
+          <div class="field-row"><span class="field-label">Equipment</span><span class="field-value">Full gym</span></div>
+          <div class="field-row"><span class="field-label">Days per week</span><span class="field-value">4 days</span></div>
+          <div class="field-row" style="border-bottom:none;"><span class="field-label">Workout time</span><span class="field-value">7:00 PM</span></div>
+        </div>
+
+        <!-- EDIT MODE -->
+        <div id="fit-edit" style="display:none;">
+          <div class="card" style="padding:16px;">
+
+            <!-- Primary goal -->
+            <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:10px;">Primary goal</div>
+            <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;" id="goal-cards">
+              <div class="pref-card" data-group="goal" data-val="Lose weight" onclick="selectPrefCard(this)" style="min-width:110px;height:60px;">
+                <div style="font-size:13px;font-weight:600;color:#3D3D5C;">Lose weight</div>
+              </div>
+              <div class="pref-card selected" data-group="goal" data-val="Build muscle" onclick="selectPrefCard(this)" style="min-width:110px;height:60px;">
+                <div style="font-size:13px;font-weight:600;color:#6C7EE8;">Build muscle</div>
+              </div>
+              <div class="pref-card" data-group="goal" data-val="Improve endurance" onclick="selectPrefCard(this)" style="min-width:130px;height:60px;">
+                <div style="font-size:13px;font-weight:600;color:#3D3D5C;">Improve endurance</div>
+              </div>
+              <div class="pref-card" data-group="goal" data-val="General fitness" onclick="selectPrefCard(this)" style="min-width:120px;height:60px;">
+                <div style="font-size:13px;font-weight:600;color:#3D3D5C;">General fitness</div>
+              </div>
+            </div>
+
+            <div style="height:.5px;background:#E8EAF8;margin-bottom:16px;"></div>
+
+            <!-- Sport -->
+            <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:10px;">Sport preference</div>
+            <div style="display:flex;gap:8px;margin-bottom:16px;" id="sport-cards">
+              <div class="pref-card" data-group="sport" data-val="Gym only" onclick="selectPrefCard(this)" style="flex:1;height:52px;font-size:13px;font-weight:600;color:#3D3D5C;">Gym only</div>
+              <div class="pref-card" data-group="sport" data-val="Running only" onclick="selectPrefCard(this)" style="flex:1;height:52px;font-size:13px;font-weight:600;color:#3D3D5C;">Running only</div>
+              <div class="pref-card selected" data-group="sport" data-val="Both" onclick="selectPrefCard(this)" style="flex:1;height:52px;font-size:13px;font-weight:600;color:#6C7EE8;">Both</div>
+            </div>
+
+            <div style="height:.5px;background:#E8EAF8;margin-bottom:16px;"></div>
+
+            <!-- Experience -->
+            <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:10px;">Experience level</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;" id="exp-cards">
+              <div class="pref-card" data-group="exp" data-val="Beginner" onclick="selectPrefCard(this)" style="height:56px;justify-content:flex-start;padding:0 14px;gap:4px;flex-direction:column;align-items:flex-start;">
+                <div style="font-size:14px;font-weight:600;color:#3D3D5C;">Beginner</div>
+                <div style="font-size:12px;color:#8A8A9E;">New to training</div>
+              </div>
+              <div class="pref-card selected" data-group="exp" data-val="Intermediate" onclick="selectPrefCard(this)" style="height:56px;justify-content:flex-start;padding:0 14px;gap:4px;flex-direction:column;align-items:flex-start;">
+                <div style="font-size:14px;font-weight:600;color:#6C7EE8;">Intermediate</div>
+                <div style="font-size:12px;color:#8A8A9E;">Train regularly</div>
+              </div>
+              <div class="pref-card" data-group="exp" data-val="Advanced" onclick="selectPrefCard(this)" style="height:56px;justify-content:flex-start;padding:0 14px;gap:4px;flex-direction:column;align-items:flex-start;">
+                <div style="font-size:14px;font-weight:600;color:#3D3D5C;">Advanced</div>
+                <div style="font-size:12px;color:#8A8A9E;">Serious training</div>
+              </div>
+            </div>
+
+            <div style="height:.5px;background:#E8EAF8;margin-bottom:16px;"></div>
+
+            <!-- Equipment -->
+            <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:10px;">Equipment available</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;" id="equip-chips">
+              <button class="cond-chip" data-group="equip" data-val="Home" onclick="toggleEquipChip(this)">Home</button>
+              <button class="cond-chip selected" data-group="equip" data-val="Gym with weights" onclick="toggleEquipChip(this)">Gym with weights</button>
+              <button class="cond-chip" data-group="equip" data-val="Outdoor" onclick="toggleEquipChip(this)">Outdoor</button>
+              <button class="cond-chip" data-group="equip" data-val="Both" onclick="toggleEquipChip(this)">Both</button>
+            </div>
+
+            <div style="height:.5px;background:#E8EAF8;margin-bottom:16px;"></div>
+
+            <!-- Days per week -->
+            <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:10px;">Days per week</div>
+            <div style="display:flex;gap:8px;margin-bottom:16px;" id="days-pills">
+              <button class="day-pill" onclick="selectDay(this)">2</button>
+              <button class="day-pill" onclick="selectDay(this)">3</button>
+              <button class="day-pill selected" onclick="selectDay(this)">4</button>
+              <button class="day-pill" onclick="selectDay(this)">5</button>
+              <button class="day-pill" onclick="selectDay(this)">6</button>
+            </div>
+
+            <div style="height:.5px;background:#E8EAF8;margin-bottom:16px;"></div>
+
+            <!-- Preferred workout time -->
+            <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:10px;">Preferred workout time</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
+              <span style="font-size:13px;color:#8A8A9E;">Time</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="time" id="workout-time" value="19:00" style="border:none;border-bottom:1.5px solid #6C7EE8;background:transparent;font-size:14px;font-weight:600;color:#3D3D5C;font-family:'Inter',sans-serif;outline:none;padding:2px 0;">
+                <span style="font-size:12px;color:#8A8A9E;">for nudge notifications</span>
+              </div>
+            </div>
+
+            <!-- Save -->
+            <button id="fit-save-btn" onclick="saveFitPrefs()" style="width:100%;height:52px;border-radius:14px;background:#6C7EE8;color:#fff;border:none;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;margin-top:16px;">Save preferences</button>
+
+            <!-- Post-save note -->
+            <div id="fit-success" style="display:none;align-items:center;gap:8px;background:#EEF0FB;border-radius:10px;padding:12px;margin-top:10px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#6C7EE8" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="#6C7EE8" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <span style="font-size:13px;color:#3D3D5C;flex:1;">Preferences updated. Go to <strong>Plans &gt; Plan Match</strong> to get a new recommendation.</span>
+              <a href="S-14-Plan-Match.html" style="font-size:12px;color:#6C7EE8;font-weight:600;text-decoration:none;white-space:nowrap;">Go now</a>
+            </div>
+
+            <!-- Cancel -->
+            <span class="cancel-link" onclick="cancelFitEdit()" style="margin-top:10px;">Cancel</span>
+
+          </div>
+        </div>
+
+        <!-- ═══ SECTION E: HEALTH CONNECTIONS ═══ -->
+        <div class="section-hdr">
+          <span class="section-hdr-label">Health Connections</span>
+        </div>
+
+        <div class="card">
+          <!-- Apple Health row -->
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:.5px solid #E8EAF8;cursor:pointer;" onclick="showConnectionSheet('Apple Health')">
+            <div style="width:36px;height:36px;border-radius:10px;background:#FFF1F2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" fill="#EF4444"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:600;color:#3D3D5C;margin-bottom:2px;">Apple Health</div>
+              <div style="font-size:12px;color:#8A8A9E;">Heart rate, calories, steps, workouts</div>
+            </div>
+            <span style="font-size:11px;font-weight:500;color:#1A7A8C;background:#E0F4F8;padding:4px 10px;border-radius:20px;white-space:nowrap;">Connected</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#C8C8D8" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+
+          <!-- Wearable row -->
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:.5px solid #E8EAF8;cursor:pointer;" onclick="showConnectionSheet('Wearable')">
+            <div style="width:36px;height:36px;border-radius:10px;background:#EEF0FB;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="3" stroke="#6C7EE8" stroke-width="1.8"/><path d="M9 2V1M15 2V1M9 22v1M15 22v1" stroke="#6C7EE8" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="2" fill="#6C7EE8"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:600;color:#3D3D5C;margin-bottom:2px;">Wearable device</div>
+              <div style="font-size:12px;color:#8A8A9E;">Apple Watch</div>
+            </div>
+            <span style="font-size:11px;font-weight:500;color:#1A7A8C;background:#E0F4F8;padding:4px 10px;border-radius:20px;white-space:nowrap;">Connected</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#C8C8D8" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+
+          <!-- Data synced note -->
+          <div style="padding:12px 16px;">
+            <div style="font-size:12px;color:#8A8A9E;line-height:1.6;">We sync: Heart rate · Calories · Steps · Workouts. Read more about data usage in our <a href="#" style="color:#6C7EE8;text-decoration:none;font-weight:500;">Privacy Policy</a>.</div>
+          </div>
+        </div>
+
+        <!-- Connection sheet (bottom sheet modal) -->
+        <div id="conn-sheet" style="display:none;position:absolute;inset:0;background:rgba(10,10,18,.45);z-index:50;align-items:flex-end;">
+          <div style="width:100%;background:#fff;border-radius:22px 22px 0 0;padding:20px 20px 40px;">
+            <div style="width:36px;height:4px;border-radius:2px;background:#C8C8D8;margin:0 auto 16px;"></div>
+            <div style="font-size:16px;font-weight:600;color:#2D3A8C;margin-bottom:4px;" id="sheet-title">Apple Health</div>
+            <div style="font-size:13px;color:#8A8A9E;margin-bottom:20px;">Currently connected. You can disconnect at any time.</div>
+            <button onclick="closeConnectionSheet()" style="width:100%;height:48px;border-radius:12px;background:#FEE2E2;color:#EF4444;border:none;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:10px;">Disconnect</button>
+            <button onclick="closeConnectionSheet()" style="width:100%;height:48px;border-radius:12px;background:#F7F8FF;color:#8A8A9E;border:.5px solid #C8C8D8;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:24px;padding-bottom:32px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#8A8A9E" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg>
+          <span style="font-size:12px;color:#8A8A9E;font-style:italic;text-align:center;">This information is used only to personalise your plan and is not shared with third parties.</span>
+        </div>
+
+      </div><!-- end screen-scroll -->
+
+    </div><!-- phone-inner -->
+  </div><!-- phone-shell -->
+</div><!-- stage -->
+
+<script>
+// ── Body Metrics edit mode ────────────────────────────────
+let bodyEditing = false;
+
+function toggleBodyEdit() {
+  bodyEditing = true;
+  document.getElementById('body-view').style.display = 'none';
+  document.getElementById('body-edit').style.display = 'block';
+  document.getElementById('body-save-row').style.display = 'block';
+  document.getElementById('body-success').style.display = 'none';
+  document.getElementById('body-edit-btn').style.display = 'none';
+  // Show avatar overlay
+  document.getElementById('avatar-cam').style.display = 'flex';
+  document.getElementById('avatar-change-link').style.display = 'block';
+}
+
+function cancelBodyEdit() {
+  bodyEditing = false;
+  document.getElementById('body-view').style.display = 'block';
+  document.getElementById('body-edit').style.display = 'none';
+  document.getElementById('body-save-row').style.display = 'none';
+  document.getElementById('body-edit-btn').style.display = 'block';
+  document.getElementById('avatar-cam').style.display = 'none';
+  document.getElementById('avatar-change-link').style.display = 'none';
+}
+
+function saveBodyMetrics() {
+  // Validate
+  const h = parseFloat(document.getElementById('input-height').value);
+  const w = parseFloat(document.getElementById('input-weight').value);
+  const sys = parseInt(document.getElementById('input-bp-sys').value);
+  const dia = parseInt(document.getElementById('input-bp-dia').value);
+
+  if (h < 50 || h > 300) { alert('Height must be between 50 and 300 cm.'); return; }
+  if (w < 20 || w > 400) { alert('Weight must be between 20 and 400 kg.'); return; }
+  if (sys && (sys < 60 || sys > 250)) { alert('Systolic BP must be 60–250.'); return; }
+  if (dia && (dia < 40 || dia > 180)) { alert('Diastolic BP must be 40–180.'); return; }
+
+  // Simulate save: spinner → success
+  const btn = document.querySelector('.save-btn');
+  btn.textContent = 'Saving...';
+  btn.style.opacity = '.7';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    cancelBodyEdit();
+    document.getElementById('body-success').style.display = 'flex';
+    setTimeout(() => {
+      document.getElementById('body-success').style.display = 'none';
+    }, 3000);
+  }, 800);
+}
+
+function setSex(btn) {
+  document.querySelectorAll('#sex-control .seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── Section B: Calorie Goal Tracking ─────────────────────
+function onCalToggle() {
+  const cb = document.getElementById('cal-toggle');
+  const track = document.getElementById('cal-toggle-track');
+  const onContent = document.getElementById('cal-on-content');
+  const offNote = document.getElementById('cal-off-note');
+
+  if (cb.checked) {
+    track.classList.remove('off');
+    onContent.style.maxHeight = '600px';
+    offNote.style.display = 'none';
+  } else {
+    track.classList.add('off');
+    onContent.style.maxHeight = '0';
+    offNote.style.display = 'block';
+  }
+}
+
+function autoCalc() {
+  const daily = parseInt(document.getElementById('cal-daily').value) || 0;
+  document.getElementById('cal-weekly').value = daily * 7;
+  document.getElementById('cal-monthly').value = daily * 7 * 4;
+}
+
+// ── Section C: Injuries & Conditions ─────────────────────
+const INJ_LABELS = ['Knee injury', 'Shoulder injury', 'Back pain', 'Hip pain'];
+const COND_LABELS = ['Asthma', 'Diabetes', 'Hypertension', 'Heart condition'];
+
+function getSelectedChips(gridId) {
+  return [...document.querySelectorAll(`#${gridId} .cond-chip.selected`)].map(b => b.dataset.val);
+}
+
+function renderViewPills() {
+  const injSelected = getSelectedChips('inj-chip-grid');
+  const condSelected = getSelectedChips('cond-chip-grid');
+
+  const injView = document.getElementById('inj-pills-view');
+  injView.innerHTML = injSelected.length
+    ? injSelected.map(v => `<span style="background:#E6EAFE;color:#6C7EE8;font-size:12px;font-weight:500;padding:4px 10px;border-radius:10px;">${v}</span>`).join('')
+    : `<span style="font-size:13px;color:#8A8A9E;font-style:italic;">None recorded</span>`;
+
+  const condView = document.getElementById('cond-pills-view');
+  condView.innerHTML = condSelected.length
+    ? condSelected.map(v => `<span style="background:#E6EAFE;color:#6C7EE8;font-size:12px;font-weight:500;padding:4px 10px;border-radius:10px;">${v}</span>`).join('')
+    : `<span style="font-size:13px;color:#8A8A9E;font-style:italic;">None recorded</span>`;
+}
+
+function toggleInjEdit() {
+  document.getElementById('inj-view').style.display = 'none';
+  document.getElementById('inj-edit').style.display = 'block';
+  document.getElementById('inj-edit-btn').style.display = 'none';
+  document.getElementById('inj-success').style.display = 'none';
+  updateImpactCard();
+}
+
+function cancelInjEdit() {
+  document.getElementById('inj-view').style.display = 'block';
+  document.getElementById('inj-edit').style.display = 'none';
+  document.getElementById('inj-edit-btn').style.display = 'block';
+}
+
+function toggleChip(btn) {
+  btn.classList.toggle('selected');
+  // Deselect "None of the above" when any specific chip is selected
+  document.getElementById('chip-none').classList.remove('selected');
+  updateImpactCard();
+}
+
+function selectNone() {
+  const noneBtn = document.getElementById('chip-none');
+  noneBtn.classList.toggle('selected');
+  if (noneBtn.classList.contains('selected')) {
+    document.querySelectorAll('.cond-chip').forEach(b => b.classList.remove('selected'));
+  }
+  updateImpactCard();
+}
+
+function updateImpactCard() {
+  const anySelected = document.querySelectorAll('.cond-chip.selected').length > 0;
+  document.getElementById('impact-card').style.display = anySelected ? 'block' : 'none';
+}
+
+function saveInjuries() {
+  const btn = document.getElementById('inj-save-btn');
+  btn.textContent = 'Saving...';
+  btn.style.opacity = '.7';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    btn.textContent = 'Save and re-check my plan';
+    btn.style.opacity = '1';
+    btn.disabled = false;
+    renderViewPills();
+    cancelInjEdit();
+    document.getElementById('inj-success').style.display = 'flex';
+    setTimeout(() => { document.getElementById('inj-success').style.display = 'none'; }, 4000);
+  }, 1000);
+}
+
+// Boot: render initial view pills and set impact card state
+window.addEventListener('DOMContentLoaded', () => {
+  renderViewPills();
+  updateImpactCard();
+});
+
+function saveCalGoals() {
+  const btn = document.getElementById('cal-save-btn');
+  btn.textContent = 'Saving...';
+  btn.style.opacity = '.7';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    btn.textContent = 'Save calorie goals';
+    btn.style.opacity = '1';
+    btn.disabled = false;
+    const banner = document.getElementById('cal-success');
+    banner.style.display = 'flex';
+    setTimeout(() => { banner.style.display = 'none'; }, 3000);
+  }, 800);
+}
+
+// ── Section D: Fitness Preferences ───────────────────────
+function toggleFitEdit() {
+  document.getElementById('fit-view').style.display = 'none';
+  document.getElementById('fit-edit').style.display = 'block';
+  document.getElementById('fit-edit-btn').style.display = 'none';
+  document.getElementById('fit-success').style.display = 'none';
+}
+
+function cancelFitEdit() {
+  document.getElementById('fit-view').style.display = 'block';
+  document.getElementById('fit-edit').style.display = 'none';
+  document.getElementById('fit-edit-btn').style.display = 'block';
+}
+
+function selectPrefCard(card) {
+  const group = card.dataset.group;
+  document.querySelectorAll(`.pref-card[data-group="${group}"]`).forEach(c => {
+    c.classList.remove('selected');
+    // reset colour on inner title div or direct text colour
+    const inner = c.querySelector('div');
+    if (inner) inner.style.color = '#3D3D5C';
+    else c.style.color = '#3D3D5C';
+  });
+  card.classList.add('selected');
+  const inner = card.querySelector('div');
+  if (inner) inner.style.color = '#6C7EE8';
+  else card.style.color = '#6C7EE8';
+}
+
+function toggleEquipChip(btn) {
+  btn.classList.toggle('selected');
+}
+
+function selectDay(btn) {
+  document.querySelectorAll('#days-pills .day-pill').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function saveFitPrefs() {
+  const btn = document.getElementById('fit-save-btn');
+  btn.textContent = 'Saving...';
+  btn.style.opacity = '.7';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    btn.textContent = 'Save preferences';
+    btn.style.opacity = '1';
+    btn.disabled = false;
+
+    // Update view mode values from current selection
+    const goalCard = document.querySelector('.pref-card[data-group="goal"].selected');
+    const sportCard = document.querySelector('.pref-card[data-group="sport"].selected');
+    const expCard = document.querySelector('.pref-card[data-group="exp"].selected');
+    const equips = [...document.querySelectorAll('#equip-chips .cond-chip.selected')].map(b => b.dataset.val);
+    const dayBtn = document.querySelector('#days-pills .day-pill.selected');
+    const time = document.getElementById('workout-time').value;
+
+    const rows = document.querySelectorAll('#fit-view .field-row');
+    if (goalCard) rows[0].querySelector('.field-value').textContent = goalCard.dataset.val;
+    if (sportCard) rows[1].querySelector('.field-value').textContent = sportCard.dataset.val;
+    if (expCard) rows[2].querySelector('.field-value').textContent = expCard.dataset.val;
+    if (equips.length) rows[3].querySelector('.field-value').textContent = equips.join(', ');
+    if (dayBtn) rows[4].querySelector('.field-value').textContent = dayBtn.textContent + ' days';
+    if (time) {
+      const [h, m] = time.split(':');
+      const hr = parseInt(h);
+      const ampm = hr >= 12 ? 'PM' : 'AM';
+      const disp = `${hr === 0 ? 12 : hr > 12 ? hr - 12 : hr}:${m} ${ampm}`;
+      rows[5].querySelector('.field-value').textContent = disp;
+    }
+
+    cancelFitEdit();
+    document.getElementById('fit-success').style.display = 'flex';
+    setTimeout(() => { document.getElementById('fit-success').style.display = 'none'; }, 5000);
+  }, 900);
+}
+
+// ── Section E: Health Connections ────────────────────────
+function showConnectionSheet(name) {
+  const sheet = document.getElementById('conn-sheet');
+  document.getElementById('sheet-title').textContent = name;
+  sheet.style.display = 'flex';
+}
+
+function closeConnectionSheet() {
+  document.getElementById('conn-sheet').style.display = 'none';
+}
+</script>
+</body>
+</html>

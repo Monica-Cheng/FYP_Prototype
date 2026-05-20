@@ -1,0 +1,383 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-12 Explore Catalog</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-12 · Explore Plan Catalog</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+/* ── Nav ──────────────────────────────────────────────────── */
+const NAV=[
+  {id:'home',href:'S-09-Home.html',icon:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill={c}/></svg>,label:'Home'},
+  {id:'plans',href:'S-10-Plans-Hub.html',icon:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="20" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill={c}/></svg>,label:'Plans'},
+  {id:'coach',href:'S-25-Coach-Chat.html',icon:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke={c} strokeWidth="1.5" strokeLinejoin="round"/></svg>,label:'Coach'},
+  {id:'club',href:'S-28-Club-Tab.html',icon:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke={c} strokeWidth="1.5"/><circle cx="17" cy="10" r="2.2" stroke={c} strokeWidth="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke={c} strokeWidth="1.5" strokeLinecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,label:'Club'},
+  {id:'progress',href:'S-32-Progress-Tab.html',icon:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,label:'Progress'},
+];
+function BottomNav({active}){return(<div style={{position:'absolute',bottom:0,left:0,right:0,height:84,background:WW.card,borderTop:'0.5px solid #E8EAF8',display:'flex',zIndex:30}}>{NAV.map(n=>{const a=n.id===active,c=a?WW.primary:WW.textSec;return(<a key={n.id} href={n.href} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,textDecoration:'none',paddingBottom:8}}>{n.icon(c)}<span style={{fontSize:10,fontWeight:600,color:c}}>{n.label}</span></a>);})}</div>);}
+
+function StatusBar(){return(<div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}><div style={{paddingTop:10}}>9:41</div><div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg></div></div>);}
+
+/* ── Plan data ────────────────────────────────────────────── */
+const PLANS=[
+  // Featured (first 3)
+  {id:1,name:'Beginner Push-Pull-Legs',goal:'Build Muscle',level:'Beginner',sport:'Gym',sub:'Full Gym',days:3,weeks:8,saves:214,accent:WW.primary,desc:'Classic 3-day split to build your first solid foundation.',coach:'WiseWorkout'},
+  {id:2,name:'Couch to 5K',goal:'Get Fitter',level:'Beginner',sport:'Running',sub:'Get Started',days:3,weeks:8,saves:312,accent:WW.teal,desc:'Walk-run intervals to get you across the 5K finish line.',coach:'Nike Run Club'},
+  {id:3,name:'Intermediate Hypertrophy',goal:'Build Muscle',level:'Intermediate',sport:'Gym',sub:'Full Gym',days:4,weeks:10,saves:97,accent:WW.lavender,desc:'High-volume upper/lower split for experienced lifters.',coach:'WiseWorkout'},
+  // Gym
+  {id:4,name:'Fat Loss Circuit',goal:'Lose Weight',level:'Beginner',sport:'Gym',sub:'Full Gym',days:3,weeks:8,saves:143,accent:WW.gold,desc:'High-intensity circuits combining strength and cardio.',coach:'WiseWorkout'},
+  {id:5,name:'Advanced Powerlifting',goal:'Build Strength',level:'Advanced',sport:'Gym',sub:'Full Gym',days:4,weeks:12,saves:38,accent:WW.primaryDark,desc:'Periodised strength block for competitive lifters.',coach:'WiseWorkout'},
+  {id:6,name:'Summer Shred',goal:'Lose Weight',level:'Intermediate',sport:'Gym',sub:'Full Gym',days:5,weeks:8,saves:122,accent:'#F97316',desc:'High-frequency training to lean down before summer.',coach:'WiseWorkout'},
+  {id:7,name:'Home Dumbbell Strength',goal:'Build Muscle',level:'Beginner',sport:'Gym',sub:'Dumbbells',days:3,weeks:8,saves:88,accent:'#10B981',desc:'Build strength from home with just a set of dumbbells.',coach:'WiseWorkout'},
+  {id:8,name:'Resistance Band Booty',goal:'Build Muscle',level:'Beginner',sport:'Gym',sub:'Bands',days:3,weeks:6,saves:76,accent:'#EC4899',desc:'Glute and leg focused resistance band programme.',coach:'WiseWorkout'},
+  {id:9,name:'30-Day Bodyweight Burn',goal:'Lose Weight',level:'Intermediate',sport:'Gym',sub:'Bodyweight',days:5,weeks:5,saves:199,accent:'#EF4444',desc:'No-equipment HIIT that burns fat fast anywhere.',coach:'WiseWorkout'},
+  {id:10,name:'HIIT & Abs',goal:'Lose Weight',level:'Intermediate',sport:'Gym',sub:'HIIT',days:4,weeks:6,saves:115,accent:'#F59E0B',desc:'Intense full-body HIIT sessions with core finishers.',coach:'WiseWorkout'},
+  // Running
+  {id:11,name:'5K Speed Builder',goal:'Endurance',level:'Intermediate',sport:'Running',sub:'5K',days:4,weeks:6,saves:156,accent:WW.teal,desc:'Tempo runs and intervals to break your 5K PB.',coach:'Nike Run Club'},
+  {id:12,name:'10K Structured Plan',goal:'Endurance',level:'Intermediate',sport:'Running',sub:'10K',days:5,weeks:10,saves:76,accent:'#22C55E',desc:'Structured mileage build to complete your first 10K.',coach:'Nike Run Club'},
+  {id:13,name:'Half Marathon Prep',goal:'Endurance',level:'Intermediate',sport:'Running',sub:'Half Marathon',days:5,weeks:16,saves:55,accent:'#16A34A',desc:'16-week build to cross your first half marathon finish line.',coach:'WiseWorkout'},
+  {id:14,name:'Marathon Ready',goal:'Endurance',level:'Advanced',sport:'Running',sub:'Marathon',days:6,weeks:20,saves:44,accent:'#7C3AED',desc:'Advanced plan for the 42.2 km ultimate challenge.',coach:'WiseWorkout'},
+  {id:15,name:'Speed & Threshold',goal:'Get Fitter',level:'Intermediate',sport:'Running',sub:'Speed',days:4,weeks:8,saves:63,accent:'#F97316',desc:'Lactate threshold and VO2max workouts to run faster.',coach:'WiseWorkout'},
+  {id:16,name:'Easy Recovery Runs',goal:'Get Fitter',level:'Beginner',sport:'Running',sub:'Recovery',days:3,weeks:4,saves:89,accent:'#059669',desc:'Low-intensity runs to build habit and aerobic base.',coach:'WiseWorkout'},
+];
+
+const FEATURED_IDS=[1,2,3];
+
+const GYM_SUBS=['All','Full Gym','At Home','Dumbbells','Bands','Bodyweight','HIIT'];
+const RUN_SUBS=['All','Get Started','5K','10K','Half Marathon','Marathon','Speed','Recovery'];
+
+const FILTER_DIMS=[
+  {id:'level',label:'Level',options:['All','Beginner','Intermediate','Advanced']},
+  {id:'goal',label:'Goal',options:['All','Build Muscle','Lose Weight','Get Fitter','Endurance','Build Strength']},
+  {id:'equipment',label:'Equip.',options:['Any','Full Gym','Dumbbells','Bands','Bodyweight']},
+  {id:'sport',label:'Sport',options:['All','Gym','Running','Outdoor']},
+];
+const DEFAULT_FILTERS={level:'All',goal:'All',equipment:'Any',sport:'All'};
+
+/* ── SaveButton ───────────────────────────────────────────── */
+function SaveBtn({saved,onToggle}){
+  return(
+    <button onClick={e=>{e.preventDefault();e.stopPropagation();onToggle();}} style={{
+      height:24,padding:'0 9px',borderRadius:7,cursor:'pointer',fontSize:10,fontWeight:700,
+      background:saved?'#D1FAE5':'transparent',border:`1.5px solid ${saved?'#059669':WW.border}`,
+      color:saved?'#059669':WW.textSec,display:'flex',alignItems:'center',gap:4,flexShrink:0,
+    }}>
+      {saved&&<svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/></svg>}
+      {saved?'Saved':'Save'}
+    </button>
+  );
+}
+
+/* ── Featured card (horizontal scroll) ───────────────────── */
+function FeaturedCard({plan,saved,onSave}){
+  return(
+    <a href="S-13-Plan-Detail.html" style={{
+      display:'block',width:268,flexShrink:0,borderRadius:18,overflow:'hidden',
+      background:`linear-gradient(135deg,${plan.accent}f0,${plan.accent}88)`,
+      textDecoration:'none',boxShadow:`0 6px 20px ${plan.accent}44`,
+    }}>
+      <div style={{padding:'18px 16px 16px'}}>
+        <div style={{fontSize:9,fontWeight:700,color:'rgba(255,255,255,0.7)',letterSpacing:'0.7px',textTransform:'uppercase',marginBottom:4}}>Featured</div>
+        <div style={{fontSize:16,fontWeight:800,color:'#fff',lineHeight:1.25,marginBottom:5,letterSpacing:'-0.3px'}}>{plan.name}</div>
+        <div style={{fontSize:11,color:'rgba(255,255,255,0.72)',marginBottom:8,lineHeight:1.45}}>{plan.desc}</div>
+        <div style={{fontSize:10,color:'rgba(255,255,255,0.6)',marginBottom:10,fontWeight:500}}>by {plan.coach}</div>
+        <div style={{display:'flex',gap:5,flexWrap:'wrap',marginBottom:12}}>
+          {[plan.level,`${plan.days} days/wk`,`${plan.weeks} wks`].map(t=>(
+            <span key={t} style={{fontSize:10,fontWeight:700,color:'rgba(255,255,255,0.9)',background:'rgba(255,255,255,0.2)',padding:'2px 8px',borderRadius:6}}>{t}</span>
+          ))}
+        </div>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div style={{fontSize:10,color:'rgba(255,255,255,0.65)'}}>{plan.saves.toLocaleString()} saves</div>
+          <div style={{padding:'6px 12px',borderRadius:9,background:'rgba(255,255,255,0.22)',fontSize:12,fontWeight:700,color:'#fff',display:'flex',alignItems:'center',gap:5}}>
+            View Plan
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+/* ── Mini card ────────────────────────────────────────────── */
+function MiniCard({plan,saved,onSave}){
+  return(
+    <a href="S-13-Plan-Detail.html" style={{
+      display:'block',width:158,flexShrink:0,background:WW.card,
+      borderRadius:14,border:`0.5px solid ${WW.border}`,
+      boxShadow:WW.shadow,overflow:'hidden',textDecoration:'none',
+    }}>
+      <div style={{height:4,background:plan.accent}}/>
+      <div style={{padding:'10px 11px 11px'}}>
+        <div style={{fontSize:12,fontWeight:800,color:WW.text,lineHeight:1.3,marginBottom:4,minHeight:34}}>{plan.name}</div>
+        <div style={{fontSize:10,color:WW.textSec,marginBottom:7,fontWeight:500}}>by {plan.coach}</div>
+        <div style={{display:'flex',gap:4,flexWrap:'wrap',marginBottom:8}}>
+          <span style={{fontSize:9,fontWeight:700,color:'#fff',background:plan.accent,padding:'2px 6px',borderRadius:4}}>{plan.goal}</span>
+          <span style={{fontSize:9,fontWeight:600,color:WW.textSec,background:WW.elevated,padding:'2px 6px',borderRadius:4}}>{plan.days}d/wk</span>
+        </div>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div style={{fontSize:10,color:WW.textSec}}>{plan.saves}</div>
+          <SaveBtn saved={saved} onToggle={onSave}/>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+/* ── Category section with sub-chips ─────────────────────── */
+function CategorySection({title,allPlans,subsList,saved,onSave}){
+  const [sub,setSub]=React.useState(subsList[0]);
+  const visible=allPlans.filter(p=>{
+    if(sub==='All'||sub===subsList[0])return true;
+    if(sub==='At Home')return p.sub==='Bodyweight'||p.sub==='Dumbbells'||p.sub==='Bands';
+    return p.sub===sub;
+  });
+  return(
+    <div style={{marginBottom:22}}>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 16px',marginBottom:10}}>
+        <div style={{fontSize:15,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.2px'}}>{title}</div>
+        <a href="#" style={{fontSize:12,color:WW.primary,fontWeight:700,textDecoration:'none'}}>See all</a>
+      </div>
+      <div style={{display:'flex',gap:7,overflowX:'auto',padding:'0 16px 10px',scrollbarWidth:'none'}}>
+        {subsList.map(s=>(
+          <button key={s} onClick={()=>setSub(s)} style={{
+            padding:'5px 13px',borderRadius:16,fontSize:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',flexShrink:0,
+            border:`1.5px solid ${sub===s?WW.primary:WW.border}`,
+            background:sub===s?WW.chipBg:WW.card,
+            color:sub===s?WW.primary:WW.textSec,
+            transition:'all 0.15s',
+          }}>{s}</button>
+        ))}
+      </div>
+      <div style={{display:'flex',gap:10,overflowX:'auto',padding:'2px 16px 6px',scrollbarWidth:'none'}}>
+        {visible.length>0?visible.map(p=>(
+          <MiniCard key={p.id} plan={p} saved={saved.has(p.id)} onSave={()=>onSave(p.id)}/>
+        )):(
+          <div style={{padding:'20px',color:WW.textSec,fontSize:13}}>No plans in this category.</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── Grid card (search results) ───────────────────────────── */
+function GridCard({plan,saved,onSave}){
+  return(
+    <a href="S-13-Plan-Detail.html" style={{display:'block',background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,overflow:'hidden',textDecoration:'none'}}>
+      <div style={{height:4,background:plan.accent}}/>
+      <div style={{padding:'10px 11px 12px'}}>
+        <div style={{fontSize:12,fontWeight:800,color:WW.text,lineHeight:1.3,marginBottom:3}}>{plan.name}</div>
+        <div style={{fontSize:10,color:WW.textSec,marginBottom:6,fontWeight:500}}>by {plan.coach}</div>
+        <div style={{display:'flex',gap:4,flexWrap:'wrap',marginBottom:7}}>
+          <span style={{fontSize:9,fontWeight:700,color:'#fff',background:plan.accent,padding:'2px 6px',borderRadius:4}}>{plan.level}</span>
+          <span style={{fontSize:9,fontWeight:600,color:WW.textSec,background:WW.elevated,padding:'2px 6px',borderRadius:4}}>{plan.days}d/wk</span>
+        </div>
+        <div style={{fontSize:10,color:WW.textSec,lineHeight:1.4,marginBottom:6}}>{plan.desc}</div>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div style={{fontSize:10,color:WW.textSec}}>{plan.saves} saves</div>
+          <SaveBtn saved={saved} onToggle={onSave}/>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+/* ── Routine card (small, grid) ───────────────────────────── */
+const ROUTINES=[
+  {id:'r1',name:'5×5 Strength',days:3,type:'Gym',saves:88,accent:WW.primaryDark,author:'@powerlifter_dan'},
+  {id:'r2',name:'PPL 6-Day',days:6,type:'Gym',saves:234,accent:WW.primary,author:'@fitness_pro'},
+  {id:'r3',name:'Bro Split',days:5,type:'Gym',saves:177,accent:WW.lavender,author:'@gainz_only'},
+  {id:'r4',name:'Full Body 3×',days:3,type:'Gym',saves:142,accent:WW.teal,author:'@coach_marcus'},
+];
+function RoutineCard({r}){
+  return(
+    <a href="S-13-Plan-Detail.html" style={{display:'block',background:WW.card,borderRadius:12,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'11px 12px',textDecoration:'none'}}>
+      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:7}}>
+        <div style={{width:32,height:32,borderRadius:9,background:r.accent+'22',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="7" y="10" width="10" height="4" rx="2" stroke={r.accent} strokeWidth="1.5"/><rect x="3" y="8" width="4" height="8" rx="2" stroke={r.accent} strokeWidth="1.5"/><rect x="17" y="8" width="4" height="8" rx="2" stroke={r.accent} strokeWidth="1.5"/></svg>
+        </div>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:13,fontWeight:800,color:WW.text,marginBottom:1}}>{r.name}</div>
+          <div style={{fontSize:10,color:WW.textSec,fontWeight:500}}>{r.author}</div>
+        </div>
+      </div>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div style={{display:'flex',gap:5}}>
+          <span style={{fontSize:9,fontWeight:700,color:WW.textSec,background:WW.elevated,padding:'2px 7px',borderRadius:5}}>{r.days}d/wk</span>
+          <span style={{fontSize:9,fontWeight:700,color:WW.textSec,background:WW.elevated,padding:'2px 7px',borderRadius:5}}>{r.type}</span>
+        </div>
+        <div style={{fontSize:10,color:WW.textSec}}>{r.saves} saves</div>
+      </div>
+    </a>
+  );
+}
+
+/* ── App ─────────────────────────────────────────────────── */
+function App(){
+  const [search,setSearch]=React.useState('');
+  const [filters,setFilters]=React.useState(DEFAULT_FILTERS);
+  const [activeDim,setActiveDim]=React.useState(null);
+  const [saved,setSaved]=React.useState(new Set([1,2]));
+
+  const toggleSave=id=>setSaved(s=>{const n=new Set(s);n.has(id)?n.delete(id):n.add(id);return n;});
+
+  const hasFilter=search.length>0||Object.entries(filters).some(([k,v])=>v!==DEFAULT_FILTERS[k]);
+
+  const filtered=PLANS.filter(p=>{
+    const q=search.toLowerCase();
+    if(q&&!p.name.toLowerCase().includes(q)&&!p.goal.toLowerCase().includes(q)&&!p.coach.toLowerCase().includes(q))return false;
+    if(filters.level!=='All'&&p.level!==filters.level)return false;
+    if(filters.goal!=='All'&&p.goal!==filters.goal)return false;
+    if(filters.equipment!=='Any'){
+      const sub=filters.equipment;
+      if(!p.sub.toLowerCase().includes(sub.toLowerCase())&&p.sub!==sub)return false;
+    }
+    if(filters.sport!=='All'&&p.sport!==filters.sport)return false;
+    return true;
+  });
+
+  const featuredPlans=PLANS.filter(p=>FEATURED_IDS.includes(p.id));
+  const gymPlans=PLANS.filter(p=>p.sport==='Gym');
+  const runPlans=PLANS.filter(p=>p.sport==='Running');
+
+  const clearFilters=()=>{setFilters(DEFAULT_FILTERS);setSearch('');setActiveDim(null);};
+
+  return(
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',position:'relative'}}>
+      <StatusBar/>
+
+      {/* Header */}
+      <div style={{padding:'2px 16px 10px',flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
+          <div style={{fontSize:24,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.5px'}}>Explore</div>
+          <a href="S-10-Plans-Hub.html" style={{width:34,height:34,borderRadius:17,background:'rgba(61,61,92,.07)',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none'}}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke={WW.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </a>
+        </div>
+        {/* Search */}
+        <div style={{position:'relative',marginBottom:10}}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style={{position:'absolute',left:11,top:'50%',transform:'translateY(-50%)'}}><circle cx="11" cy="11" r="7" stroke={WW.textSec} strokeWidth="1.8"/><path d="M16.5 16.5l3.5 3.5" stroke={WW.textSec} strokeWidth="1.8" strokeLinecap="round"/></svg>
+          <input placeholder="Search plans, goals, coaches…" value={search} onChange={e=>setSearch(e.target.value)}
+            style={{width:'100%',height:40,borderRadius:12,border:`1px solid ${WW.border}`,background:WW.card,fontSize:13,color:WW.text,paddingLeft:34,paddingRight:12,boxSizing:'border-box',outline:'none',fontFamily:'inherit'}}/>
+        </div>
+
+        {/* 4-dim filter bar */}
+        <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:activeDim?6:0,scrollbarWidth:'none'}}>
+          {FILTER_DIMS.map(dim=>{
+            const active=filters[dim.id]!==DEFAULT_FILTERS[dim.id];
+            const expanded=activeDim===dim.id;
+            return(
+              <button key={dim.id} onClick={()=>setActiveDim(expanded?null:dim.id)} style={{
+                padding:'6px 11px',borderRadius:20,fontSize:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',flexShrink:0,
+                border:`1.5px solid ${(active||expanded)?WW.primary:WW.border}`,
+                background:(active||expanded)?WW.chipBg:WW.card,
+                color:(active||expanded)?WW.primary:WW.textSec,
+                display:'flex',alignItems:'center',gap:4,transition:'all 0.15s',
+              }}>
+                {active?filters[dim.id]:dim.label}
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" style={{transform:expanded?'rotate(180deg)':'',transition:'transform 0.2s'}}><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></svg>
+              </button>
+            );
+          })}
+          {hasFilter&&(
+            <button onClick={clearFilters} style={{padding:'6px 10px',borderRadius:20,fontSize:11,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',flexShrink:0,border:`1.5px solid #EF4444`,background:'#FEE2E2',color:'#EF4444'}}>
+              Clear ×
+            </button>
+          )}
+        </div>
+        {/* Expanded dim options */}
+        {activeDim&&(()=>{
+          const dim=FILTER_DIMS.find(d=>d.id===activeDim);
+          return(
+            <div style={{display:'flex',gap:6,overflowX:'auto',paddingTop:8,paddingBottom:2,scrollbarWidth:'none'}}>
+              {dim.options.map(opt=>{
+                const sel=filters[activeDim]===opt;
+                return(
+                  <button key={opt} onClick={()=>{setFilters(f=>({...f,[activeDim]:opt}));setActiveDim(null);}} style={{
+                    padding:'5px 13px',borderRadius:16,fontSize:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',flexShrink:0,
+                    border:`1.5px solid ${sel?WW.primary:WW.border}`,
+                    background:sel?WW.primary:WW.card,
+                    color:sel?'#fff':WW.textSec,
+                  }}>{opt}</button>
+                );
+              })}
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* Scrollable body */}
+      <div style={{flex:1,overflowY:'auto',paddingBottom:92,scrollbarWidth:'none'}}>
+
+        {hasFilter?(
+          /* ── Filtered results ── */
+          <div style={{padding:'4px 16px'}}>
+            <div style={{fontSize:12,color:WW.textSec,fontWeight:600,marginBottom:12}}>{filtered.length} plan{filtered.length!==1?'s':''} found</div>
+            {filtered.length===0?(
+              <div style={{textAlign:'center',padding:'40px 20px'}}>
+                <div style={{fontSize:40,marginBottom:12}}>🔍</div>
+                <div style={{fontSize:15,fontWeight:700,color:WW.primaryDark,marginBottom:6}}>No plans match</div>
+                <div style={{fontSize:13,color:WW.textSec,lineHeight:1.5}}>Try adjusting your filters or search term.</div>
+                <button onClick={clearFilters} style={{marginTop:16,padding:'10px 22px',borderRadius:12,background:WW.primary,color:'#fff',border:'none',fontSize:14,fontWeight:700,cursor:'pointer'}}>Clear Filters</button>
+              </div>
+            ):(
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+                {filtered.map(p=><GridCard key={p.id} plan={p} saved={saved.has(p.id)} onSave={()=>toggleSave(p.id)}/>)}
+              </div>
+            )}
+          </div>
+        ):(
+          /* ── Browse mode ── */
+          <>
+            {/* Featured plans */}
+            <div style={{marginBottom:22}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'4px 16px 10px'}}>
+                <div style={{fontSize:15,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.2px'}}>Featured</div>
+                <a href="#" style={{fontSize:12,color:WW.primary,fontWeight:700,textDecoration:'none'}}>See all</a>
+              </div>
+              <div style={{display:'flex',gap:12,overflowX:'auto',padding:'2px 16px 6px',scrollbarWidth:'none'}}>
+                {featuredPlans.map(p=><FeaturedCard key={p.id} plan={p} saved={saved.has(p.id)} onSave={()=>toggleSave(p.id)}/>)}
+              </div>
+            </div>
+
+            {/* Gym plans */}
+            <CategorySection title="Gym Plans" allPlans={gymPlans} subsList={GYM_SUBS} saved={saved} onSave={toggleSave}/>
+
+            {/* Running plans */}
+            <CategorySection title="Running Plans" allPlans={runPlans} subsList={RUN_SUBS} saved={saved} onSave={toggleSave}/>
+
+            {/* Community Routines */}
+            <div style={{padding:'0 16px',marginBottom:16}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
+                <div style={{fontSize:15,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.2px'}}>Popular Routines</div>
+                <a href="#" style={{fontSize:12,color:WW.primary,fontWeight:700,textDecoration:'none'}}>See all</a>
+              </div>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+                {ROUTINES.map(r=><RoutineCard key={r.id} r={r}/>)}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      <BottomNav active="plans"/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

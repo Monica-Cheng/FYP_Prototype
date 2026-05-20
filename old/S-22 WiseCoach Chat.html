@@ -1,0 +1,339 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-22 WiseCoach Chat</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell { width: 390px; height: 844px; border-radius: 52px; background: #0A0A12; padding: 5px; box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12); position: relative; box-sizing: content-box; }
+  .phone-inner { width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #F7F8FF; position: relative; }
+  .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60; pointer-events: none; }
+  .tweaks-panel { position: fixed; bottom: 20px; right: 20px; width: 280px; background: #fff; border-radius: 14px; padding: 14px 16px 16px; box-shadow: 0 10px 40px rgba(20,25,60,0.18), 0 0 0 0.5px rgba(0,0,0,0.08); color: #3D3D5C; display: none; z-index: 100; }
+  .tweaks-panel.open { display: block; }
+  .tweaks-panel h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; color: #8A8A9E; }
+  .tweak-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; gap: 10px; }
+  .tweak-row label { font-size: 13px; color: #3D3D5C; flex: 1; }
+  .tweak-row input[type="checkbox"] { accent-color: #6C7EE8; }
+  .tweak-row select { font-size: 12px; padding: 5px 8px; border-radius: 8px; border: 0.5px solid #C8C8D8; background: #F7F8FF; color: #3D3D5C; }
+
+  @keyframes typingDot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-3px); opacity: 1; }
+  }
+  .td { display: inline-block; width: 6px; height: 6px; border-radius: 3px; background: #9B84E8; margin: 0 1.5px; animation: typingDot 1.2s infinite ease-in-out; }
+  .td:nth-child(2) { animation-delay: 0.15s; }
+  .td:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes bubbleIn {
+    from { opacity: 0; transform: translateY(6px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .bubble-in { animation: bubbleIn 360ms cubic-bezier(.2,.8,.2,1) both; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="label">S-22 · WiseCoach Chat</div>
+    <div class="phone-shell" data-screen-label="S-22 WiseCoach Chat">
+      <div class="island"></div>
+      <div class="phone-inner" id="app"></div>
+    </div>
+  </div>
+
+  <div class="tweaks-panel" id="tweaks">
+    <h3>Tweaks</h3>
+    <div class="tweak-row"><label>Typing indicator</label><input type="checkbox" id="tw-typing" checked></div>
+    <div class="tweak-row"><label>Context banner</label><input type="checkbox" id="tw-ctx" checked></div>
+    <div class="tweak-row"><label>Quick replies</label><input type="checkbox" id="tw-chips" checked></div>
+    <div class="tweak-row">
+      <label>User tone</label>
+      <select id="tw-tone">
+        <option value="tired">Pretty good, a bit tired.</option>
+        <option value="great">Feeling great, ready to push.</option>
+        <option value="sore">Shoulder is a little sore.</option>
+        <option value="short">Short on time today.</option>
+      </select>
+    </div>
+  </div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const WW = {
+  bg: '#F7F8FF', card: '#FFFFFF', elevated: '#EEF0FB',
+  primary: '#6C7EE8', primaryDark: '#2D3A8C',
+  chipBg: '#E6EAFE', chipText: '#4A5CC0',
+  lavender: '#9B84E8', lavenderBg: '#F0EEFE', lavenderDark: '#7B5CB8',
+  teal: '#4BB8CC', tealBg: '#E0F4F8',
+  text: '#3D3D5C', textSec: '#8A8A9E', textTert: '#B5B5C8',
+  border: '#E2E3ED', borderSoft: '#EEEFF5',
+  shadow: '0 2px 8px rgba(45,58,140,0.06)',
+};
+
+const Ico = {
+  sparkle:(c,s=16)=>(<svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill={c||'#fff'}/><circle cx="18.5" cy="5.5" r="1.2" fill={c||'#fff'}/></svg>),
+  info:(c)=>(<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={c||WW.text} strokeWidth="1.6"/><path d="M12 10v6M12 7.5v0.1" stroke={c||WW.text} strokeWidth="1.8" strokeLinecap="round"/></svg>),
+  back:(c)=>(<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke={c||WW.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>),
+  chart:(c)=>(<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke={c||WW.lavenderDark} strokeWidth="2" strokeLinecap="round"/></svg>),
+  dumbbell:(c)=>(<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="2" y="9" width="3" height="6" rx="1" fill={c||WW.lavenderDark}/><rect x="19" y="9" width="3" height="6" rx="1" fill={c||WW.lavenderDark}/><rect x="5" y="10.5" width="2" height="3" rx="0.5" fill={c||WW.lavenderDark}/><rect x="17" y="10.5" width="2" height="3" rx="0.5" fill={c||WW.lavenderDark}/><rect x="7" y="11" width="10" height="2" rx="0.6" fill={c||WW.lavenderDark}/></svg>),
+  shield:(c)=>(<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-0.8-8-4.5-8-9V6l8-3z" stroke={c||WW.lavenderDark} strokeWidth="1.8" strokeLinejoin="round" fill="none"/></svg>),
+  send:(c)=>(<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12l18-8-7 18-3-8-8-2z" fill={c||'#fff'}/></svg>),
+  plus:(c)=>(<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke={c||WW.textSec} strokeWidth="1.8" strokeLinecap="round"/></svg>),
+  mic:(c)=>(<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="12" rx="3" fill={c||WW.textSec}/><path d="M5 11a7 7 0 0014 0M12 18v3" stroke={c||WW.textSec} strokeWidth="1.6" strokeLinecap="round"/></svg>),
+};
+
+function StatusBar() {
+  return (
+    <div style={{ height:47, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 28px', fontSize:15, fontWeight:600, color:WW.text, position:'relative', zIndex:5 }}>
+      <div style={{ paddingTop:10 }}>9:41</div>
+      <div style={{ display:'flex', gap:6, alignItems:'center', paddingTop:10 }}>
+        <svg width="17" height="11" viewBox="0 0 17 11">
+          <rect x="0" y="7" width="3" height="4" rx="0.6" fill={WW.text}/>
+          <rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={WW.text}/>
+          <rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={WW.text}/>
+          <rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={WW.text}/>
+        </svg>
+        <svg width="24" height="11" viewBox="0 0 24 11">
+          <rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity="0.4" fill="none"/>
+          <rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/>
+          <rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={WW.text} opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function TopBar() {
+  return (
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'4px 14px 10px' }}>
+      <button style={{ width:36, height:36, borderRadius:18, background:'transparent', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+        {Ico.back(WW.text)}
+      </button>
+      <div style={{ display:'flex', alignItems:'center', gap:10, flex:1, justifyContent:'center' }}>
+        <div style={{ width:34, height:34, borderRadius:17, background:`linear-gradient(135deg, ${WW.lavender} 0%, #B8A6F0 100%)`, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 3px 10px rgba(155,132,232,0.35)' }}>
+          {Ico.sparkle('#fff', 16)}
+        </div>
+        <div style={{ display:'flex', flexDirection:'column', lineHeight:1.1 }}>
+          <div style={{ fontSize:15, fontWeight:700, color:WW.text, letterSpacing:'-0.2px' }}>WiseCoach</div>
+          <div style={{ fontSize:10.5, color:WW.lavenderDark, fontWeight:600, letterSpacing:'0.2px', display:'flex', alignItems:'center', gap:4 }}>
+            <span style={{ width:6, height:6, borderRadius:3, background:'#3EB37A' }}/>
+            Online
+          </div>
+        </div>
+      </div>
+      <button style={{ width:36, height:36, borderRadius:18, background:'transparent', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+        {Ico.info(WW.textSec)}
+      </button>
+    </div>
+  );
+}
+
+function ContextBanner() {
+  const items = [
+    { ic: Ico.chart, label:'7 days training' },
+    { ic: Ico.dumbbell, label:'current plan' },
+    { ic: Ico.shield, label:'injury profile' },
+  ];
+  return (
+    <div style={{ margin:'0 18px 14px', background:WW.lavenderBg, borderRadius:12, padding:'9px 12px', display:'flex', alignItems:'center', gap:8 }}>
+      <div style={{ fontSize:10.5, fontWeight:700, color:WW.lavenderDark, letterSpacing:'0.3px', textTransform:'uppercase' }}>Reading</div>
+      <div style={{ display:'flex', alignItems:'center', gap:10, flex:1, flexWrap:'wrap' }}>
+        {items.map((it,i) => (
+          <div key={i} style={{ display:'flex', alignItems:'center', gap:4 }}>
+            {it.ic()}
+            <span style={{ fontSize:11.5, color:WW.lavenderDark, fontWeight:500 }}>{it.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CoachAvatar() {
+  return (
+    <div style={{ width:26, height:26, borderRadius:13, background:`linear-gradient(135deg, ${WW.lavender} 0%, #B8A6F0 100%)`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:2, boxShadow:'0 2px 6px rgba(155,132,232,0.3)' }}>
+      {Ico.sparkle('#fff', 13)}
+    </div>
+  );
+}
+
+function CoachBubble({ children, tail, delay=0 }) {
+  return (
+    <div className="bubble-in" style={{ display:'flex', gap:8, alignItems:'flex-start', marginBottom:10, paddingRight:40, animationDelay:`${delay}ms` }}>
+      {tail ? <CoachAvatar/> : <div style={{ width:26, flexShrink:0 }}/>}
+      <div style={{ background:WW.lavenderBg, color:WW.lavenderDark, padding:'11px 14px', borderRadius:18, borderTopLeftRadius: tail ? 6 : 18, fontSize:13.5, lineHeight:1.45, fontWeight:500, maxWidth:'100%', letterSpacing:'-0.05px' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function UserBubble({ children, delay=0 }) {
+  return (
+    <div className="bubble-in" style={{ display:'flex', justifyContent:'flex-end', marginBottom:10, paddingLeft:40, animationDelay:`${delay}ms` }}>
+      <div style={{ background:WW.primary, color:'#fff', padding:'10px 14px', borderRadius:18, borderTopRightRadius:6, fontSize:13.5, lineHeight:1.45, fontWeight:500, letterSpacing:'-0.05px', boxShadow:'0 4px 12px rgba(108,126,232,0.25)' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function QuickReplies({ options }) {
+  return (
+    <div className="bubble-in" style={{ display:'flex', flexWrap:'wrap', gap:7, paddingLeft:34, marginBottom:12, animationDelay:'900ms' }}>
+      {options.map(o => (
+        <button key={o} style={{ padding:'8px 13px', borderRadius:17, background:WW.chipBg, border:`0.5px solid ${WW.chipText}22`, fontSize:12.5, fontWeight:600, color:WW.chipText, cursor:'pointer', fontFamily:'inherit', letterSpacing:'-0.05px', whiteSpace:'nowrap' }}>
+          {o}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function TypingBubble({ delay=0 }) {
+  return (
+    <div className="bubble-in" style={{ display:'flex', gap:8, alignItems:'flex-end', marginBottom:6, animationDelay:`${delay}ms` }}>
+      <CoachAvatar/>
+      <div style={{ background:WW.lavenderBg, padding:'11px 14px', borderRadius:18, borderTopLeftRadius:6, display:'flex', alignItems:'center', minHeight:14 }}>
+        <span className="td"/>
+        <span className="td"/>
+        <span className="td"/>
+      </div>
+    </div>
+  );
+}
+
+function InputBar() {
+  return (
+    <div style={{ position:'absolute', left:0, right:0, bottom:0, background:'rgba(255,255,255,0.97)', backdropFilter:'blur(14px)', WebkitBackdropFilter:'blur(14px)', borderTop:`0.5px solid ${WW.borderSoft}`, padding:'10px 14px 22px' }}>
+      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+        <button style={{ width:36, height:36, borderRadius:18, background:WW.elevated, border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0 }}>
+          {Ico.plus(WW.textSec)}
+        </button>
+        <div style={{ flex:1, height:42, borderRadius:21, background:WW.elevated, padding:'0 12px 0 16px', display:'flex', alignItems:'center', gap:8 }}>
+          <div style={{ flex:1, fontSize:13.5, color:WW.textTert, fontWeight:500 }}>Ask WiseCoach anything…</div>
+          <button style={{ width:28, height:28, borderRadius:14, background:'transparent', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0 }}>
+            {Ico.mic(WW.textSec)}
+          </button>
+        </div>
+        <button style={{ width:36, height:36, borderRadius:18, background:WW.primary, border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0, boxShadow:'0 4px 10px rgba(108,126,232,0.3)' }}>
+          {Ico.send('#fff')}
+        </button>
+      </div>
+      <div style={{ fontSize:10, color:WW.textTert, fontWeight:500, textAlign:'center', marginTop:8, letterSpacing:'-0.05px' }}>
+        Not a substitute for professional medical advice.
+      </div>
+    </div>
+  );
+}
+
+const TONES = {
+  tired: 'Pretty good, a bit tired.',
+  great: 'Feeling great, ready to push.',
+  sore:  'Shoulder is a little sore.',
+  short: 'Short on time today.',
+};
+
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "typing": true,
+  "showContext": true,
+  "showChips": true,
+  "tone": "tired"
+}/*EDITMODE-END*/;
+
+function ChatScreen({ tw }) {
+  return (
+    <div style={{ width:390, height:844, background:WW.bg, fontFamily:'-apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif', color:WW.text, position:'relative', overflow:'hidden', WebkitFontSmoothing:'antialiased' }}>
+      <StatusBar/>
+      <TopBar/>
+      {tw.showContext && <ContextBanner/>}
+      <div style={{ position:'absolute', top: tw.showContext ? 148 : 98, left:0, right:0, bottom:96, overflowY:'auto', padding:'4px 16px 10px' }}>
+        {/* day divider */}
+        <div style={{ textAlign:'center', margin:'6px 0 14px' }}>
+          <span style={{ fontSize:10.5, color:WW.textSec, fontWeight:600, letterSpacing:'0.5px', textTransform:'uppercase', padding:'4px 10px', background:'rgba(61,61,92,0.05)', borderRadius:10 }}>Today</span>
+        </div>
+
+        <CoachBubble tail delay={0}>
+          Hi Marcus! I noticed you had a strong session yesterday — new personal best on bench press. How are you feeling today?
+        </CoachBubble>
+
+        <UserBubble delay={220}>
+          {TONES[tw.tone] || TONES.tired}
+        </UserBubble>
+
+        <CoachBubble tail delay={460}>
+          That makes sense — your volume was up <span style={{ fontWeight:700, color:WW.primaryDark }}>15%</span> this week. I&apos;d suggest a lighter upper body session or an active rest day today. Want me to adjust today&apos;s plan?
+        </CoachBubble>
+
+        {tw.showChips && (
+          <QuickReplies options={['Yes, adjust today', 'Show my progress', 'What should I eat?']}/>
+        )}
+
+        {tw.typing && <TypingBubble delay={1200}/>}
+      </div>
+      <InputBar/>
+    </div>
+  );
+}
+
+function App() {
+  const [tw, setTw] = React.useState(TWEAKS);
+  window.__getTweaks = () => tw;
+  window.__updateTweaks = (patch) => {
+    setTw(prev => {
+      const next = { ...prev, ...patch };
+      window.parent.postMessage({ type:'__edit_mode_set_keys', edits:patch }, '*');
+      return next;
+    });
+  };
+  return <ChatScreen tw={tw}/>;
+}
+
+function __mountWhenReady() {
+  if (!window.ReactDOM) return setTimeout(__mountWhenReady, 30);
+  ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+}
+__mountWhenReady();
+</script>
+
+<script>
+(function () {
+  const panel = document.getElementById('tweaks');
+  const t = document.getElementById('tw-typing');
+  const c = document.getElementById('tw-ctx');
+  const ch = document.getElementById('tw-chips');
+  const tn = document.getElementById('tw-tone');
+
+  function syncFrom(tw) {
+    t.checked = !!tw.typing;
+    c.checked = !!tw.showContext;
+    ch.checked = !!tw.showChips;
+    tn.value = tw.tone;
+  }
+  function whenReady(cb) {
+    if (window.__updateTweaks) return cb();
+    setTimeout(() => whenReady(cb), 30);
+  }
+  whenReady(() => {
+    syncFrom(window.__getTweaks());
+    t.addEventListener('change', e => window.__updateTweaks({ typing: e.target.checked }));
+    c.addEventListener('change', e => window.__updateTweaks({ showContext: e.target.checked }));
+    ch.addEventListener('change', e => window.__updateTweaks({ showChips: e.target.checked }));
+    tn.addEventListener('change', e => window.__updateTweaks({ tone: e.target.value }));
+  });
+  window.addEventListener('message', (ev) => {
+    const d = ev.data;
+    if (!d || typeof d !== 'object') return;
+    if (d.type === '__activate_edit_mode') panel.classList.add('open');
+    else if (d.type === '__deactivate_edit_mode') panel.classList.remove('open');
+  });
+  window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+})();
+</script>
+
+</body></html>

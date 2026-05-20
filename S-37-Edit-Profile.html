@@ -1,0 +1,156 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-37 Edit Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0;padding:0;background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .lbl{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  .spin{animation:spin .8s linear infinite;display:inline-flex}
+</style>
+</head><body>
+<div class="stage">
+  <div class="lbl">S-37 · Edit Profile</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+const PATHS={
+  'chevron-left':"M15 18l-6-6 6-6",
+  camera:"M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
+  'map-pin':"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+  check:"M20 6L9 17l-5-5",
+  'loader-circle':"M21 12a9 9 0 1 1-6.22-8.56",
+};
+function Icon({name,size=16,color='currentColor',style:s,className:cn}){
+  const p=PATHS[name];if(!p)return null;
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-flex',flexShrink:0,...s}} className={cn}><path d={p}/></svg>;
+}
+function StatusBar(){
+  return <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0,background:WW.card}}>
+    <span style={{paddingTop:10}}>9:41</span>
+    <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+      <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+      <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+    </div>
+  </div>;
+}
+
+const ORIG={name:'Marcus Tan',username:'@marcustan',hometown:'Singapore',bio:'Gym 4x a week. Running on weekends. Chasing PRs and consistency.'};
+
+function App(){
+  const [name,setName]=React.useState(ORIG.name);
+  const [username,setUsername]=React.useState(ORIG.username);
+  const [hometown,setHometown]=React.useState(ORIG.hometown);
+  const [bio,setBio]=React.useState(ORIG.bio);
+  const [saveS,setSaveS]=React.useState('idle');
+
+  const dirty=name!==ORIG.name||username!==ORIG.username||hometown!==ORIG.hometown||bio!==ORIG.bio;
+  const canSave=dirty&&saveS==='idle';
+
+  function handleSave(){
+    if(!canSave)return;
+    setSaveS('loading');
+    setTimeout(()=>{
+      setSaveS('saved');
+      setTimeout(()=>window.location.href='S-34-Profile.html',800);
+    },800);
+  }
+
+  const saveBg=saveS==='saved'?'#22C55E':canSave?WW.primary:'#E8EAF8';
+  const saveFg=saveS==='saved'||canSave?'#fff':'#8A8A9E';
+  const saveTxt=saveS==='loading'?'Saving...':saveS==='saved'?'Saved!':'Save Changes';
+
+  const fieldRow=(label,content)=>(
+    <div style={{padding:'12px 16px',borderTop:`0.5px solid #E8EAF8`}}>
+      <div style={{fontSize:11,fontWeight:500,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',marginBottom:6}}>{label}</div>
+      {content}
+    </div>
+  );
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,fontFamily:"'Inter',system-ui,sans-serif"}}>
+      <StatusBar/>
+      {/* Top bar */}
+      <div style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',flexShrink:0,position:'relative'}}>
+        <a href="S-34-Profile.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,textDecoration:'none',flexShrink:0}}>
+          <Icon name="chevron-left" size={18} color={WW.textSec}/>
+        </a>
+        <span style={{position:'absolute',left:'50%',transform:'translateX(-50%)',fontSize:18,fontWeight:600,color:WW.primaryDark}}>Edit Profile</span>
+        <button onClick={handleSave} disabled={!canSave} style={{marginLeft:'auto',fontSize:15,fontWeight:500,color:canSave?WW.primary:'#C8C8D8',background:'none',border:'none',padding:0,cursor:canSave?'pointer':'not-allowed',fontFamily:'inherit'}}>Save</button>
+      </div>
+
+      {/* Scroll */}
+      <div style={{flex:1,overflowY:'auto',paddingBottom:100}}>
+        {/* Avatar */}
+        <div style={{display:'flex',flexDirection:'column',alignItems:'center',padding:'20px 0 16px'}}>
+          <div style={{position:'relative',display:'inline-flex'}}>
+            <div onClick={()=>alert('Photo picker would open here.')} style={{width:80,height:80,borderRadius:40,background:WW.primary,display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,fontWeight:700,color:'#fff',cursor:'pointer'}}>M</div>
+            <button onClick={()=>alert('Photo picker would open here.')} style={{position:'absolute',bottom:0,right:0,width:28,height:28,borderRadius:14,background:WW.card,border:`1.5px solid ${WW.primary}`,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',padding:0}}>
+              <Icon name="camera" size={14} color={WW.primary}/>
+            </button>
+          </div>
+          <button onClick={()=>alert('Photo picker would open here.')} style={{marginTop:6,fontSize:13,color:WW.primary,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>Change photo</button>
+        </div>
+
+        {/* Form card */}
+        <div style={{background:WW.card,borderRadius:16,margin:'0 16px',border:`0.5px solid ${WW.border}`,overflow:'hidden',boxShadow:WW.shadow}}>
+          {/* Name */}
+          <div style={{padding:'12px 16px'}}>
+            <div style={{fontSize:11,fontWeight:500,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',marginBottom:6}}>Name</div>
+            <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your display name"
+              style={{width:'100%',border:'none',outline:'none',fontSize:15,color:WW.text,background:'transparent',fontFamily:'inherit',boxSizing:'border-box'}}/>
+          </div>
+          <div style={{height:'0.5px',background:'#E8EAF8'}}/>
+          {/* Username */}
+          <div style={{padding:'12px 16px'}}>
+            <div style={{fontSize:11,fontWeight:500,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',marginBottom:6}}>Username</div>
+            <input value={username} onChange={e=>setUsername(e.target.value)} placeholder="@username"
+              style={{width:'100%',border:'none',outline:'none',fontSize:15,color:WW.text,background:'transparent',fontFamily:'inherit',boxSizing:'border-box'}}/>
+            <div style={{fontSize:11,color:WW.textSec,fontStyle:'italic',marginTop:4}}>wiseworkout.app/u/marcustan</div>
+          </div>
+          <div style={{height:'0.5px',background:'#E8EAF8'}}/>
+          {/* Hometown */}
+          <div style={{padding:'12px 16px'}}>
+            <div style={{fontSize:11,fontWeight:500,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',marginBottom:6}}>Hometown</div>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <Icon name="map-pin" size={14} color={WW.textSec}/>
+              <input value={hometown} onChange={e=>setHometown(e.target.value)} placeholder="City or country"
+                style={{flex:1,border:'none',outline:'none',fontSize:15,color:WW.text,background:'transparent',fontFamily:'inherit'}}/>
+            </div>
+          </div>
+          <div style={{height:'0.5px',background:'#E8EAF8'}}/>
+          {/* Bio */}
+          <div style={{padding:'12px 16px'}}>
+            <div style={{fontSize:11,fontWeight:500,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',marginBottom:6}}>Bio</div>
+            <textarea value={bio} onChange={e=>setBio(e.target.value.slice(0,150))} placeholder="Write a short bio..." maxLength={150}
+              style={{width:'100%',border:'none',outline:'none',fontSize:15,color:WW.text,background:'transparent',fontFamily:'inherit',resize:'none',minHeight:72,lineHeight:1.5,boxSizing:'border-box'}}/>
+            <div style={{textAlign:'right',fontSize:11,color:WW.textSec}}>{bio.length} / 150</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sticky save */}
+      <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,padding:'12px 16px',paddingBottom:'calc(12px + env(safe-area-inset-bottom,0px))',borderTop:'0.5px solid #E8EAF8',zIndex:20}}>
+        <button onClick={handleSave} style={{width:'100%',height:52,borderRadius:16,border:'none',background:saveBg,color:saveFg,fontSize:16,fontWeight:500,cursor:canSave?'pointer':'not-allowed',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+          {saveS==='loading'&&<Icon name="loader-circle" size={16} color="#fff" className="spin"/>}
+          {saveS==='saved'&&<Icon name="check" size={16} color="#fff"/>}
+          {saveTxt}
+        </button>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

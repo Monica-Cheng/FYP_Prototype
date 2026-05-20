@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiseWorkout · S-08 Health Declaration · For Figma</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F7F8FF;
+      --canvas: #EDEEF5;
+      --card: #FFFFFF;
+      --elevated: #EEF0FB;
+      --primary: #6C7EE8;
+      --primary-dark: #2D3A8C;
+      --lavender: #9B84E8;
+      --lavender-bg: #F0EEFE;
+      --lavender-dark: #7B5CB8;
+      --text: #3D3D5C;
+      --text-sec: #8A8A9E;
+      --border: #C8C8D8;
+      --shadow: 0 2px 8px rgba(45,58,140,0.06);
+      --frame-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    }
+    body { min-height: 100vh; padding: 48px 40px 64px; }
+
+    .page-title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.04em;
+    }
+
+    .page-subtitle {
+      margin: 0 0 32px;
+      color: var(--text-sec);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 840px;
+    }
+
+    .storyboard {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .frame-block {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .frame-label {
+      font-size: 12px;
+      color: #6B6B80;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .phone-shell {
+      width: 390px;
+      height: auto;
+      min-height: 844px;
+      border-radius: 52px;
+      background: #0A0A12;
+      padding: 5px;
+      box-shadow: var(--frame-shadow);
+      position: relative;
+    }
+
+    .phone-inner {
+      width: 100%;
+      height: auto;
+      min-height: 834px;
+      border-radius: 47px;
+      overflow: hidden;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 33px;
+      border-radius: 20px;
+      background: #000;
+      z-index: 3;
+    }
+
+    .status-bar {
+      height: 47px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .status-time,
+    .status-icons { padding-top: 10px; }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+
+    .topbar {
+      padding: 4px 20px 12px;
+      flex-shrink: 0;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 19px;
+      background: rgba(61,61,92,0.07);
+      text-decoration: none;
+    }
+
+    .content {
+      flex: 1;
+      min-height: 0;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .warn-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+      background: #FEF3C7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    .disclaimer {
+      background: var(--card);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .disclaimer-copy {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .safety {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 13px;
+      background: var(--lavender-bg);
+      border-radius: 10px;
+      border: 0.5px solid rgba(155,132,232,0.3);
+      margin-top: 14px;
+    }
+
+    .safety-copy {
+      font-size: 13px;
+      color: var(--lavender-dark);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .edit-link {
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+      margin-bottom: 24px;
+      display: inline-block;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px;
+      background: var(--card);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .check-row.checked {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px rgba(108,126,232,0.13);
+    }
+
+    .check {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+    }
+
+    .checked .check {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .check-copy {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.55;
+      font-weight: 500;
+    }
+
+    .spacer { flex: 1; }
+
+    .cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 52px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      text-decoration: none;
+      margin-bottom: 32px;
+    }
+
+    .cta.disabled {
+      background: var(--border);
+      color: var(--text-sec);
+    }
+
+    .cta.enabled {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(108,126,232,0.35);
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">S-08 Health Declaration for Figma</h1>
+  <p class="page-subtitle">
+    This version is flattened for HTML-to-Figma import. It includes the main screen states with and without recorded conditions,
+    plus the acknowledged state where the continue button is enabled.
+  </p>
+
+  <div class="storyboard">
+    <section class="frame-block">
+      <div class="frame-label">Conditions Present<br>Unchecked</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner">
+        <div class="status-bar"><div class="status-time">9:41</div><div class="status-icons" aria-hidden="true"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill="#3D3D5C"/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill="#3D3D5C" opacity="0.4"/></svg></div></div>
+        <div class="topbar"><a class="back" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#3D3D5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+        <div class="content">
+          <div class="warn-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 3L2 20h20L12 3z" stroke="#D97706" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9v5M12 16.5v.5" stroke="#D97706" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="title">Before you begin</div>
+          <div class="disclaimer">
+            <div class="disclaimer-copy">This plan involves exercise that may not be suitable for all fitness levels. If you have any existing medical conditions or injuries, please consult a doctor before starting.</div>
+            <div class="safety"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:2px;"><path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-0.8-8-4.5-8-9V6l8-3z" stroke="#9B84E8" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#9B84E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="safety-copy">We have applied safety filters based on your health profile. Some exercises have been adjusted.</div></div>
+          </div>
+          <a class="edit-link" href="#">Edit health profile →</a>
+          <div class="check-row"><div class="check"></div><div class="check-copy">I have read and understood the above. I will consult a healthcare professional if I have any concerns.</div></div>
+          <div class="spacer"></div>
+          <div class="cta disabled">Continue</div>
+        </div>
+      </div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Conditions Present<br>Checked</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner">
+        <div class="status-bar"><div class="status-time">9:41</div><div class="status-icons" aria-hidden="true"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill="#3D3D5C"/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill="#3D3D5C" opacity="0.4"/></svg></div></div>
+        <div class="topbar"><a class="back" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#3D3D5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+        <div class="content">
+          <div class="warn-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 3L2 20h20L12 3z" stroke="#D97706" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9v5M12 16.5v.5" stroke="#D97706" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="title">Before you begin</div>
+          <div class="disclaimer">
+            <div class="disclaimer-copy">This plan involves exercise that may not be suitable for all fitness levels. If you have any existing medical conditions or injuries, please consult a doctor before starting.</div>
+            <div class="safety"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:2px;"><path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-0.8-8-4.5-8-9V6l8-3z" stroke="#9B84E8" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#9B84E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="safety-copy">We have applied safety filters based on your health profile. Some exercises have been adjusted.</div></div>
+          </div>
+          <a class="edit-link" href="#">Edit health profile →</a>
+          <div class="check-row checked"><div class="check">✓</div><div class="check-copy">I have read and understood the above. I will consult a healthcare professional if I have any concerns.</div></div>
+          <div class="spacer"></div>
+          <div class="cta enabled">Continue</div>
+        </div>
+      </div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">No Recorded Conditions<br>Checked</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner">
+        <div class="status-bar"><div class="status-time">9:41</div><div class="status-icons" aria-hidden="true"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill="#3D3D5C"/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill="#3D3D5C" opacity="0.4"/></svg></div></div>
+        <div class="topbar"><a class="back" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#3D3D5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+        <div class="content">
+          <div class="warn-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 3L2 20h20L12 3z" stroke="#D97706" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9v5M12 16.5v.5" stroke="#D97706" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="title">Before you begin</div>
+          <div class="disclaimer">
+            <div class="disclaimer-copy">This plan involves exercise that may not be suitable for all fitness levels. If you have any existing medical conditions or injuries, please consult a doctor before starting.</div>
+          </div>
+          <a class="edit-link" href="#">Edit health profile →</a>
+          <div class="check-row checked"><div class="check">✓</div><div class="check-copy">I have read and understood the above. I will consult a healthcare professional if I have any concerns.</div></div>
+          <div class="spacer"></div>
+          <div class="cta enabled">Continue</div>
+        </div>
+      </div></div>
+    </section>
+  </div>
+</body>
+</html>

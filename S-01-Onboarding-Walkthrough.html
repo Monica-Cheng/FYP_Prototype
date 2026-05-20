@@ -1,0 +1,267 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-01 Onboarding Walkthrough</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell { width: 390px; height: 844px; border-radius: 52px; background: #0A0A12; padding: 5px; box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12); position: relative; box-sizing: content-box; }
+  .phone-inner { width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #F7F8FF; position: relative; }
+  .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60; pointer-events: none; }
+  @keyframes fadeSlide { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="label">S-01 · Onboarding Walkthrough</div>
+  <div class="phone-shell">
+    <div class="island"></div>
+    <div class="phone-inner" id="app"></div>
+  </div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW = {
+  bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',
+  primary:'#6C7EE8',primaryDark:'#2D3A8C',
+  lavender:'#9B84E8',lavenderBg:'#F0EEFE',
+  teal:'#4BB8CC',tealBg:'#E0F4F8',
+  text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',
+  chipBg:'#E6EAFE',shadow:'0 2px 8px rgba(45,58,140,0.06)',
+};
+
+const CARDS = [
+  {
+    title: 'Your AI fitness coach',
+    body: 'WiseCoach learns your training and tells you exactly what to do next.',
+    bg: '#F0EEFE',
+    illustration: () => (
+      <svg width="260" height="220" viewBox="0 0 260 220" fill="none">
+        {/* Phone shell */}
+        <rect x="80" y="16" width="100" height="176" rx="18" fill="#fff" stroke="#E8EAF8" strokeWidth="1.5"/>
+        <rect x="107" y="22" width="46" height="10" rx="5" fill="#E8EAF8"/>
+        {/* Coach bubble */}
+        <rect x="90" y="46" width="72" height="42" rx="12" fill="#F0EEFE"/>
+        <circle cx="100" cy="67" r="10" fill="#9B84E8"/>
+        <path d="M97 67l2.5 2.5 4.5-5" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+        <rect x="114" y="56" width="40" height="7" rx="3.5" fill="#D8CCEE"/>
+        <rect x="114" y="67" width="28" height="7" rx="3.5" fill="#D8CCEE"/>
+        {/* User bubble */}
+        <rect x="98" y="100" width="64" height="30" rx="12" fill="#6C7EE8"/>
+        <rect x="104" y="108" width="42" height="6" rx="3" fill="rgba(255,255,255,0.6)"/>
+        <rect x="104" y="118" width="28" height="6" rx="3" fill="rgba(255,255,255,0.35)"/>
+        {/* Second coach bubble */}
+        <rect x="90" y="142" width="72" height="38" rx="12" fill="#F0EEFE"/>
+        <circle cx="100" cy="161" r="10" fill="#9B84E8"/>
+        <rect x="114" y="151" width="40" height="7" rx="3.5" fill="#D8CCEE"/>
+        <rect x="114" y="161" width="32" height="7" rx="3.5" fill="#D8CCEE"/>
+        <rect x="114" y="171" width="22" height="7" rx="3.5" fill="#D8CCEE"/>
+        {/* Sparkles */}
+        <path d="M196 40l2 5.5 5.5 2-5.5 2L196 55l-2-5.5-5.5-2 5.5-2z" fill="#9B84E8" opacity="0.55"/>
+        <path d="M46 90l1.3 3.5 3.5 1.3-3.5 1.3L46 99.6l-1.3-3.5-3.5-1.3 3.5-1.3z" fill="#6C7EE8" opacity="0.4"/>
+        <circle cx="220" cy="160" r="5" fill="#9B84E8" opacity="0.25"/>
+        <circle cx="40" cy="50" r="4" fill="#6C7EE8" opacity="0.2"/>
+      </svg>
+    ),
+  },
+  {
+    title: 'Plans that adapt to real life',
+    body: 'Gym and running plans that automatically adjust when life gets in the way.',
+    bg: '#E0F4F8',
+    illustration: () => (
+      <svg width="260" height="220" viewBox="0 0 260 220" fill="none">
+        {/* Calendar base */}
+        <rect x="50" y="36" width="160" height="148" rx="18" fill="#fff" stroke="#C8C8D8" strokeWidth="1.2"/>
+        {/* Calendar header */}
+        <rect x="50" y="36" width="160" height="44" rx="18" fill="#4BB8CC"/>
+        <rect x="50" y="62" width="160" height="18" fill="#4BB8CC"/>
+        <text x="130" y="60" fontSize="14" fontWeight="800" fill="#fff" textAnchor="middle">May 2025</text>
+        {/* Day labels */}
+        {['M','T','W','T','F','S','S'].map((d,i)=>(
+          <text key={i} x={70+i*22} y={98} fontSize="10" fontWeight="600" fill="#8A8A9E" textAnchor="middle">{d}</text>
+        ))}
+        {/* Week rows — days */}
+        {[
+          [null,null,null,1,2,3,4],
+          [5,6,7,8,9,10,11],
+          [12,13,14,15,16,17,18],
+        ].map((row,ri)=>row.map((d,ci)=>d?(
+          <g key={`${ri}-${ci}`}>
+            <circle cx={70+ci*22} cy={116+ri*26} r="11"
+              fill={
+                (ri===0&&ci===5)||(ri===1&&ci===2)||(ri===1&&ci===4)||(ri===2&&ci===0)||(ri===2&&ci===3)
+                  ? '#6C7EE8' : (ri===0&&ci===6)||(ri===1&&ci===6)||(ri===2&&ci===6) ? '#EEF0FB' : 'transparent'
+              }/>
+            <text x={70+ci*22} y={120+ri*26} fontSize="11" fontWeight="700"
+              fill={
+                (ri===0&&ci===5)||(ri===1&&ci===2)||(ri===1&&ci===4)||(ri===2&&ci===0)||(ri===2&&ci===3)
+                  ? '#fff' : '#3D3D5C'
+              } textAnchor="middle">{d}</text>
+          </g>
+        ):null))}
+        {/* Adapt badge */}
+        <rect x="158" y="172" width="52" height="28" rx="10" fill="#E6EAFE"/>
+        <text x="184" y="189" fontSize="10" fontWeight="700" fill="#6C7EE8" textAnchor="middle">Adjusted ✓</text>
+        {/* Sparkles */}
+        <path d="M220 50l1.5 4 4 1.5-4 1.5L220 61l-1.5-4-4-1.5 4-1.5z" fill="#4BB8CC" opacity="0.5"/>
+        <circle cx="38" cy="100" r="5" fill="#6C7EE8" opacity="0.2"/>
+      </svg>
+    ),
+  },
+  {
+    title: 'Train with your squad',
+    body: 'Leaderboards, challenges and social accountability to keep you going.',
+    bg: '#EEF0FB',
+    illustration: () => (
+      <svg width="260" height="220" viewBox="0 0 260 220" fill="none">
+        {/* Podium */}
+        <rect x="74" y="124" width="40" height="66" rx="8" fill="#D9DFF8"/>
+        <rect x="110" y="104" width="40" height="86" rx="8" fill="#6C7EE8"/>
+        <rect x="146" y="136" width="40" height="54" rx="8" fill="#D9DFF8"/>
+        {/* Rank numbers */}
+        <text x="94" y="160" fontSize="15" fontWeight="800" fill="#8A8A9E" textAnchor="middle">2</text>
+        <text x="130" y="138" fontSize="15" fontWeight="800" fill="#fff" textAnchor="middle">1</text>
+        <text x="166" y="172" fontSize="15" fontWeight="800" fill="#8A8A9E" textAnchor="middle">3</text>
+        {/* Avatars */}
+        <circle cx="94" cy="106" r="16" fill="#C8C8D8"/>
+        <circle cx="130" cy="84" r="18" fill="#6C7EE8"/>
+        <circle cx="166" cy="118" r="16" fill="#9B84E8"/>
+        {/* Crown */}
+        <path d="M120 80l3.5-6 6.5 3.5 6.5-3.5 3.5 6" stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        {/* XP chips */}
+        <rect x="60" y="36" width="60" height="22" rx="11" fill="#E6EAFE"/>
+        <text x="90" y="50" fontSize="11" fontWeight="700" fill="#6C7EE8" textAnchor="middle">+250 XP</text>
+        <rect x="140" y="36" width="60" height="22" rx="11" fill="#E0F4F8"/>
+        <text x="170" y="50" fontSize="11" fontWeight="700" fill="#4BB8CC" textAnchor="middle">Streak 🔥</text>
+        {/* Star */}
+        <path d="M218 80l1.8 5.2 5.5.4-4.2 3.6 1.4 5.3L218 92l-4.5 2.5 1.4-5.3-4.2-3.6 5.5-.4z" fill="#F59E0B" opacity="0.75"/>
+      </svg>
+    ),
+  },
+];
+
+function StatusBar() {
+  return (
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,position:'relative',zIndex:5}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11">
+          <rect x="0" y="7" width="3" height="4" rx="0.6" fill={WW.text}/>
+          <rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={WW.text}/>
+          <rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={WW.text}/>
+          <rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={WW.text}/>
+        </svg>
+        <svg width="24" height="11" viewBox="0 0 24 11">
+          <rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity="0.4" fill="none"/>
+          <rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/>
+          <rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={WW.text} opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [idx, setIdx] = React.useState(0);
+  const [animKey, setAnimKey] = React.useState(0);
+  const startX = React.useRef(null);
+
+  const go = (next) => {
+    const clamped = Math.max(0, Math.min(CARDS.length - 1, next));
+    setIdx(clamped);
+    setAnimKey(k => k + 1);
+  };
+
+  const onTouchStart = e => { startX.current = e.touches[0].clientX; };
+  const onTouchEnd = e => {
+    if (startX.current === null) return;
+    const dx = e.changedTouches[0].clientX - startX.current;
+    if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
+    startX.current = null;
+  };
+
+  const card = CARDS[idx];
+  const isLast = idx === CARDS.length - 1;
+
+  return (
+    <div style={{width:'100%',height:'100%',position:'relative',background:WW.bg,display:'flex',flexDirection:'column'}}
+      onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <StatusBar/>
+
+      {/* Skip button — cards 1 and 2 only */}
+      {!isLast && (
+        <div style={{position:'absolute',top:54,right:20,zIndex:20}}>
+          <button onClick={() => go(CARDS.length - 1)} style={{background:'none',border:'none',fontSize:14,color:WW.textSec,fontWeight:600,cursor:'pointer',padding:'6px 4px'}}>
+            Skip
+          </button>
+        </div>
+      )}
+
+      {/* Illustration */}
+      <div key={animKey} style={{
+        flex:1,display:'flex',alignItems:'center',justifyContent:'center',
+        background:card.bg,borderRadius:'0 0 40px 40px',
+        animation:'fadeSlide 0.32s ease both',
+      }}>
+        {card.illustration()}
+      </div>
+
+      {/* Text + dots + CTA */}
+      <div style={{padding:'26px 28px 0',flexShrink:0}}>
+        <div key={animKey+'t'} style={{animation:'fadeSlide 0.32s ease both'}}>
+          <div style={{fontSize:27,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.6px',lineHeight:1.18,marginBottom:11}}>
+            {card.title}
+          </div>
+          <div style={{fontSize:16,color:WW.textSec,lineHeight:1.6,fontWeight:450}}>
+            {card.body}
+          </div>
+        </div>
+
+        {/* Dots */}
+        <div style={{display:'flex',justifyContent:'center',gap:8,marginTop:26}}>
+          {CARDS.map((_,i) => (
+            <div key={i} onClick={() => go(i)} style={{
+              width: i === idx ? 24 : 8, height: 8, borderRadius: 4,
+              background: i === idx ? WW.primary : WW.border,
+              cursor:'pointer', transition:'all 0.25s ease',
+            }}/>
+          ))}
+        </div>
+
+        {/* Last card CTAs */}
+        {isLast ? (
+          <div style={{display:'flex',flexDirection:'column',gap:12,marginTop:24,paddingBottom:44}}>
+            <a href="S-03-Register.html" style={{
+              display:'flex',alignItems:'center',justifyContent:'center',
+              height:52,borderRadius:14,background:WW.primary,
+              color:'#fff',fontSize:16,fontWeight:700,textDecoration:'none',
+              boxShadow:'0 4px 14px rgba(108,126,232,0.35)',
+            }}>Create Account</a>
+            <a href="S-02-Login.html" style={{
+              display:'flex',alignItems:'center',justifyContent:'center',
+              height:52,borderRadius:14,border:`1.5px solid ${WW.primary}`,
+              color:WW.primary,fontSize:16,fontWeight:700,textDecoration:'none',
+            }}>Log In</a>
+          </div>
+        ) : (
+          <div style={{paddingBottom:44,marginTop:22}}>
+            <button onClick={() => go(idx + 1)} style={{
+              width:'100%',height:52,borderRadius:14,background:WW.primary,
+              color:'#fff',fontSize:16,fontWeight:700,border:'none',cursor:'pointer',
+              boxShadow:'0 4px 14px rgba(108,126,232,0.35)',
+            }}>Next</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

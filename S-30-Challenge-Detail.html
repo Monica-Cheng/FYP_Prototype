@@ -1,0 +1,402 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-30 Challenge Detail</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  .tweaks-panel{position:fixed;bottom:20px;right:20px;width:250px;background:#fff;border-radius:14px;padding:14px 16px 16px;box-shadow:0 10px 40px rgba(20,25,60,.18),0 0 0 .5px rgba(0,0,0,.08);color:#3D3D5C;display:none;z-index:100}
+  .tweaks-panel.open{display:block}.tweaks-panel h3{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:#8A8A9E}
+  .tweak-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:10px}
+  .tweak-row label{font-size:13px;color:#3D3D5C;flex:1}.tweak-row input[type="checkbox"]{accent-color:#6C7EE8}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-30 · Challenge Detail</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<div class="tweaks-panel" id="tweaks">
+  <h3>State</h3>
+  <div class="tweak-row"><label>Already joined</label><input type="checkbox" id="tw-joined" checked/></div>
+  <div class="tweak-row"><label>Squad challenge</label><input type="checkbox" id="tw-squad"/></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',lavenderText:'#7B5CB8',lavenderBody:'#5B3F9E',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+const Ico={
+  home:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill={c}/></svg>,
+  plans:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="20" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill={c}/></svg>,
+  coach:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke={c} strokeWidth="1.5" strokeLinejoin="round"/></svg>,
+  club:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke={c} strokeWidth="1.5"/><circle cx="17" cy="10" r="2.2" stroke={c} strokeWidth="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke={c} strokeWidth="1.5" strokeLinecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  progress:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+};
+const NAV=[{id:'home',label:'Home',icon:Ico.home,href:'S-09-Home.html'},{id:'plans',label:'Plans',icon:Ico.plans,href:'S-10-Plans-Hub.html'},{id:'coach',label:'Coach',icon:Ico.coach,href:'S-25-Coach-Chat.html'},{id:'club',label:'Club',icon:Ico.club,href:'S-28-Club-Tab.html'},{id:'progress',label:'Progress',icon:Ico.progress,href:'S-32-Progress-Tab.html'}];
+function StatusBar({light}){const c=light?'#fff':WW.text;return(<div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:c,flexShrink:0}}><div style={{paddingTop:10}}>9:41</div><div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={c}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={c}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={c}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={c}/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={c} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={c}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={c} opacity=".4"/></svg></div></div>);}
+function BottomNav({active}){return(<div style={{position:'absolute',bottom:0,left:0,right:0,height:84,background:WW.card,borderTop:'0.5px solid #E8EAF8',display:'flex',zIndex:30}}>{NAV.map(n=>{const a=n.id===active,c=a?WW.primary:WW.textSec;return(<a key={n.id} href={n.href} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,textDecoration:'none',paddingBottom:8}}>{n.icon(c)}<span style={{fontSize:10,fontWeight:600,color:c}}>{n.label}</span></a>);})}</div>);}
+
+function HexBadge({size=80}){
+  const s=size;
+  const cx=s/2,cy=s/2,r=s/2*0.88;
+  const pts=Array.from({length:6},(_,i)=>{const a=(i*60-90)*Math.PI/180;return`${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}`;}).join(' ');
+  return(
+    <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`}>
+      <polygon points={pts} fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.45)" strokeWidth="2"/>
+      <g transform={`translate(${s*.28},${s*.28})`}>
+        <svg width={s*.44} height={s*.44} viewBox="0 0 24 24" fill="none">
+          <path d="M7 17l4-10 3 4 3-7" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          <circle cx="17" cy="7" r="2" fill="#fff"/>
+        </svg>
+      </g>
+    </svg>
+  );
+}
+
+const CHALLENGE={
+  name:'10k Steps Squad',
+  type:'cardio',
+  goal:'Reach 50,000 steps as a team',
+  unit:'steps',
+  teamTarget:50000,
+  duration:'7 days',
+  endDate:'May 18, 2026',
+  daysLeft:3,
+  participants:4,
+  xpReward:300,
+  activities:['Running','Walking','Hiking'],
+  description:'Join forces with your friends and collectively hit 50,000 steps over 7 days. Every step counts — sync your wearable or log manually. The team that crosses the line earns the badge.',
+  rules:['Steps from Running, Walking, or Hiking count','Wearable sync or manual logging both accepted','Each person can contribute unlimited steps','Progress updates every 30 minutes'],
+  gradient:'linear-gradient(145deg,#1A6B7C 0%,#4BB8CC 100%)',
+};
+
+const PARTICIPANTS=[
+  {rank:1,initials:'AK',color:'#F59E0B',name:'Alex Koh',steps:18200,isMe:false},
+  {rank:2,initials:'M',color:'#6C7EE8',name:'Marcus (You)',steps:12400,isMe:true},
+  {rank:3,initials:'JT',color:'#4BB8CC',name:'Jamie Tan',steps:9800,isMe:false},
+  {rank:4,initials:'SL',color:'#9B84E8',name:'Sarah Lim',steps:6600,isMe:false},
+];
+const SQUAD_PARTICIPANTS=[
+  {rank:1,initials:'M',color:'#6C7EE8',name:'Marcus (You)',steps:12400,isMe:true},
+  {rank:2,initials:'AK',color:'#F59E0B',name:'Alex Koh',steps:9100,isMe:false},
+  {rank:3,initials:'JT',color:'#4BB8CC',name:'Jamie Tan',steps:4300,isMe:false},
+];
+const ACTIVITY_FEED=[
+  {initials:'AK',color:'#F59E0B',name:'Alex Koh',activity:'Morning Run',value:'+4,200 steps',time:'2h ago'},
+  {initials:'M',color:'#6C7EE8',name:'You',activity:'Evening Walk',value:'+3,800 steps',time:'4h ago'},
+  {initials:'JT',color:'#4BB8CC',name:'Jamie Tan',activity:'Trail Hike',value:'+6,100 steps',time:'Yesterday'},
+];
+
+function App(){
+  const [joined,setJoined]=React.useState(true);
+  const [isSquad,setIsSquad]=React.useState(false);
+  const [leaving,setLeaving]=React.useState(false);
+
+  React.useEffect(()=>{
+    const cb=()=>{
+      setJoined(document.getElementById('tw-joined')?.checked??true);
+      setIsSquad(document.getElementById('tw-squad')?.checked??false);
+    };
+    document.querySelectorAll('#tweaks input').forEach(el=>el.addEventListener('change',cb));
+    cb();
+    const panel=document.getElementById('tweaks');
+    if(panel)panel.style.display='none';
+    const btn=document.createElement('button');
+    btn.textContent='⚙';btn.style.cssText='position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:22px;background:#6C7EE8;color:#fff;border:none;font-size:20px;cursor:pointer;z-index:200;box-shadow:0 4px 12px rgba(108,126,232,.4)';
+    btn.onclick=()=>panel?.classList.toggle('open');document.body.appendChild(btn);
+  },[]);
+
+  const participants=isSquad?SQUAD_PARTICIPANTS:PARTICIPANTS;
+  const totalSteps=participants.reduce((s,p)=>s+p.steps,0);
+  const overallPct=Math.min(100,Math.round(totalSteps/CHALLENGE.teamTarget*100));
+  const me=participants.find(p=>p.isMe);
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,position:'relative'}}>
+
+      {/* ① Hero banner */}
+      <div style={{position:'relative',flexShrink:0,background:CHALLENGE.gradient,paddingBottom:22}}>
+        <StatusBar light/>
+        {/* Back */}
+        <div style={{position:'absolute',top:47,left:16,zIndex:10}}>
+          <a href="S-28-Club-Tab.html" style={{width:34,height:34,borderRadius:17,background:'rgba(255,255,255,0.18)',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </a>
+        </div>
+        {/* Share */}
+        <div style={{position:'absolute',top:47,right:16,zIndex:10}}>
+          <div style={{width:34,height:34,borderRadius:17,background:'rgba(255,255,255,0.18)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a1 1 0 001 1h14a1 1 0 001-1v-8M16 6l-4-4-4 4M12 2v13" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+        </div>
+
+        {/* Badge + name */}
+        <div style={{display:'flex',flexDirection:'column',alignItems:'center',padding:'40px 20px 0',gap:10}}>
+          <HexBadge size={90}/>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <div style={{fontSize:21,fontWeight:900,color:'#fff',textAlign:'center',letterSpacing:'-0.4px'}}>{CHALLENGE.name}</div>
+            {isSquad&&<span style={{background:'rgba(245,158,11,.25)',color:'#F59E0B',fontSize:11,fontWeight:700,padding:'3px 8px',borderRadius:10,border:'1px solid rgba(245,158,11,.4)',flexShrink:0}}>Squad</span>}
+          </div>
+          <div style={{fontSize:13,color:'rgba(255,255,255,0.8)',textAlign:'center'}}>{CHALLENGE.goal}</div>
+          {/* Tag row */}
+          <div style={{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'center'}}>
+            {[CHALLENGE.duration,`Ends ${CHALLENGE.endDate}`,`${CHALLENGE.daysLeft} days left`].map(t=>(
+              <span key={t} style={{fontSize:11,fontWeight:700,color:'rgba(255,255,255,0.9)',background:'rgba(255,255,255,0.18)',padding:'3px 10px',borderRadius:20,border:'0.5px solid rgba(255,255,255,0.3)'}}>
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Scrollable content */}
+      <div style={{flex:1,overflowY:'auto',paddingBottom:120}}>
+
+        {/* ② Quick stats row */}
+        <div style={{display:'flex',background:WW.card,borderBottom:`0.5px solid ${WW.border}`,flexShrink:0}}>
+          {[
+            {icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke={WW.primary} strokeWidth="1.5"/><path d="M2 20c0-3.3 3.1-5 7-5s7 1.7 7 5" stroke={WW.primary} strokeWidth="1.5" strokeLinecap="round"/></svg>,val:`${CHALLENGE.participants}`,sub:'participants'},
+            {icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke={WW.teal} strokeWidth="1.5"/><path d="M3 9h18M8 2v4M16 2v4" stroke={WW.teal} strokeWidth="1.5" strokeLinecap="round"/></svg>,val:CHALLENGE.duration,sub:'duration'},
+            {icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.2L12 16.5l-6.2 4.4 2.4-7.2L2 9.2h7.6L12 2z" fill={WW.gold}/></svg>,val:`${CHALLENGE.xpReward} XP`,sub:'reward'},
+            {icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="5" r="2" fill={WW.lavender}/><path d="M10 9l2 4 3-2 2 5M7 14l2-4" stroke={WW.lavender} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,val:'Cardio',sub:'type'},
+          ].map((s,i)=>(
+            <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',padding:'11px 4px',borderRight:i<3?`0.5px solid ${WW.border}`:''}}>
+              {s.icon}
+              <div style={{fontSize:12,fontWeight:800,color:WW.text,marginTop:3}}>{s.val}</div>
+              <div style={{fontSize:10,color:WW.textSec}}>{s.sub}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{padding:'14px 16px 0'}}>
+
+          {/* Joined badge */}
+          {joined&&(
+            <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 12px',background:WW.tealBg,borderRadius:12,border:`0.5px solid rgba(75,184,204,.3)`,marginBottom:14}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke={WW.teal} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <div style={{fontSize:13,color:'#1A7A8C',fontWeight:700}}>You're in! Keep logging activity to climb the leaderboard.</div>
+            </div>
+          )}
+
+          {/* ③ About */}
+          <div style={{marginBottom:16}}>
+            <div style={{fontSize:14,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>About this Challenge</div>
+            <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,padding:'12px 14px',boxShadow:WW.shadow}}>
+              <div style={{fontSize:13,color:WW.text,lineHeight:1.65}}>{CHALLENGE.description}</div>
+            </div>
+          </div>
+
+          {/* ④ Goal breakdown */}
+          <div style={{marginBottom:16}}>
+            <div style={{fontSize:14,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>Goal Breakdown</div>
+            <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,padding:'12px 14px',boxShadow:WW.shadow}}>
+              <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,color:WW.textSec,marginBottom:3}}>Team Target</div>
+                  <div style={{fontSize:22,fontWeight:900,color:WW.primaryDark,letterSpacing:'-0.5px'}}>{CHALLENGE.teamTarget.toLocaleString()}</div>
+                  <div style={{fontSize:11,color:WW.textSec}}>steps combined</div>
+                </div>
+                <div style={{width:1,height:50,background:WW.border}}/>
+                <div style={{flex:1,paddingLeft:10}}>
+                  <div style={{fontSize:13,color:WW.textSec,marginBottom:3}}>Per Person</div>
+                  <div style={{fontSize:22,fontWeight:900,color:WW.teal,letterSpacing:'-0.5px'}}>{(CHALLENGE.teamTarget/CHALLENGE.participants).toLocaleString()}</div>
+                  <div style={{fontSize:11,color:WW.textSec}}>avg needed</div>
+                </div>
+              </div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+                <div style={{fontSize:11,color:WW.textSec,fontWeight:600,marginRight:4,alignSelf:'center'}}>Counts:</div>
+                {CHALLENGE.activities.map(a=>(
+                  <span key={a} style={{fontSize:11,fontWeight:700,color:WW.teal,background:WW.tealBg,padding:'3px 9px',borderRadius:20,border:'0.5px solid rgba(75,184,204,.3)'}}>{a}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ⑤ Rules & Scoring */}
+          <div style={{marginBottom:16}}>
+            <div style={{fontSize:14,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>Rules & Scoring</div>
+            <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,padding:'12px 14px',boxShadow:WW.shadow}}>
+              {CHALLENGE.rules.map((r,i)=>(
+                <div key={i} style={{display:'flex',gap:9,paddingTop:i>0?9:0,paddingBottom:i<CHALLENGE.rules.length-1?9:0,borderBottom:i<CHALLENGE.rules.length-1?`0.5px solid ${WW.border}`:''}}>
+                  <div style={{width:18,height:18,borderRadius:9,background:WW.chipBg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:1}}>
+                    <span style={{fontSize:9,fontWeight:800,color:WW.primary}}>{i+1}</span>
+                  </div>
+                  <div style={{fontSize:13,color:WW.text,lineHeight:1.5}}>{r}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ⑥ My Progress */}
+          {joined&&me&&(
+            <div style={{marginBottom:16}}>
+              <div style={{fontSize:14,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>My Progress</div>
+              <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,padding:'14px',boxShadow:WW.shadow}}>
+                <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:10}}>
+                  <div style={{width:44,height:44,borderRadius:22,background:me.color,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                    <span style={{fontSize:16,fontWeight:800,color:'#fff'}}>{me.initials}</span>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:14,fontWeight:800,color:WW.primaryDark}}>{me.steps.toLocaleString()} steps</div>
+                    <div style={{fontSize:11,color:WW.textSec}}>Rank #{me.rank} of {participants.length}</div>
+                  </div>
+                  <div style={{textAlign:'right'}}>
+                    <div style={{fontSize:16,fontWeight:900,color:WW.primary}}>{Math.round(me.steps/CHALLENGE.teamTarget*100)}%</div>
+                    <div style={{fontSize:10,color:WW.textSec}}>of goal</div>
+                  </div>
+                </div>
+                <div style={{height:8,borderRadius:4,background:WW.elevated,overflow:'hidden'}}>
+                  <div style={{height:'100%',width:`${Math.min(100,me.steps/CHALLENGE.teamTarget*100)}%`,borderRadius:4,background:`linear-gradient(90deg,${WW.primary},${WW.teal})`}}/>
+                </div>
+                <div style={{fontSize:11,color:WW.textSec,marginTop:5}}>{(CHALLENGE.teamTarget/CHALLENGE.participants-me.steps).toLocaleString()} steps to reach your fair share</div>
+              </div>
+            </div>
+          )}
+
+          {/* ⑦ Team Progress */}
+          <div style={{marginBottom:16}}>
+            <div style={{fontSize:14,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>{isSquad?'Squad Progress':'Team Progress'}</div>
+            <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,padding:'14px',boxShadow:WW.shadow}}>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:10}}>
+                <div>
+                  <div style={{fontSize:20,fontWeight:900,color:WW.primaryDark,letterSpacing:'-0.4px'}}>{totalSteps.toLocaleString()}</div>
+                  <div style={{fontSize:11,color:WW.textSec}}>of {CHALLENGE.teamTarget.toLocaleString()} steps</div>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <div style={{fontSize:20,fontWeight:900,color:WW.teal}}>{overallPct}%</div>
+                  <div style={{fontSize:11,color:WW.textSec}}>complete</div>
+                </div>
+              </div>
+              <div style={{height:10,borderRadius:5,background:WW.chipBg,overflow:'hidden',marginBottom:6}}>
+                <div style={{height:'100%',width:`${overallPct}%`,borderRadius:5,background:`linear-gradient(90deg,${WW.primary},${WW.teal})`}}/>
+              </div>
+              <div style={{fontSize:11,color:WW.textSec}}>{(CHALLENGE.teamTarget-totalSteps).toLocaleString()} steps remaining · {CHALLENGE.daysLeft} days to go</div>
+            </div>
+          </div>
+
+          {/* ⑧ Leaderboard */}
+          <div style={{marginBottom:16}}>
+            <div style={{fontSize:14,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>
+              {isSquad?`Squad (${participants.length})`:`Leaderboard (${CHALLENGE.participants})`}
+            </div>
+            <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,overflow:'hidden'}}>
+              {participants.map((p,i)=>{
+                const pct=Math.min(100,Math.round(p.steps/CHALLENGE.teamTarget*100));
+                const medals=['🥇','🥈','🥉'];
+                return(
+                  <div key={p.rank} style={{padding:'11px 14px',background:p.isMe?WW.chipBg:'transparent',borderBottom:i<participants.length-1?`0.5px solid ${WW.border}`:'none'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
+                      <div style={{width:26,textAlign:'center',fontSize:16,flexShrink:0}}>{medals[i]||<span style={{fontSize:13,fontWeight:700,color:WW.textSec}}>{p.rank}</span>}</div>
+                      <div style={{width:34,height:34,borderRadius:17,background:p.color,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                        <span style={{fontSize:12,fontWeight:800,color:'#fff'}}>{p.initials}</span>
+                      </div>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:13,fontWeight:700,color:p.isMe?WW.primaryDark:WW.text}}>{p.name}</div>
+                        <div style={{fontSize:11,color:WW.textSec}}>{p.steps.toLocaleString()} steps</div>
+                      </div>
+                      <div style={{fontSize:12,fontWeight:700,color:WW.textSec}}>{pct}%</div>
+                    </div>
+                    <div style={{marginLeft:36,height:4,borderRadius:2,background:WW.elevated,overflow:'hidden'}}>
+                      <div style={{height:'100%',width:`${pct}%`,borderRadius:2,background:i===0?WW.gold:p.isMe?WW.primary:WW.teal}}/>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ⑨ Activity Feed */}
+          <div style={{marginBottom:16}}>
+            <div style={{fontSize:14,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>Recent Activity</div>
+            <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,overflow:'hidden'}}>
+              {ACTIVITY_FEED.map((a,i)=>(
+                <div key={i} style={{display:'flex',alignItems:'center',gap:10,padding:'11px 14px',borderBottom:i<ACTIVITY_FEED.length-1?`0.5px solid ${WW.border}`:'none'}}>
+                  <div style={{width:34,height:34,borderRadius:17,background:a.color,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                    <span style={{fontSize:12,fontWeight:800,color:'#fff'}}>{a.initials}</span>
+                  </div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:13,fontWeight:600,color:WW.text}}><span style={{fontWeight:700}}>{a.name}</span> · {a.activity}</div>
+                    <div style={{fontSize:11,color:WW.textSec}}>{a.time}</div>
+                  </div>
+                  <div style={{fontSize:12,fontWeight:800,color:WW.teal,flexShrink:0}}>{a.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ⑩ Invite (squad only) */}
+          {isSquad&&(
+            <div style={{marginBottom:16}}>
+              <div style={{fontSize:14,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>Squad Members</div>
+              <div style={{background:WW.card,borderRadius:14,border:`1.5px dashed ${WW.primary}`,padding:'14px',display:'flex',alignItems:'center',gap:12,boxShadow:WW.shadow}}>
+                <div style={{width:40,height:40,borderRadius:20,background:WW.chipBg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="10" cy="8" r="3" stroke={WW.primary} strokeWidth="1.6"/><path d="M3 20c0-3.3 2.7-6 7-6s7 2.7 7 6" stroke={WW.primary} strokeWidth="1.6" strokeLinecap="round"/><path d="M20 13v6M23 16h-6" stroke={WW.primary} strokeWidth="1.6" strokeLinecap="round"/></svg>
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:700,color:WW.primaryDark}}>Invite more members</div>
+                  <div style={{fontSize:12,color:WW.textSec}}>{participants.length}/8 members · Up to 8 per squad</div>
+                </div>
+                <a href="S-29-Add-Friends.html" style={{padding:'8px 14px',borderRadius:10,background:WW.chipBg,color:WW.primary,border:`1.5px solid ${WW.primary}`,fontSize:13,fontWeight:700,textDecoration:'none'}}>Invite</a>
+              </div>
+            </div>
+          )}
+
+          {/* ⑪ WiseCoach note */}
+          <div style={{marginBottom:16}}>
+            <div style={{background:WW.lavenderBg,borderRadius:14,border:`0.5px solid rgba(155,132,232,.25)`,borderLeft:`3px solid ${WW.lavender}`,padding:'12px 14px',boxShadow:WW.shadow}}>
+              <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:8}}>
+                <div style={{width:26,height:26,borderRadius:13,background:WW.lavender,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.5L12 14.5 7.1 17.2l.9-5.5L4 7.8 9.5 7z" fill="#fff"/></svg>
+                </div>
+                <div>
+                  <div style={{fontSize:11,fontWeight:800,color:WW.lavenderText,letterSpacing:'.3px'}}>WISECOACH TIP</div>
+                </div>
+              </div>
+              <div style={{fontSize:13,color:WW.lavenderBody,lineHeight:1.6}}>
+                You're on track! At your current pace of ~3,100 steps/day, you'll contribute about 21,700 steps by the end. Aim for a 30-min walk today to close the gap.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Sticky CTAs */}
+      <div style={{position:'absolute',bottom:84,left:0,right:0,padding:'12px 16px',background:WW.card,borderTop:'0.5px solid #E8EAF8',zIndex:25}}>
+        {joined?(
+          <div style={{display:'flex',gap:10}}>
+            <button onClick={()=>setLeaving(true)} style={{flex:1,height:50,borderRadius:13,background:WW.elevated,color:WW.text,border:`1.5px solid ${WW.border}`,fontSize:14,fontWeight:700,cursor:'pointer'}}>Leave</button>
+            <a href="S-24-Manual-Activity-Log.html" style={{flex:2,height:50,borderRadius:13,background:WW.teal,color:'#fff',fontSize:15,fontWeight:800,textDecoration:'none',display:'flex',alignItems:'center',justifyContent:'center',gap:7,boxShadow:'0 4px 14px rgba(75,184,204,.35)'}}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"/></svg>
+              Log Activity
+            </a>
+          </div>
+        ):(
+          <button onClick={()=>setJoined(true)} style={{width:'100%',height:50,borderRadius:13,background:WW.primary,color:'#fff',border:'none',fontSize:15,fontWeight:800,cursor:'pointer',boxShadow:'0 4px 14px rgba(108,126,232,.35)'}}>Join Challenge</button>
+        )}
+      </div>
+
+      {/* Leave confirmation */}
+      {leaving&&(
+        <div style={{position:'absolute',inset:0,background:'rgba(10,10,18,.5)',zIndex:50,display:'flex',alignItems:'flex-end'}}>
+          <div style={{width:'100%',background:WW.card,borderRadius:'22px 22px 0 0',padding:'20px 20px 40px',boxShadow:'0 -8px 40px rgba(20,25,60,.2)'}}>
+            <div style={{width:36,height:4,borderRadius:2,background:WW.border,margin:'0 auto 20px'}}/>
+            <div style={{fontSize:18,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>Leave challenge?</div>
+            <div style={{fontSize:14,color:WW.textSec,lineHeight:1.5,marginBottom:20}}>Your progress will be lost and you won't earn XP for this challenge.</div>
+            <button onClick={()=>{setLeaving(false);setJoined(false);}} style={{width:'100%',height:50,borderRadius:14,background:'#FEE2E2',color:'#DC2626',border:'none',fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:10}}>Yes, leave</button>
+            <button onClick={()=>setLeaving(false)} style={{width:'100%',height:50,borderRadius:14,background:WW.elevated,color:WW.text,border:`1.5px solid ${WW.border}`,fontSize:15,fontWeight:700,cursor:'pointer'}}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      <BottomNav active="club"/>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

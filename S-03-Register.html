@@ -1,0 +1,155 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-03 Register</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell { width: 390px; height: 844px; border-radius: 52px; background: #0A0A12; padding: 5px; box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12); position: relative; box-sizing: content-box; }
+  .phone-inner { width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #F7F8FF; position: relative; }
+  .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="label">S-03 · Register</div>
+  <div class="phone-shell">
+    <div class="island"></div>
+    <div class="phone-inner" id="app"></div>
+  </div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW = {
+  bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',
+  primary:'#6C7EE8',primaryDark:'#2D3A8C',
+  text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',
+  shadow:'0 2px 8px rgba(45,58,140,0.06)',
+};
+
+function StatusBar() {
+  return (
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={WW.text} opacity="0.4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function Field({label, type, placeholder, value, onChange, error}) {
+  const [show, setShow] = React.useState(false);
+  const isPw = type === 'password';
+  return (
+    <div style={{marginBottom:14}}>
+      <div style={{fontSize:13,fontWeight:600,color:WW.text,marginBottom:6}}>{label}</div>
+      <div style={{position:'relative'}}>
+        <input type={isPw && !show ? 'password' : 'text'} placeholder={placeholder} value={value} onChange={e=>onChange(e.target.value)}
+          style={{width:'100%',height:50,borderRadius:12,border:`1px solid ${error?'#EF4444':WW.border}`,background:error?'#FFF5F5':WW.card,fontSize:15,color:WW.text,padding:`0 ${isPw?44:14}px 0 14px`,boxSizing:'border-box',outline:'none',fontFamily:'inherit'}}/>
+        {isPw && (
+          <button onClick={()=>setShow(s=>!s)} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',padding:4,color:WW.textSec}}>
+            {show
+              ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" strokeWidth="1.6"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6"/><path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
+              : <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" strokeWidth="1.6"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6"/></svg>
+            }
+          </button>
+        )}
+      </div>
+      {error && <div style={{fontSize:12,color:'#EF4444',marginTop:4,fontWeight:500}}>{error}</div>}
+    </div>
+  );
+}
+
+function App() {
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [errors, setErrors] = React.useState({});
+  const [tried, setTried] = React.useState(false);
+
+  const handleSubmit = () => {
+    const errs = {};
+    if (!name.trim()) errs.name = 'Display name is required';
+    if (!email.includes('@')) errs.email = 'Enter a valid email address';
+    if (password.length < 8) errs.password = 'Password must be at least 8 characters';
+    setErrors(errs);
+    setTried(true);
+    if (Object.keys(errs).length === 0) {
+      window.location.href = 'S-05-Onboarding-Body-Health.html';
+    }
+  };
+
+  return (
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',overflowY:'auto'}}>
+      <StatusBar/>
+      <div style={{padding:'16px 24px 36px',flex:1}}>
+
+        {/* Back */}
+        <a href="S-01-Onboarding-Walkthrough.html" style={{display:'flex',alignItems:'center',gap:4,color:WW.primary,textDecoration:'none',fontSize:15,fontWeight:600,marginBottom:20}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Back
+        </a>
+
+        <div style={{marginBottom:26}}>
+          <div style={{fontSize:28,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.6px',marginBottom:6}}>Create your account</div>
+          <div style={{fontSize:14,color:WW.textSec,fontWeight:450}}>Start your fitness journey today</div>
+        </div>
+
+        {/* 3 fields only */}
+        <Field label="Display Name" type="text" placeholder="How should we call you?" value={name} onChange={setName} error={tried && errors.name}/>
+        <Field label="Email" type="text" placeholder="you@example.com" value={email} onChange={setEmail} error={tried && errors.email}/>
+        <Field label="Password" type="password" placeholder="Min. 8 characters" value={password} onChange={setPassword} error={tried && errors.password}/>
+
+        {/* Sign Up */}
+        <button onClick={handleSubmit} style={{width:'100%',height:52,borderRadius:14,background:WW.primary,color:'#fff',fontSize:16,fontWeight:700,border:'none',cursor:'pointer',boxShadow:'0 4px 14px rgba(108,126,232,0.35)',marginBottom:22,marginTop:4}}>
+          Sign Up
+        </button>
+
+        {/* Divider */}
+        <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:14}}>
+          <div style={{flex:1,height:1,background:WW.border}}/>
+          <div style={{fontSize:12,color:WW.textSec,fontWeight:600}}>or</div>
+          <div style={{flex:1,height:1,background:WW.border}}/>
+        </div>
+
+        {/* Google */}
+        <button style={{width:'100%',height:52,borderRadius:14,background:WW.card,border:`1px solid ${WW.border}`,display:'flex',alignItems:'center',justifyContent:'center',gap:10,fontSize:15,fontWeight:600,color:WW.text,cursor:'pointer',boxShadow:WW.shadow,marginBottom:10}}>
+          <svg width="20" height="20" viewBox="0 0 48 48" fill="none">
+            <path d="M43.6 20.5H42V20H24v8h11.3C33.7 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.4 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z" fill="#FFC107"/>
+            <path d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.4 29.3 4 24 4c-7.5 0-14 4.3-17.7 10.7z" fill="#FF3D00"/>
+            <path d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.4 35.4 26.8 36 24 36c-5.3 0-9.7-3.4-11.3-8H6.3C9.9 37.8 16.4 44 24 44z" fill="#4CAF50"/>
+            <path d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.3 5.6l6.2 5.2C37.5 38 44 33 44 24c0-1.2-.1-2.4-.4-3.5z" fill="#1976D2"/>
+          </svg>
+          Sign up with Google
+        </button>
+
+        {/* Apple */}
+        <button style={{width:'100%',height:52,borderRadius:14,background:'#000',border:'none',display:'flex',alignItems:'center',justifyContent:'center',gap:10,fontSize:15,fontWeight:600,color:'#fff',cursor:'pointer',marginBottom:28}}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+          Sign up with Apple
+        </button>
+
+        {/* Professional link */}
+        <div style={{textAlign:'center'}}>
+          <div style={{fontSize:13,color:WW.textSec,lineHeight:1.5}}>
+            Registering as a fitness professional?{' '}
+            <a href="S-37-BP-Registration.html" style={{color:WW.primary,fontWeight:700,textDecoration:'none'}}>Tap here</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

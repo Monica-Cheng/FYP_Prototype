@@ -1,0 +1,214 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-23 Post-Cardio Summary</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  .tweaks-panel{position:fixed;bottom:20px;right:20px;width:240px;background:#fff;border-radius:14px;padding:14px 16px 16px;box-shadow:0 10px 40px rgba(20,25,60,.18),0 0 0 .5px rgba(0,0,0,.08);color:#3D3D5C;display:none;z-index:100}
+  .tweaks-panel.open{display:block}.tweaks-panel h3{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:#8A8A9E}
+  .tweak-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:10px}
+  .tweak-row label{font-size:13px;color:#3D3D5C;flex:1}.tweak-row input[type="checkbox"]{accent-color:#6C7EE8}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes popIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-23 · Post-Cardio Summary</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<div class="tweaks-panel" id="tweaks">
+  <h3>State</h3>
+  <div class="tweak-row"><label>Outdoor (show map)</label><input type="checkbox" id="tw-outdoor" checked/></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',lavenderDark:'#7B5CB8',lavenderText:'#5B3F9E',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+const ROUTE_POINTS=[[30,70],[55,55],[85,60],[115,48],[140,58],[165,44],[190,55],[215,42],[240,52],[270,40],[300,50],[330,38]];
+const SPLITS=[{km:1,pace:'5:12'},{km:2,pace:'5:24'},{km:3,pace:'5:19'},{km:4,pace:'5:08'},{km:5,pace:'5:31'}];
+const HR_BANDS=[
+  {zone:1,color:'#4BB8CC',pct:5},{zone:2,color:'#6C7EE8',pct:20},{zone:3,color:'#F59E0B',pct:58},{zone:4,color:'#EF4444',pct:17},
+];
+
+function StatusBar(){
+  return(
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function RouteMap(){
+  const routePath=ROUTE_POINTS.map((p,i)=>`${i===0?'M':'L'}${p[0]} ${p[1]}`).join(' ');
+  const lastPt=ROUTE_POINTS[ROUTE_POINTS.length-1];
+  return(
+    <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,overflow:'hidden',marginBottom:12}}>
+      <div style={{height:120,background:'#E8EDF0',position:'relative'}}>
+        <svg width="100%" height="100%" viewBox="0 0 360 120" style={{display:'block'}}>
+          <rect width="360" height="120" fill="#E8EDF0"/>
+          {[40,80].map(y=><line key={y} x1="0" y1={y} x2="360" y2={y} stroke="#D4DAE0" strokeWidth=".5"/>)}
+          {[90,180,270].map(x=><line key={x} x1={x} y1="0" x2={x} y2="120" stroke="#D4DAE0" strokeWidth=".5"/>)}
+          <path d={routePath} fill="none" stroke={WW.primary} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <circle cx={ROUTE_POINTS[0][0]} cy={ROUTE_POINTS[0][1]} r="5" fill="#10B981" stroke="#fff" strokeWidth="1.5"/>
+          <circle cx={lastPt[0]} cy={lastPt[1]} r="5" fill="#EF4444" stroke="#fff" strokeWidth="1.5"/>
+        </svg>
+        <div style={{position:'absolute',bottom:6,left:10,display:'flex',gap:12}}>
+          <div style={{display:'flex',alignItems:'center',gap:4}}><div style={{width:8,height:8,borderRadius:4,background:'#10B981'}}/><span style={{fontSize:9,color:WW.textSec,fontWeight:600}}>Start</span></div>
+          <div style={{display:'flex',alignItems:'center',gap:4}}><div style={{width:8,height:8,borderRadius:4,background:'#EF4444'}}/><span style={{fontSize:9,color:WW.textSec,fontWeight:600}}>Finish</span></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HRGraph(){
+  const pts=[[0,70],[30,55],[60,48],[90,40],[120,42],[150,38],[180,44],[210,36],[240,40],[270,35],[300,38],[330,32],[358,35]];
+  const linePath=pts.map((p,i)=>`${i===0?'M':'L'}${p[0]} ${p[1]}`).join(' ');
+  return(
+    <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'13px 14px',marginBottom:12}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+        <div style={{fontSize:13,fontWeight:700,color:WW.text}}>Heart Rate</div>
+        <div style={{fontSize:12,color:WW.textSec}}>Avg 148 bpm · Max 172</div>
+      </div>
+      <div style={{height:80,position:'relative',overflow:'hidden',borderRadius:8}}>
+        <svg width="100%" height="80" viewBox="0 0 358 80" style={{display:'block'}}>
+          {/* Zone bands */}
+          <rect x="0" y="0" width="358" height="20" fill="#EF444420"/>
+          <rect x="0" y="20" width="358" height="20" fill="#F59E0B18"/>
+          <rect x="0" y="40" width="358" height="20" fill="#6C7EE815"/>
+          <rect x="0" y="60" width="358" height="20" fill="#4BB8CC12"/>
+          {/* HR line */}
+          <path d={linePath} fill="none" stroke={WW.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          {/* Area */}
+          <path d={linePath+' L358 80 L0 80 Z'} fill={WW.primary} opacity=".08"/>
+        </svg>
+        <div style={{position:'absolute',top:1,right:6,fontSize:9,color:'#EF4444',fontWeight:700}}>Z4</div>
+        <div style={{position:'absolute',top:21,right:6,fontSize:9,color:'#F59E0B',fontWeight:700}}>Z3</div>
+        <div style={{position:'absolute',top:41,right:6,fontSize:9,color:WW.primary,fontWeight:700}}>Z2</div>
+        <div style={{position:'absolute',top:61,right:6,fontSize:9,color:WW.teal,fontWeight:700}}>Z1</div>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [outdoor,setOutdoor]=React.useState(true);
+
+  React.useEffect(()=>{
+    const el=document.getElementById('tw-outdoor');
+    if(el){el.checked=true;el.addEventListener('change',e=>setOutdoor(e.target.checked));}
+    const panel=document.getElementById('tweaks');
+    if(panel)panel.style.display='none';
+    const btn=document.createElement('button');
+    btn.textContent='⚙';btn.style.cssText='position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:22px;background:#6C7EE8;color:#fff;border:none;font-size:20px;cursor:pointer;z-index:200;box-shadow:0 4px 12px rgba(108,126,232,.4)';
+    btn.onclick=()=>panel?.classList.toggle('open');document.body.appendChild(btn);
+  },[]);
+
+  return(
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',position:'relative'}}>
+      <StatusBar/>
+      <div style={{flex:1,overflowY:'auto',paddingBottom:90}}>
+
+        {/* Header */}
+        <div style={{background:`linear-gradient(160deg,${WW.teal},#3a9ab0)`,padding:'16px 20px 22px',position:'relative',overflow:'hidden'}}>
+          <div style={{textAlign:'center'}}>
+            <div style={{width:52,height:52,borderRadius:26,background:'rgba(255,255,255,.2)',border:'2px solid rgba(255,255,255,.5)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 10px',animation:'popIn .5s cubic-bezier(.2,.8,.2,1) both'}}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#fff"/></svg>
+            </div>
+            <div style={{fontSize:21,fontWeight:800,color:'#fff',letterSpacing:'-.3px',marginBottom:3}}>Run Complete!</div>
+            <div style={{fontSize:13,color:'rgba(255,255,255,.7)',fontWeight:500}}>Outdoor Run · Mon 11 May 2026</div>
+          </div>
+        </div>
+
+        <div style={{padding:'0 16px'}}>
+          {/* Stat row */}
+          <div style={{display:'flex',gap:8,margin:'14px 0'}}>
+            {[['5.34','km','Distance'],['26:48','min','Duration'],["5'01",'/ km','Avg Pace'],['298','kcal','Calories']].map(([v,u,l])=>(
+              <div key={l} style={{flex:1,background:WW.elevated,borderRadius:12,padding:'10px 6px',textAlign:'center',border:`0.5px solid ${WW.border}`}}>
+                <div style={{fontSize:16,fontWeight:800,color:WW.primaryDark,letterSpacing:'-.5px',lineHeight:1}}>{v}</div>
+                <div style={{fontSize:9,color:WW.textSec,fontWeight:600}}>{u}</div>
+                <div style={{fontSize:9,color:WW.textSec,marginTop:1}}>{l}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Route map (outdoor only) */}
+          {outdoor&&<RouteMap/>}
+
+          {/* Detail metrics */}
+          <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'13px 14px',marginBottom:12}}>
+            <div style={{fontSize:13,fontWeight:700,color:WW.text,marginBottom:10}}>
+              {outdoor?'Elevation & Splits':'Session Details'}
+            </div>
+            {outdoor&&(
+              <div style={{display:'flex',gap:14,marginBottom:10,paddingBottom:10,borderBottom:`0.5px solid ${WW.border}`}}>
+                <div><div style={{fontSize:14,fontWeight:800,color:WW.text}}>+62m</div><div style={{fontSize:11,color:WW.textSec}}>Elevation gain</div></div>
+                <div><div style={{fontSize:14,fontWeight:800,color:WW.text}}>−34m</div><div style={{fontSize:11,color:WW.textSec}}>Elevation loss</div></div>
+                <div><div style={{fontSize:14,fontWeight:800,color:WW.text}}>182 spm</div><div style={{fontSize:11,color:WW.textSec}}>Cadence</div></div>
+              </div>
+            )}
+            {/* Splits table */}
+            <div style={{fontSize:12,fontWeight:700,color:WW.textSec,marginBottom:6}}>Splits</div>
+            {SPLITS.map(s=>(
+              <div key={s.km} style={{display:'flex',alignItems:'center',padding:'5px 0',borderBottom:`0.5px solid ${WW.border}`}}>
+                <div style={{fontSize:12,fontWeight:600,color:WW.textSec,width:50}}>Km {s.km}</div>
+                <div style={{flex:1,height:4,borderRadius:2,background:WW.elevated,overflow:'hidden',margin:'0 8px'}}>
+                  <div style={{height:'100%',width:`${Math.max(30,100-(parseInt(s.pace)-4.5)*20)}%`,background:WW.teal,borderRadius:2}}/>
+                </div>
+                <div style={{fontSize:13,fontWeight:700,color:WW.text,width:44,textAlign:'right'}}>{s.pace}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* HR graph */}
+          <HRGraph/>
+
+          {/* WiseCoach */}
+          <div style={{background:WW.lavenderBg,borderRadius:16,borderLeft:`3px solid ${WW.lavender}`,padding:'13px 14px',marginBottom:12}}>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
+              <div style={{width:26,height:26,borderRadius:13,background:WW.lavender,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"/></svg>
+              </div>
+              <span style={{fontSize:12,fontWeight:700,color:WW.lavenderDark}}>WiseCoach</span>
+            </div>
+            <div style={{fontSize:13,color:WW.lavenderText,lineHeight:1.6}}>Strong run — your pace was 12 seconds faster per km than last week's 5k. Zone 3 time improved too. Consider adding strides to your next easy run to build speed without adding stress.</div>
+          </div>
+
+          {/* XP banner (outdoor only) */}
+          {outdoor&&(
+            <div style={{background:WW.tealBg,borderRadius:14,border:`0.5px solid rgba(75,184,204,.35)`,padding:'12px 14px',marginBottom:12,display:'flex',alignItems:'center',gap:10}}>
+              <div style={{width:34,height:34,borderRadius:17,background:WW.teal,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.2L12 16.5l-6.2 4.4 2.4-7.2L2 9.2h7.6L12 2z" fill="#fff"/></svg>
+              </div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:13,fontWeight:700,color:'#1A7A8C'}}>+180 XP earned!</div>
+                <div style={{height:4,borderRadius:2,background:'rgba(75,184,204,.25)',marginTop:5,overflow:'hidden'}}>
+                  <div style={{height:'100%',width:'52%',background:WW.teal,borderRadius:2}}/>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom actions */}
+      <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,borderTop:`0.5px solid ${WW.border}`,padding:'10px 16px 24px',display:'flex',gap:8,zIndex:20}}>
+        <a href="S38-Share-Card.html" style={{flex:1,height:46,borderRadius:12,border:`1.5px solid ${WW.border}`,background:'transparent',color:WW.text,fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none'}}>Share</a>
+        <a href="S-09-Home.html" style={{flex:2,height:46,borderRadius:12,background:WW.primary,color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 10px rgba(108,126,232,.35)'}}>Done</a>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

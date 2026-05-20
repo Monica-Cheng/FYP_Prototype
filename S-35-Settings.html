@@ -1,0 +1,195 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-35 Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0;padding:0;background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .lbl{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+</style>
+</head><body>
+<div class="stage">
+  <div class="lbl">S-35 · Settings</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+const PATHS={
+  'chevron-left':"M15 18l-6-6 6-6",
+  'chevron-right':"M9 18l6-6-6-6",
+  'chevron-down':"M6 9l6 6 6-6",
+  user:"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
+  mail:"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6",
+  'user-circle':"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 8a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm-7 13a7 7 0 0 1 14 0",
+  monitor:"M21 3H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7l-2 4h8l-2-4h7a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z",
+  heart:"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z",
+  bell:"M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0",
+  eye:"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z",
+  'shield-off':"M19.7 14a6.9 6.9 0 0 0 .3-2V5l-8-3-3.2 1.2M4.7 4.7 4 5v7c0 5.55 3.84 10.74 8 12a13 13 0 0 0 5-4.07M23 1 1 23",
+  'bar-chart-2':"M18 20V10M12 20V4M6 20v-6",
+  star:"M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
+  'help-circle':"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 16v.01M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3",
+  shield:"M12 2l8 4v6c0 5.5-3.5 10.74-8 12-4.5-1.26-8-6.5-8-12V6l8-4z",
+  'log-out':"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
+  'trash-2':"M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6",
+};
+function Icon({name,size=16,color='currentColor',style:s}){
+  const p=PATHS[name];if(!p)return null;
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-flex',flexShrink:0,...s}}><path d={p}/></svg>;
+}
+function StatusBar(){
+  return <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0,background:WW.card}}>
+    <span style={{paddingTop:10}}>9:41</span>
+    <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+      <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+      <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+    </div>
+  </div>;
+}
+
+function Toggle({on,onToggle}){
+  return <div onClick={onToggle} style={{width:44,height:26,borderRadius:13,background:on?WW.primary:'#C8C8D8',position:'relative',cursor:'pointer',flexShrink:0,transition:'background .2s'}}>
+    <div style={{position:'absolute',top:3,left:on?21:3,width:20,height:20,borderRadius:10,background:'#fff',boxShadow:'0 1px 3px rgba(0,0,0,.2)',transition:'left .2s'}}/>
+  </div>;
+}
+
+function SectionHeader({children}){
+  return <div style={{fontSize:11,fontWeight:500,color:WW.textSec,letterSpacing:1,textTransform:'uppercase',padding:'24px 16px 6px'}}>{children}</div>;
+}
+
+function SettingsCard({children}){
+  return <div style={{background:WW.card,borderRadius:16,margin:'0 16px',border:`0.5px solid ${WW.border}`,overflow:'hidden',boxShadow:WW.shadow}}>{children}</div>;
+}
+
+function Row({icon,iconBg,title,sub,href,chevron=true,right,onClick,red,borderTop=true}){
+  const inner=(
+    <div style={{display:'flex',alignItems:'center',gap:12,padding:'0 16px',minHeight:52,borderTop:borderTop?`0.5px solid #E8EAF8`:'none'}}>
+      {icon&&iconBg&&<div style={{width:32,height:32,borderRadius:8,background:iconBg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><Icon name={icon} size={16} color="#fff"/></div>}
+      {icon&&!iconBg&&<Icon name={icon} size={18} color="#EF4444" style={{flexShrink:0}}/>}
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:600,color:red?'#EF4444':WW.text}}>{title}</div>
+        {sub&&<div style={{fontSize:12,color:WW.textSec,marginTop:1}}>{sub}</div>}
+      </div>
+      {right||null}
+      {chevron&&!right&&<Icon name="chevron-right" size={16} color={red?'#EF4444':'#C8C8D8'}/>}
+    </div>
+  );
+  if(href) return <a href={href} style={{display:'block',textDecoration:'none'}}>{inner}</a>;
+  return <div onClick={onClick} style={{cursor:'pointer'}}>{inner}</div>;
+}
+
+function App(){
+  const [notifOpen,setNotifOpen]=React.useState(false);
+  const [leaderboard,setLeaderboard]=React.useState(true);
+  const [notifs,setNotifs]=React.useState({workout:true,streak:true,squad:true,missed:true,overtrain:true,plan:true});
+  const toggleNotif=k=>setNotifs(p=>({...p,[k]:!p[k]}));
+
+  const NotifRow=({k,label,sub})=>(
+    <div style={{display:'flex',alignItems:'flex-start',gap:12,padding:'12px 16px',borderTop:`0.5px solid #E8EAF8`}}>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,color:WW.text}}>{label}</div>
+        {sub&&<div style={{fontSize:11,color:WW.textSec,fontStyle:'italic',marginTop:3,lineHeight:1.4}}>{sub}</div>}
+      </div>
+      <Toggle on={notifs[k]} onToggle={()=>toggleNotif(k)}/>
+    </div>
+  );
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,fontFamily:"'Inter',system-ui,sans-serif"}}>
+      <StatusBar/>
+      {/* Top bar */}
+      <div style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',flexShrink:0,position:'relative'}}>
+        <button onClick={()=>window.history.back()} style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,border:'none',cursor:'pointer',padding:0}}>
+          <Icon name="chevron-left" size={18} color={WW.textSec}/>
+        </button>
+        <span style={{position:'absolute',left:'50%',transform:'translateX(-50%)',fontSize:18,fontWeight:600,color:WW.primaryDark}}>Settings</span>
+      </div>
+
+      {/* Scroll */}
+      <div style={{flex:1,overflowY:'auto',paddingBottom:32}}>
+
+        <SectionHeader>Account</SectionHeader>
+        <SettingsCard>
+          <Row borderTop={false} icon="user" iconBg={WW.primary} title="Edit Profile" sub="Name, username, photo, bio" href="S-37-Edit-Profile.html"/>
+          <Row icon="mail" iconBg={WW.primary} title="Change Email" sub="m.tan@email.com" href="S-39-Change-Email.html"/>
+          <Row icon="user-circle" iconBg="#4BB8CC" title="About You" sub="Age, height, weight, sex" href="S-40-About-You.html"/>
+          <Row icon="monitor" iconBg="#4BB8CC" title="Manage Apps and Devices" sub="Apple Watch · Apple Health" href="S-41-Manage-Apps.html"/>
+        </SettingsCard>
+
+        <SectionHeader>Fitness</SectionHeader>
+        <SettingsCard>
+          <Row borderTop={false} icon="heart" iconBg="#EF4444" title="Health Profile" sub="Injuries, calorie goals, conditions" href="S-36-Health-Profile-Settings.html"/>
+          <div>
+            <div onClick={()=>setNotifOpen(o=>!o)} style={{display:'flex',alignItems:'center',gap:12,padding:'0 16px',minHeight:52,borderTop:`0.5px solid #E8EAF8`,cursor:'pointer'}}>
+              <div style={{width:32,height:32,borderRadius:8,background:'#F59E0B',display:'flex',alignItems:'center',justifyContent:'center'}}><Icon name="bell" size={16} color="#fff"/></div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:14,fontWeight:600,color:WW.text}}>Notification Preferences</div>
+                <div style={{fontSize:12,color:WW.textSec,marginTop:1}}>Reminders, nudges, alerts</div>
+              </div>
+              <Icon name="chevron-down" size={16} color="#C8C8D8" style={{transform:notifOpen?'rotate(180deg)':'rotate(0deg)',transition:'transform .2s'}}/>
+            </div>
+            {notifOpen&&(
+              <div style={{background:WW.bg}}>
+                <NotifRow k="workout" label="Workout reminders"/>
+                <NotifRow k="streak" label="Streak at risk alerts"/>
+                <NotifRow k="squad" label="Squad updates"/>
+                <NotifRow k="missed" label="Missed workout checkup" sub="Send a check-in if I haven't logged a session by my usual workout time."/>
+                <NotifRow k="overtrain" label="Overtraining alerts"/>
+                <NotifRow k="plan" label="Plan updates from WiseCoach"/>
+              </div>
+            )}
+          </div>
+        </SettingsCard>
+
+        <SectionHeader>Community</SectionHeader>
+        <SettingsCard>
+          <Row borderTop={false} icon="eye" iconBg="#8B5CF6" title="Profile Visibility" sub="Public" href="S-42-Profile-Visibility.html"/>
+          <Row icon="shield-off" iconBg="#8B5CF6" title="Blocked Users" sub="0 blocked" href="S-43-Blocked-Users.html"/>
+          <div style={{display:'flex',alignItems:'center',gap:12,padding:'0 16px',minHeight:52,borderTop:`0.5px solid #E8EAF8`}}>
+            <div style={{width:32,height:32,borderRadius:8,background:'#8B5CF6',display:'flex',alignItems:'center',justifyContent:'center'}}><Icon name="bar-chart-2" size={16} color="#fff"/></div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:14,fontWeight:600,color:WW.text}}>Friend Leaderboard</div>
+              <div style={{fontSize:12,color:WW.textSec,marginTop:1}}>Appear in your friends' leaderboard</div>
+            </div>
+            <Toggle on={leaderboard} onToggle={()=>setLeaderboard(v=>!v)}/>
+          </div>
+        </SettingsCard>
+
+        <SectionHeader>Support</SectionHeader>
+        <SettingsCard>
+          <Row borderTop={false} icon="star" iconBg="#F59E0B" title="Your Plan" sub="Free · Upgrade for Premium features" href="S-44-Your-Plan.html"/>
+          <Row icon="help-circle" iconBg="#22C55E" title="Help and Feedback" sub="FAQs, contact, report a bug" onClick={()=>alert('Would open Help centre')}/>
+          <Row icon="shield" iconBg="#22C55E" title="Privacy Policy" onClick={()=>alert('Would open Privacy Policy')}/>
+        </SettingsCard>
+
+        {/* Log out */}
+        <div style={{marginTop:32,padding:'0 16px'}}>
+          <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,overflow:'hidden',boxShadow:WW.shadow}}>
+            <Row borderTop={false} icon="log-out" iconBg="#8A8A9E" title="Log Out" chevron={false}
+              onClick={()=>{if(confirm('Are you sure you want to log out?'))window.location.href='S-02-Login.html';}}/>
+          </div>
+          <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,overflow:'hidden',boxShadow:WW.shadow,marginTop:12}}>
+            <div onClick={()=>confirm('This action is permanent. Delete account?')}
+              style={{display:'flex',alignItems:'center',gap:12,padding:'0 16px',minHeight:52,cursor:'pointer'}}>
+              <Icon name="trash-2" size={18} color="#EF4444"/>
+              <span style={{flex:1,fontSize:14,fontWeight:500,color:'#EF4444'}}>Delete or deactivate account</span>
+              <Icon name="chevron-right" size={16} color="#EF4444"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

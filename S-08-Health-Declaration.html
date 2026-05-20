@@ -1,0 +1,175 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-08 Health Declaration</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell { width: 390px; height: 844px; border-radius: 52px; background: #0A0A12; padding: 5px; box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12); position: relative; box-sizing: content-box; }
+  .phone-inner { width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #F7F8FF; position: relative; }
+  .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60; pointer-events: none; }
+  .tweaks-panel { position: fixed; bottom: 20px; right: 20px; width: 260px; background: #fff; border-radius: 14px; padding: 14px 16px 16px; box-shadow: 0 10px 40px rgba(20,25,60,0.18), 0 0 0 0.5px rgba(0,0,0,0.08); color: #3D3D5C; display: none; z-index: 100; }
+  .tweaks-panel.open { display: block; }
+  .tweaks-panel h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; color: #8A8A9E; }
+  .tweak-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; gap: 10px; }
+  .tweak-row label { font-size: 13px; color: #3D3D5C; flex: 1; }
+  .tweak-row input[type="checkbox"] { accent-color: #6C7EE8; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="label">S-08 · Health Declaration</div>
+  <div class="phone-shell">
+    <div class="island"></div>
+    <div class="phone-inner" id="app"></div>
+  </div>
+</div>
+
+<div class="tweaks-panel" id="tweaks">
+  <h3>State</h3>
+  <div class="tweak-row"><label>Has recorded conditions</label><input type="checkbox" id="tw-conditions" checked/></div>
+</div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const WW = {
+  bg: '#F7F8FF', card: '#FFFFFF', elevated: '#EEF0FB',
+  primary: '#6C7EE8', primaryDark: '#2D3A8C',
+  lavender: '#9B84E8', lavenderBg: '#F0EEFE', lavenderDark: '#7B5CB8',
+  teal: '#4BB8CC', tealBg: '#E0F4F8',
+  text: '#3D3D5C', textSec: '#8A8A9E', border: '#C8C8D8',
+  shadow: '0 2px 8px rgba(45,58,140,0.06)',
+};
+
+function StatusBar() {
+  return (
+    <div style={{ height: 47, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 28px', fontSize: 15, fontWeight: 600, color: WW.text, flexShrink: 0 }}>
+      <div style={{ paddingTop: 10 }}>9:41</div>
+      <div style={{ display: 'flex', gap: 6, alignItems: 'center', paddingTop: 10 }}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={WW.text} opacity="0.4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [checked, setChecked] = React.useState(false);
+  const [hasConditions, setHasConditions] = React.useState(true);
+
+  React.useEffect(() => {
+    const el = document.getElementById('tw-conditions');
+    if (el) {
+      el.checked = true;
+      el.addEventListener('change', e => setHasConditions(e.target.checked));
+    }
+    const panel = document.getElementById('tweaks');
+    if (panel) panel.style.display = 'none';
+    const btn = document.createElement('button');
+    btn.textContent = '⚙';
+    btn.style.cssText = 'position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:22px;background:#6C7EE8;color:#fff;border:none;font-size:20px;cursor:pointer;z-index:200;box-shadow:0 4px 12px rgba(108,126,232,0.4)';
+    btn.onclick = () => panel?.classList.toggle('open');
+    document.body.appendChild(btn);
+  }, []);
+
+  return (
+    <div style={{ width: '100%', height: '100%', background: WW.bg, display: 'flex', flexDirection: 'column' }}>
+      <StatusBar />
+
+      {/* Top bar with back button */}
+      <div style={{ padding: '4px 20px 12px', flexShrink: 0 }}>
+        <a href="S-07-Onboarding-Plan-Result.html" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 19, background: 'rgba(61,61,92,0.07)', textDecoration: 'none' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M15 5l-7 7 7 7" stroke={WW.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, padding: '0 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+        {/* Warning icon */}
+        <div style={{ width: 64, height: 64, borderRadius: 20, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3L2 20h20L12 3z" stroke="#D97706" strokeWidth="1.8" strokeLinejoin="round"/>
+            <path d="M12 9v5M12 16.5v.5" stroke="#D97706" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </div>
+
+        <div style={{ fontSize: 26, fontWeight: 800, color: WW.primaryDark, letterSpacing: '-0.5px', marginBottom: 16 }}>
+          Before you begin
+        </div>
+
+        {/* Disclaimer card */}
+        <div style={{ background: WW.card, borderRadius: 16, border: `0.5px solid ${WW.border}`, boxShadow: WW.shadow, padding: '18px 18px', marginBottom: 14 }}>
+          <div style={{ fontSize: 15, color: WW.text, lineHeight: 1.65, marginBottom: hasConditions ? 14 : 0 }}>
+            This plan involves exercise that may not be suitable for all fitness levels. If you have any existing medical conditions or injuries, please consult a doctor before starting.
+          </div>
+
+          {hasConditions && (
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 13px', background: WW.lavenderBg, borderRadius: 10, border: `0.5px solid rgba(155,132,232,0.3)` }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
+                <path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-0.8-8-4.5-8-9V6l8-3z" stroke={WW.lavender} strokeWidth="1.8" strokeLinejoin="round"/>
+                <path d="M9 12l2 2 4-4" stroke={WW.lavender} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <div style={{ fontSize: 13, color: WW.lavenderDark, fontWeight: 500, lineHeight: 1.5 }}>
+                We have applied safety filters based on your health profile. Some exercises have been adjusted.
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Health profile link */}
+        <a href="S-36-Health-Profile-Settings.html" style={{ fontSize: 13, color: WW.primary, fontWeight: 600, textDecoration: 'none', marginBottom: 24, display: 'inline-block' }}>
+          Edit health profile →
+        </a>
+
+        {/* Checkbox row */}
+        <div
+          onClick={() => setChecked(v => !v)}
+          style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '16px', background: WW.card, borderRadius: 14, border: `1.5px solid ${checked ? WW.primary : WW.border}`, boxShadow: checked ? `0 0 0 1px ${WW.primary}22` : 'none', cursor: 'pointer', marginBottom: 24, transition: 'all 0.18s' }}
+        >
+          <div style={{
+            width: 22, height: 22, borderRadius: 6, flexShrink: 0, marginTop: 1,
+            border: `2px solid ${checked ? WW.primary : WW.border}`,
+            background: checked ? WW.primary : 'transparent',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.18s',
+          }}>
+            {checked && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+          </div>
+          <div style={{ fontSize: 14, color: WW.text, lineHeight: 1.55, fontWeight: 500 }}>
+            I have read and understood the above. I will consult a healthcare professional if I have any concerns.
+          </div>
+        </div>
+
+        <div style={{ flex: 1 }}/>
+
+        {/* Continue button */}
+        <a href={checked ? 'S-09-Home.html' : undefined}
+          onClick={e => { if (!checked) e.preventDefault(); }}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            height: 52, borderRadius: 14,
+            background: checked ? WW.primary : WW.border,
+            color: checked ? '#fff' : WW.textSec,
+            fontSize: 16, fontWeight: 700, textDecoration: 'none',
+            cursor: checked ? 'pointer' : 'not-allowed',
+            boxShadow: checked ? '0 4px 14px rgba(108,126,232,0.35)' : 'none',
+            transition: 'all 0.25s', marginBottom: 32,
+          }}>
+          Continue
+        </a>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

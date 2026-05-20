@@ -1,0 +1,175 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-15 My Plans Library</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-15 · My Plans Library</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+const Ico={
+  home:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill={c}/></svg>,
+  plans:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="20" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill={c}/></svg>,
+  coach:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke={c} strokeWidth="1.5" strokeLinejoin="round"/></svg>,
+  club:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke={c} strokeWidth="1.5"/><circle cx="17" cy="10" r="2.2" stroke={c} strokeWidth="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke={c} strokeWidth="1.5" strokeLinecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  progress:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+};
+
+function StatusBar(){return(<div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}><div style={{paddingTop:10}}>9:41</div><div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg></div></div>);}
+
+const NAV=[{id:'home',label:'Home',icon:Ico.home,href:'S-09-Home.html'},{id:'plans',label:'Plans',icon:Ico.plans,href:'S-10-Plans-Hub.html'},{id:'coach',label:'Coach',icon:Ico.coach,href:'S-25-Coach-Chat.html'},{id:'club',label:'Club',icon:Ico.club,href:'S-28-Club-Tab.html'},{id:'progress',label:'Progress',icon:Ico.progress,href:'S-32-Progress-Tab.html'}];
+function BottomNav({active}){return(<div style={{position:'absolute',bottom:0,left:0,right:0,height:84,background:WW.card,borderTop:'0.5px solid #E8EAF8',display:'flex',zIndex:30}}>{NAV.map(n=>{const a=n.id===active,c=a?WW.primary:WW.textSec;return(<a key={n.id} href={n.href} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,textDecoration:'none',paddingBottom:8}}>{n.icon(c)}<span style={{fontSize:10,fontWeight:600,color:c}}>{n.label}</span></a>);})}</div>);}
+
+const PLANS=[
+  {id:1,name:'Beginner Push-Pull-Legs',goal:'Build Muscle',level:'Beginner',days:3,weeks:8,color:WW.primary,source:'Catalog',tracked:true,progress:22},
+  {id:2,name:'Fat Loss Circuit',goal:'Lose Weight',level:'Beginner',days:3,weeks:8,color:'#F59E0B',source:'Catalog',tracked:false,progress:0},
+  {id:3,name:'My Custom Routine',goal:'Build Strength',level:'Intermediate',days:4,weeks:null,color:'#9B84E8',source:'Custom',tracked:false,progress:0},
+  {id:4,name:'5K Running Plan',goal:'Improve Endurance',level:'Beginner',days:4,weeks:6,color:WW.teal,source:'Plan Match',tracked:false,progress:0},
+];
+
+const SOURCE_COLORS={Catalog:[WW.primary,WW.chipBg],'Plan Match':[WW.lavender,'#F0EEFE'],Custom:['#F59E0B','#FEF3C7']};
+
+function ThreeDotMenu({plan,onTrack,onDelete}){
+  const [open,setOpen]=React.useState(false);
+  const isTracked=plan.tracked;
+  return(
+    <div style={{position:'relative'}}>
+      <button onClick={e=>{e.stopPropagation();setOpen(o=>!o);}} style={{width:32,height:32,borderRadius:16,background:'transparent',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill={WW.textSec}/><circle cx="12" cy="12" r="1.5" fill={WW.textSec}/><circle cx="12" cy="19" r="1.5" fill={WW.textSec}/></svg>
+      </button>
+      {open&&(
+        <div onClick={e=>e.stopPropagation()} style={{position:'absolute',top:36,right:0,width:190,background:WW.card,borderRadius:12,boxShadow:'0 8px 30px rgba(20,25,60,.16)',border:`0.5px solid ${WW.border}`,zIndex:50,animation:'slideDown .15s ease',overflow:'hidden'}}>
+          {!isTracked&&(
+            <button onClick={()=>{onTrack(plan.id);setOpen(false);}} style={{width:'100%',padding:'12px 14px',background:'transparent',border:'none',cursor:'pointer',textAlign:'left',display:'flex',alignItems:'center',gap:10,borderBottom:`0.5px solid ${WW.border}`}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={WW.primary} strokeWidth="1.6"/><path d="M8 12l3 3 5-5" stroke={WW.primary} strokeWidth="1.6" strokeLinecap="round"/></svg>
+              <span style={{fontSize:13,fontWeight:600,color:WW.text}}>Set as Tracked Plan</span>
+            </button>
+          )}
+          {plan.source==='Custom'&&(
+            <a href="S-11-Build-Custom-Routine.html" style={{width:'100%',padding:'12px 14px',background:'transparent',border:'none',cursor:'pointer',textAlign:'left',display:'flex',alignItems:'center',gap:10,borderBottom:`0.5px solid ${WW.border}`,textDecoration:'none'}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a1 1 0 00-1 1v15a1 1 0 001 1h15a1 1 0 001-1v-7" stroke={WW.textSec} strokeWidth="1.6" strokeLinecap="round"/><path d="M18.5 2.5a2 2 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke={WW.textSec} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <span style={{fontSize:13,fontWeight:600,color:WW.text}}>Edit Routine</span>
+            </a>
+          )}
+          <button onClick={()=>{onDelete(plan.id);setOpen(false);}} style={{width:'100%',padding:'12px 14px',background:'transparent',border:'none',cursor:'pointer',textAlign:'left',display:'flex',alignItems:'center',gap:10}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="#EF4444" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <span style={{fontSize:13,fontWeight:600,color:'#EF4444'}}>Delete</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PlanRow({plan,onTrack,onDelete}){
+  const [srcColor,srcBg]=SOURCE_COLORS[plan.source]||[WW.textSec,WW.elevated];
+  return(
+    <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,overflow:'hidden',marginBottom:10}}>
+      <div style={{height:5,background:plan.color}}/>
+      <div style={{padding:'11px 12px'}}>
+        <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8,marginBottom:6}}>
+          <div style={{flex:1}}>
+            <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:3,flexWrap:'wrap'}}>
+              {plan.tracked&&(
+                <span style={{fontSize:10,fontWeight:700,color:WW.teal,background:WW.tealBg,padding:'2px 7px',borderRadius:5,flexShrink:0}}>Tracked</span>
+              )}
+              <span style={{fontSize:10,fontWeight:600,color:srcColor,background:srcBg,padding:'2px 7px',borderRadius:5,flexShrink:0}}>{plan.source}</span>
+            </div>
+            <div style={{fontSize:14,fontWeight:800,color:WW.text,lineHeight:1.3}}>{plan.name}</div>
+          </div>
+          <ThreeDotMenu plan={plan} onTrack={onTrack} onDelete={onDelete}/>
+        </div>
+        <div style={{display:'flex',gap:5,flexWrap:'wrap',marginBottom:plan.tracked?10:0}}>
+          <span style={{fontSize:10,fontWeight:700,color:'#fff',background:plan.color,padding:'2px 7px',borderRadius:5}}>{plan.goal}</span>
+          <span style={{fontSize:10,fontWeight:600,color:WW.textSec,background:WW.elevated,padding:'2px 7px',borderRadius:5}}>{plan.level}</span>
+          <span style={{fontSize:10,fontWeight:600,color:WW.textSec,background:WW.elevated,padding:'2px 7px',borderRadius:5}}>{plan.days}d/wk</span>
+          {plan.weeks&&<span style={{fontSize:10,fontWeight:600,color:WW.textSec,background:WW.elevated,padding:'2px 7px',borderRadius:5}}>{plan.weeks}wk</span>}
+        </div>
+        {plan.tracked&&(
+          <>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:4}}>
+              <div style={{fontSize:11,color:WW.textSec,fontWeight:600}}>Progress</div>
+              <div style={{fontSize:11,fontWeight:700,color:WW.primary}}>{plan.progress}%</div>
+            </div>
+            <div style={{height:5,borderRadius:3,background:WW.elevated,overflow:'hidden',marginBottom:10}}>
+              <div style={{height:'100%',width:`${plan.progress}%`,background:WW.primary,borderRadius:3}}/>
+            </div>
+            <a href="S-16-Tracked-Plan-Schedule.html" style={{display:'block',textAlign:'center',padding:'8px',borderRadius:10,background:WW.primary,color:'#fff',fontSize:12,fontWeight:700,textDecoration:'none'}}>View Schedule</a>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function EmptyState(){
+  return(
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'50px 24px',textAlign:'center'}}>
+      <div style={{width:64,height:64,borderRadius:20,background:WW.elevated,display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16}}>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill={WW.border}/><rect x="20" y="10" width="3.5" height="7" rx="1" fill={WW.border}/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill={WW.border}/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill={WW.border}/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill={WW.border}/></svg>
+      </div>
+      <div style={{fontSize:16,fontWeight:800,color:WW.text,marginBottom:6}}>No plans yet</div>
+      <div style={{fontSize:13,color:WW.textSec,lineHeight:1.5,marginBottom:20}}>Save plans from the catalog or create your own custom routine.</div>
+      <div style={{display:'flex',flexDirection:'column',gap:8,width:'100%'}}>
+        <a href="S-12-Explore-Plan-Catalog.html" style={{padding:'12px',borderRadius:12,background:WW.primary,color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none',textAlign:'center'}}>Explore Catalog</a>
+        <a href="S-11-Build-Custom-Routine.html" style={{padding:'12px',borderRadius:12,border:`1.5px solid ${WW.border}`,color:WW.primary,fontSize:14,fontWeight:700,textDecoration:'none',textAlign:'center'}}>Build Custom Routine</a>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [plans,setPlans]=React.useState(PLANS);
+
+  const handleTrack=id=>{
+    setPlans(ps=>ps.map(p=>({...p,tracked:p.id===id})));
+  };
+  const handleDelete=id=>{
+    setPlans(ps=>ps.filter(p=>p.id!==id));
+  };
+
+  const savedCount=plans.length;
+
+  return(
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',position:'relative'}}>
+      <StatusBar/>
+      {/* Header */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'4px 16px 10px',flexShrink:0}}>
+        <div>
+          <div style={{fontSize:24,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.5px',lineHeight:1.1}}>All Plans</div>
+          <div style={{fontSize:13,color:WW.textSec,marginTop:2}}>{savedCount} saved</div>
+        </div>
+        <a href="S-12-Explore-Plan-Catalog.html" style={{height:36,padding:'0 14px',borderRadius:18,background:WW.primary,color:'#fff',fontSize:13,fontWeight:700,textDecoration:'none',display:'flex',alignItems:'center',gap:6}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></svg>
+          Add
+        </a>
+      </div>
+
+      <div style={{flex:1,overflowY:'auto',padding:'0 16px',paddingBottom:92}}>
+        {plans.length===0?(
+          <EmptyState/>
+        ):(
+          plans.map(p=><PlanRow key={p.id} plan={p} onTrack={handleTrack} onDelete={handleDelete}/>)
+        )}
+      </div>
+      <BottomNav active="plans"/>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

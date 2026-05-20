@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-22b Post Indoor Save</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  .tweaks-panel{position:fixed;bottom:20px;right:20px;width:240px;background:#fff;border-radius:14px;padding:14px 16px 16px;box-shadow:0 10px 40px rgba(20,25,60,.18),0 0 0 .5px rgba(0,0,0,.08);color:#3D3D5C;display:none;z-index:100}
+  .tweaks-panel.open{display:block}.tweaks-panel h3{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:#8A8A9E}
+  .tweak-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:10px}
+  .tweak-row label{font-size:13px;color:#3D3D5C;flex:1}.tweak-row input[type="checkbox"]{accent-color:#6C7EE8}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-22b · Post Indoor Save</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<div class="tweaks-panel" id="tweaks">
+  <h3>State</h3>
+  <div class="tweak-row"><label>Wearable connected</label><input type="checkbox" id="tw-hr" checked/></div>
+  <div class="tweak-row"><label>Distance entered</label><input type="checkbox" id="tw-dist" checked/></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',lavenderText:'#7B5CB8',lavenderBody:'#5B3F9E',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+const ACTIVITY_CHIPS=['Treadmill Run','Treadmill Walk','Elliptical','Rowing Machine','Indoor Cycle','Stair Climber','Other'];
+
+const SEC_HDR={fontSize:11,fontWeight:700,color:'#8A8A9E',textTransform:'uppercase',letterSpacing:.8,marginBottom:6,paddingLeft:2};
+
+function StatusBar(){
+  return(
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [hasHR,setHasHR]=React.useState(true);
+  const [distEntered,setDistEntered]=React.useState(true);
+  const [distVal,setDistVal]=React.useState('2.1');
+  const [distUnit,setDistUnit]=React.useState('km');
+  const [effort,setEffort]=React.useState(null);
+  const [actType,setActType]=React.useState('Treadmill Run');
+  const [notes,setNotes]=React.useState('');
+  const [showDiscard,setShowDiscard]=React.useState(false);
+
+  React.useEffect(()=>{
+    const sync=()=>{
+      setHasHR(document.getElementById('tw-hr')?.checked??true);
+      setDistEntered(document.getElementById('tw-dist')?.checked??true);
+    };
+    document.querySelectorAll('#tweaks input').forEach(el=>el.addEventListener('change',sync));
+    sync();
+    const panel=document.getElementById('tweaks');
+    if(panel)panel.style.display='none';
+    const btn=document.createElement('button');
+    btn.textContent='⚙';btn.style.cssText='position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:22px;background:#6C7EE8;color:#fff;border:none;font-size:20px;cursor:pointer;z-index:200;box-shadow:0 4px 12px rgba(108,126,232,.4)';
+    btn.onclick=()=>panel?.classList.toggle('open');document.body.appendChild(btn);
+  },[]);
+
+  const distNum=parseFloat(distVal)||0;
+  const paceSecPerKm=distNum>0?Math.round(1112/distNum):0;
+  const paceFmt=paceSecPerKm>0?`${Math.floor(paceSecPerKm/60)}:${String(paceSecPerKm%60).padStart(2,'0')} /km`:'--';
+
+  // Metrics rows — only non-empty shown
+  const metricRows=[
+    {label:'Duration',val:'18:32'},
+    {label:'Calories (est.)',val:'186 kcal'},
+    distEntered&&distNum>0&&{label:'Distance',val:`${distNum} ${distUnit}`},
+    distEntered&&distNum>0&&{label:'Avg pace',val:paceFmt},
+    hasHR&&{label:'Heart Rate avg',val:'142 bpm'},
+    hasHR&&{label:'Heart Rate peak',val:'161 bpm'},
+    hasHR&&{label:'HR Zone',val:'Zone 3 · Aerobic'},
+    {label:'Activity type',val:actType},
+    effort!==null&&{label:'Effort level',val:`${effort} / 10 · ${effort<=3?'Easy':effort<=7?'Moderate':'Hard'}`},
+  ].filter(Boolean);
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,position:'relative'}}>
+      <StatusBar/>
+
+      {/* Top bar */}
+      <div style={{display:'flex',alignItems:'center',padding:'0 16px',height:48,flexShrink:0}}>
+        <button onClick={()=>setShowDiscard(true)}
+          style={{width:36,height:36,borderRadius:10,background:WW.card,border:`0.5px solid ${WW.border}`,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',boxShadow:WW.shadow}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={WW.text} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div style={{flex:1,textAlign:'center',fontSize:18,fontWeight:800,color:WW.primaryDark}}>Save session</div>
+        <a href="S-09-Home.html" style={{fontSize:15,fontWeight:700,color:WW.primary,textDecoration:'none',padding:'8px 4px'}}>Save</a>
+      </div>
+
+      {/* Scrollable content */}
+      <div style={{flex:1,overflowY:'auto',padding:'4px 16px 24px'}}>
+
+        {/* Session snapshot card */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'14px 16px',marginBottom:16,boxShadow:WW.shadow}}>
+          <div style={{fontSize:15,fontWeight:800,color:WW.primaryDark,marginBottom:12}}>Treadmill Run</div>
+          {[
+            {icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={WW.textSec} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,text:'18:32 recorded'},
+            {icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2C8 2 4 5 4 9c0 6 8 13 8 13s8-7 8-13c0-4-4-7-8-7z"/><circle cx="12" cy="9" r="2.5"/></svg>,text:'~186 kcal estimated'},
+            hasHR&&{icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,text:'142 bpm avg'},
+            !hasHR&&{icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={WW.textSec} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,text:'Heart rate: not available',sec:true},
+          ].filter(Boolean).map((r,i)=>(
+            <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'5px 0',borderBottom:i<2?`0.5px solid ${WW.border}`:'none'}}>
+              {r.icon}
+              <span style={{fontSize:13,fontWeight:600,color:r.sec?WW.textSec:WW.text}}>{r.text}</span>
+            </div>
+          ))}
+          <div style={{fontSize:11,color:WW.textSec,fontStyle:'italic',marginTop:10,lineHeight:1.5}}>Calorie estimate based on activity type, duration, and your body weight. You can add distance below to improve accuracy.</div>
+        </div>
+
+        {/* Field 1: Distance */}
+        <div style={{marginBottom:6}}><div style={SEC_HDR}>Distance</div></div>
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'14px 16px',marginBottom:16,boxShadow:WW.shadow}}>
+          <div style={{display:'flex',alignItems:'center',gap:10}}>
+            <div style={{flex:1,fontSize:14,fontWeight:600,color:WW.text}}>Distance covered</div>
+            <input type="number" step="0.1" value={distVal} onChange={e=>setDistVal(e.target.value)}
+              style={{width:70,height:38,borderRadius:10,border:`1.5px solid ${distVal?WW.primary:WW.border}`,padding:'0 10px',fontSize:16,fontWeight:700,color:WW.primaryDark,outline:'none',textAlign:'right',fontFamily:'inherit'}}/>
+            <div style={{fontSize:13,fontWeight:600,color:WW.textSec,minWidth:22}}>{distUnit}</div>
+          </div>
+          <div style={{fontSize:11,color:WW.textSec,marginTop:8,lineHeight:1.5}}>Treadmill showing a different number? Enter it here for a more accurate record.</div>
+          {/* Unit toggle */}
+          <div style={{display:'flex',background:WW.elevated,borderRadius:9,padding:2,gap:2,marginTop:10,alignSelf:'flex-start',width:80}}>
+            {['km','mi'].map(u=>(
+              <button key={u} onClick={()=>setDistUnit(u)}
+                style={{flex:1,padding:'5px 0',borderRadius:7,border:'none',background:distUnit===u?WW.card:'transparent',color:distUnit===u?WW.primaryDark:WW.textSec,fontSize:12,fontWeight:distUnit===u?800:600,cursor:'pointer',boxShadow:distUnit===u?WW.shadow:'none'}}>
+                {u}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Field 2: Effort */}
+        <div style={{marginBottom:6}}><div style={SEC_HDR}>My Effort</div></div>
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'14px 16px',marginBottom:16,boxShadow:WW.shadow}}>
+          <div style={{fontSize:15,fontWeight:600,color:WW.text,marginBottom:12}}>How hard did that feel?</div>
+          <div style={{display:'flex',gap:5,justifyContent:'space-between'}}>
+            {Array.from({length:10},(_,i)=>i+1).map(n=>(
+              <button key={n} onClick={()=>setEffort(n)}
+                style={{width:28,height:28,borderRadius:14,border:'none',background:effort===n?WW.primary:'#F2F2F7',color:effort===n?'#fff':WW.textSec,fontSize:12,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all .12s',flexShrink:0}}>
+                {n}
+              </button>
+            ))}
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',marginTop:7}}>
+            <span style={{fontSize:11,color:WW.textSec}}>Easy</span>
+            <span style={{fontSize:11,color:WW.textSec}}>Moderate</span>
+            <span style={{fontSize:11,color:WW.textSec}}>Hard</span>
+          </div>
+        </div>
+
+        {/* Field 3: Activity type */}
+        <div style={{marginBottom:6}}><div style={SEC_HDR}>Activity type</div></div>
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'14px 16px',marginBottom:16,boxShadow:WW.shadow}}>
+          <div style={{display:'flex',flexWrap:'wrap',gap:7}}>
+            {ACTIVITY_CHIPS.map(c=>{
+              const sel=actType===c;
+              return(
+                <button key={c} onClick={()=>setActType(c)}
+                  style={{padding:'6px 12px',borderRadius:20,border:`1.5px solid ${sel?WW.primary:WW.border}`,background:sel?WW.chipBg:'transparent',color:sel?WW.primary:WW.text,fontSize:12,fontWeight:sel?700:500,cursor:'pointer',transition:'all .12s'}}>
+                  {c}
+                </button>
+              );
+            })}
+          </div>
+          <div style={{fontSize:11,color:WW.textSec,fontStyle:'italic',marginTop:10}}>Changed mid-session? Select your main activity above.</div>
+        </div>
+
+        {/* Field 4: Notes */}
+        <div style={{marginBottom:6}}><div style={SEC_HDR}>Notes</div></div>
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'14px 16px',marginBottom:16,boxShadow:WW.shadow}}>
+          <textarea
+            value={notes}
+            onChange={e=>setNotes(e.target.value.slice(0,200))}
+            placeholder="e.g. Felt strong today. Increased incline to 4% for the last 5 minutes."
+            style={{width:'100%',minHeight:80,border:'none',outline:'none',fontSize:13,color:WW.text,background:'transparent',resize:'none',padding:0,boxSizing:'border-box',fontFamily:'inherit',lineHeight:1.6}}
+          />
+          <div style={{textAlign:'right',fontSize:10,color:WW.textSec,marginTop:4}}>{notes.length} / 200</div>
+        </div>
+
+        {/* WiseCoach summary */}
+        <div style={{background:WW.lavenderBg,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'13px 14px',marginBottom:16,borderLeft:`3px solid ${WW.lavender}`,boxShadow:WW.shadow}}>
+          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+            <div style={{width:28,height:28,borderRadius:14,background:WW.lavender,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div style={{flex:1}}>
+              <span style={{fontSize:12,fontWeight:800,color:WW.lavenderText}}>WiseCoach</span>
+              <span style={{fontSize:11,color:WW.textSec,marginLeft:8}}>Just now</span>
+            </div>
+          </div>
+          <div style={{fontSize:14,color:WW.lavenderBody,lineHeight:1.6}}>Good effort — 18 minutes on the treadmill. Your calorie estimate of 186 kcal keeps you on track for your weekly goal. For your next indoor session, try adding 2 minutes to your duration to build consistency gradually.</div>
+          <div style={{fontSize:10,color:WW.textSec,marginTop:8,lineHeight:1.4}}>WiseCoach provides general guidance and is not a substitute for professional medical advice.</div>
+        </div>
+
+        {/* Metrics section */}
+        <div style={{marginBottom:6}}><div style={SEC_HDR}>What this session tracked</div></div>
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'4px 16px',marginBottom:12,boxShadow:WW.shadow}}>
+          {metricRows.map((row,i)=>(
+            <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:i<metricRows.length-1?`0.5px solid #E8EAF8`:''}}>
+              <span style={{fontSize:13,color:WW.textSec}}>{row.label}</span>
+              <span style={{fontSize:13,fontWeight:700,color:WW.text}}>{row.val}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* XP banner */}
+        <div style={{background:WW.teal,borderRadius:14,padding:'0 16px',height:56,display:'flex',alignItems:'center',gap:10,marginBottom:16,boxShadow:'0 3px 12px rgba(75,184,204,.3)'}}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+          <div style={{flex:1,fontSize:14,fontWeight:800,color:'#fff',textAlign:'center'}}>+30 XP — Session logged</div>
+          <div style={{fontSize:12,fontWeight:700,color:'rgba(255,255,255,.8)'}}>Lv.7</div>
+        </div>
+
+        {/* Bottom buttons */}
+        <div style={{display:'flex',gap:12,paddingBottom:16}}>
+          <a href="S38-Share-Card.html"
+            style={{flex:1,height:48,borderRadius:14,border:`1.5px solid ${WW.primary}`,background:'transparent',color:WW.primary,fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none'}}>
+            Share
+          </a>
+          <a href="S-09-Home.html"
+            style={{flex:1,height:48,borderRadius:14,background:WW.primary,color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none',boxShadow:'0 3px 10px rgba(108,126,232,.3)'}}>
+            Done
+          </a>
+        </div>
+
+      </div>
+
+      {/* Discard confirmation sheet */}
+      {showDiscard&&(
+        <div style={{position:'absolute',inset:0,background:'rgba(10,10,18,.5)',zIndex:50,display:'flex',alignItems:'flex-end'}}>
+          <div style={{width:'100%',background:WW.card,borderRadius:'22px 22px 0 0',padding:'20px 20px 40px',boxShadow:'0 -8px 40px rgba(20,25,60,.2)',animation:'slideUp .28s ease'}}>
+            <div style={{width:36,height:4,borderRadius:2,background:WW.border,margin:'0 auto 20px'}}/>
+            <div style={{fontSize:17,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>End this session?</div>
+            <div style={{fontSize:14,color:WW.textSec,lineHeight:1.6,marginBottom:24}}>Your progress will not be saved.</div>
+            <div style={{display:'flex',gap:12}}>
+              <button onClick={()=>setShowDiscard(false)}
+                style={{flex:1,height:48,borderRadius:12,border:`1.5px solid ${WW.border}`,background:'transparent',color:WW.text,fontSize:14,fontWeight:700,cursor:'pointer'}}>
+                Cancel
+              </button>
+              <a href="S-22-Indoor-Cardio-Logging.html"
+                style={{flex:1,height:48,borderRadius:12,border:'none',background:'#EF4444',color:'#fff',fontSize:14,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none'}}>
+                Confirm
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

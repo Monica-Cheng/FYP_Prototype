@@ -1,0 +1,408 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-14 Summary</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell { width: 390px; height: 844px; border-radius: 52px; background: #0A0A12; padding: 5px; box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12); position: relative; box-sizing: content-box; }
+  .phone-inner { width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #F7F8FF; position: relative; }
+  .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60; pointer-events: none; }
+  .tweaks-panel { position: fixed; bottom: 20px; right: 20px; width: 280px; background: #fff; border-radius: 14px; padding: 14px 16px 16px; box-shadow: 0 10px 40px rgba(20,25,60,0.18), 0 0 0 0.5px rgba(0,0,0,0.08); color: #3D3D5C; display: none; z-index: 100; }
+  .tweaks-panel.open { display: block; }
+  .tweaks-panel h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; color: #8A8A9E; }
+  .tweak-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; gap: 10px; }
+  .tweak-row label { font-size: 13px; color: #3D3D5C; flex: 1; }
+  .tweak-row input[type="checkbox"] { accent-color: #6C7EE8; }
+  .tweak-row input[type="range"] { flex: 1.1; accent-color: #6C7EE8; }
+  .tweak-val { font-size: 11px; color: #8A8A9E; min-width: 46px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(-40px) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translateY(420px) rotate(540deg); opacity: 0; }
+  }
+  .confetti-piece {
+    position: absolute; width: 8px; height: 12px; border-radius: 2px;
+    animation: confettiFall 3.2s ease-in forwards;
+  }
+  @keyframes glowPulse {
+    0%, 100% { transform: scale(1); opacity: 0.55; }
+    50% { transform: scale(1.08); opacity: 0.75; }
+  }
+  .hero-glow { animation: glowPulse 4s ease-in-out infinite; }
+  @keyframes xpFill {
+    from { width: 0%; }
+    to { width: 81%; }
+  }
+  .xp-bar { animation: xpFill 1.4s cubic-bezier(.2,.8,.2,1) 0.3s both; }
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .rise { animation: riseIn 550ms cubic-bezier(.2,.8,.2,1) both; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="label">S-14 · Post-Session Summary</div>
+    <div class="phone-shell" data-screen-label="S-14 Summary">
+      <div class="island"></div>
+      <div class="phone-inner" id="app"></div>
+    </div>
+  </div>
+
+  <div class="tweaks-panel" id="tweaks">
+    <h3>Tweaks</h3>
+    <div class="tweak-row">
+      <label>Confetti</label>
+      <input type="checkbox" id="tw-confetti" checked>
+    </div>
+    <div class="tweak-row">
+      <label>Exercises expanded</label>
+      <input type="checkbox" id="tw-expand">
+    </div>
+    <div class="tweak-row">
+      <label>XP earned</label>
+      <input type="range" id="tw-xp" min="0" max="200" step="10">
+      <span class="tweak-val" id="tw-xp-v">50</span>
+    </div>
+    <div class="tweak-row">
+      <label>Level progress</label>
+      <input type="range" id="tw-prog" min="0" max="100" step="1">
+      <span class="tweak-val" id="tw-prog-v">81%</span>
+    </div>
+  </div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const WW = {
+  bg: '#F7F8FF', card: '#FFFFFF', elevated: '#EEF0FB',
+  primary: '#6C7EE8', primaryDark: '#2D3A8C',
+  lavender: '#9B84E8', lavenderBg: '#F0EEFE', lavenderDark: '#7B5CB8',
+  teal: '#4BB8CC', tealBg: '#E0F4F8', tealDark: '#2E8B9E',
+  success: '#3EB37A',
+  text: '#3D3D5C', textSec: '#8A8A9E', textTert: '#B5B5C8',
+  border: '#E2E3ED', borderSoft: '#EEEFF5',
+  shadow: '0 2px 8px rgba(45,58,140,0.06)',
+  shadowLg: '0 10px 28px rgba(45,58,140,0.12)',
+};
+
+const Ico = {
+  sparkle:(c,s=16)=>(<svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill={c||'#fff'}/><circle cx="18.5" cy="5.5" r="1.2" fill={c||'#fff'}/></svg>),
+  chev:(c,dir='right')=>(<svg width="8" height="14" viewBox="0 0 8 14" style={{ transform: dir==='down'?'rotate(90deg)':(dir==='left'?'scaleX(-1)':'none') }}><path d="M1 1l6 6-6 6" stroke={c||WW.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>),
+  clock:(c)=>(<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={c||WW.primary} strokeWidth="1.7"/><path d="M12 7v5l3 2" stroke={c||WW.primary} strokeWidth="1.7" strokeLinecap="round"/></svg>),
+  layers:(c)=>(<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 4.5L12 12 3 7.5 12 3z" stroke={c||WW.primary} strokeWidth="1.7" strokeLinejoin="round"/><path d="M3 12l9 4.5L21 12M3 16.5l9 4.5 9-4.5" stroke={c||WW.primary} strokeWidth="1.7" strokeLinejoin="round" strokeLinecap="round"/></svg>),
+  weight:(c)=>(<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="9" width="3" height="6" rx="1" fill={c||WW.primary}/><rect x="19" y="9" width="3" height="6" rx="1" fill={c||WW.primary}/><rect x="5" y="10.5" width="2" height="3" rx="0.5" fill={c||WW.primary}/><rect x="17" y="10.5" width="2" height="3" rx="0.5" fill={c||WW.primary}/><rect x="7" y="11" width="10" height="2" rx="0.6" fill={c||WW.primary}/></svg>),
+  trophy:(c)=>(<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 4h8v5a4 4 0 01-8 0V4z" fill={c||'#fff'}/><path d="M16 5h3v2a3 3 0 01-3 3M8 5H5v2a3 3 0 003 3" stroke={c||'#fff'} strokeWidth="1.5" strokeLinecap="round"/><rect x="10" y="13" width="4" height="3" fill={c||'#fff'}/><rect x="8" y="17" width="8" height="2" rx="0.8" fill={c||'#fff'}/></svg>),
+  share:(c)=>(<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="12" r="2.4" stroke={c||WW.text} strokeWidth="1.6"/><circle cx="17" cy="6" r="2.4" stroke={c||WW.text} strokeWidth="1.6"/><circle cx="17" cy="18" r="2.4" stroke={c||WW.text} strokeWidth="1.6"/><path d="M8.2 11l6.6-3.8M8.2 13l6.6 3.8" stroke={c||WW.text} strokeWidth="1.6" strokeLinecap="round"/></svg>),
+  check:(c,s=12)=>(<svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5 10-11" stroke={c||'#fff'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>),
+};
+
+// ————————————————————————————————— status bar
+function StatusBar() {
+  return (
+    <div style={{ height:47, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 28px', fontSize:15, fontWeight:600, color:WW.text, position:'relative', zIndex:5 }}>
+      <div style={{ paddingTop:10 }}>9:41</div>
+      <div style={{ display:'flex', gap:6, alignItems:'center', paddingTop:10 }}>
+        <svg width="17" height="11" viewBox="0 0 17 11">
+          <rect x="0" y="7" width="3" height="4" rx="0.6" fill={WW.text}/>
+          <rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={WW.text}/>
+          <rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={WW.text}/>
+          <rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={WW.text}/>
+        </svg>
+        <svg width="24" height="11" viewBox="0 0 24 11">
+          <rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity="0.4" fill="none"/>
+          <rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/>
+          <rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={WW.text} opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— hero (title + celebratory glow + confetti)
+function Hero({ showConfetti }) {
+  // deterministic confetti
+  const pieces = React.useMemo(() => {
+    const colors = [WW.primary, WW.lavender, WW.teal, '#F7C873', '#F29AB6'];
+    const arr = [];
+    for (let i = 0; i < 28; i++) {
+      const seed = (i * 9301 + 49297) % 233280;
+      const rand = seed / 233280;
+      arr.push({
+        left: 6 + rand * 88,
+        delay: (i % 10) * 0.18,
+        color: colors[i % colors.length],
+        rot: (i * 37) % 360,
+        size: 6 + (i % 4) * 2,
+        skew: (i % 2 === 0) ? 'circle' : 'rect',
+      });
+    }
+    return arr;
+  }, []);
+  return (
+    <div style={{ position:'relative', padding:'6px 24px 14px', textAlign:'center', overflow:'hidden' }}>
+      {/* soft glow behind the title */}
+      <div className="hero-glow" style={{
+        position:'absolute', top:'-20px', left:'50%', transform:'translateX(-50%)',
+        width:320, height:220, borderRadius:'50%',
+        background:'radial-gradient(closest-side, rgba(155,132,232,0.35), rgba(108,126,232,0.12) 55%, transparent 80%)',
+        filter:'blur(6px)', zIndex:0, pointerEvents:'none',
+      }}/>
+      {/* confetti */}
+      {showConfetti && (
+        <div style={{ position:'absolute', inset:0, pointerEvents:'none', zIndex:1 }}>
+          {pieces.map((p, i) => (
+            <div key={i} className="confetti-piece" style={{
+              left:`${p.left}%`, top:-12,
+              width:p.size, height:p.skew === 'rect' ? p.size * 1.6 : p.size,
+              borderRadius: p.skew === 'circle' ? '50%' : 2,
+              background:p.color,
+              animationDelay:`${p.delay}s`,
+              transform:`rotate(${p.rot}deg)`,
+              boxShadow:`0 1px 2px rgba(45,58,140,0.12)`,
+            }}/>
+          ))}
+        </div>
+      )}
+      {/* medallion */}
+      <div className="rise" style={{ position:'relative', zIndex:2, display:'inline-flex', alignItems:'center', justifyContent:'center', width:64, height:64, borderRadius:32, background:`linear-gradient(135deg, ${WW.primary} 0%, ${WW.lavender} 100%)`, marginTop:4, boxShadow:'0 12px 28px rgba(108,126,232,0.32), inset 0 1px 0 rgba(255,255,255,0.25)' }}>
+        {Ico.check('#fff', 30)}
+      </div>
+      {/* heading */}
+      <div className="rise" style={{ position:'relative', zIndex:2, fontSize:24, fontWeight:700, color:WW.primaryDark, letterSpacing:'-0.5px', marginTop:14, animationDelay:'80ms' }}>Workout complete!</div>
+      <div className="rise" style={{ position:'relative', zIndex:2, fontSize:13, color:WW.textSec, fontWeight:500, marginTop:4, animationDelay:'160ms' }}>Push A — Upper Body · Today, 9:41 AM</div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— stat cards row
+function StatCards() {
+  const cards = [
+    { ic:Ico.clock,  value:'45',    unit:'min', label:'Duration' },
+    { ic:Ico.layers, value:'18',    unit:'',    label:'Total sets' },
+    { ic:Ico.weight, value:'1,240', unit:'kg',  label:'Volume' },
+  ];
+  return (
+    <div className="rise" style={{ padding:'2px 18px 16px', display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:10, animationDelay:'220ms' }}>
+      {cards.map((c, i) => (
+        <div key={c.label} style={{ background:WW.elevated, borderRadius:16, padding:'12px 10px 11px', textAlign:'left' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:8 }}>
+            {c.ic(WW.primary)}
+            <div style={{ fontSize:10, fontWeight:700, color:WW.primary, letterSpacing:'0.4px', textTransform:'uppercase' }}>{c.label}</div>
+          </div>
+          <div style={{ display:'flex', alignItems:'baseline', gap:3 }}>
+            <div style={{ fontSize:22, fontWeight:700, color:WW.text, letterSpacing:'-0.6px', fontVariantNumeric:'tabular-nums', lineHeight:1 }}>{c.value}</div>
+            {c.unit && <div style={{ fontSize:11, fontWeight:600, color:WW.textSec }}>{c.unit}</div>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ————————————————————————————————— WiseCoach summary
+function CoachSummary() {
+  return (
+    <div className="rise" style={{ margin:'0 18px 14px', background:WW.lavenderBg, borderRadius:18, padding:'14px 14px 14px 12px', display:'flex', gap:11, alignItems:'flex-start', animationDelay:'300ms' }}>
+      <div style={{ width:30, height:30, borderRadius:15, background:WW.lavender, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1, boxShadow:'0 3px 8px rgba(155,132,232,0.35)' }}>
+        {Ico.sparkle('#fff', 15)}
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:5 }}>
+          <div style={{ fontSize:11, fontWeight:700, color:WW.lavenderDark, letterSpacing:'0.4px', textTransform:'uppercase' }}>WiseCoach</div>
+          <div style={{ fontSize:10, color:WW.lavenderDark, opacity:0.6, fontWeight:500 }}>· just now</div>
+        </div>
+        <div style={{ fontSize:13.5, color:WW.text, lineHeight:1.5, fontWeight:500, letterSpacing:'-0.05px' }}>
+          Strong session. New personal best on bench press — <span style={{ fontWeight:700, color:WW.primaryDark }}>80 kg</span>. Your volume is up <span style={{ fontWeight:700, color:WW.primaryDark }}>15%</span> this week. Consider a lighter session next time if fatigue builds.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— XP banner + level bar
+function XPBanner({ xp, progressPct }) {
+  const currentXP = Math.round(3240 + (progressPct - 81) * 40);
+  const dispXP = Math.max(0, Math.min(4000, currentXP));
+  return (
+    <div className="rise" style={{ margin:'0 18px 14px', background:`linear-gradient(135deg, ${WW.teal} 0%, #5AC9DD 100%)`, borderRadius:18, padding:'14px 16px', color:'#fff', boxShadow:'0 10px 22px rgba(75,184,204,0.28)', animationDelay:'380ms' }}>
+      <div style={{ display:'flex', alignItems:'center', gap:11 }}>
+        <div style={{ width:38, height:38, borderRadius:19, background:'rgba(255,255,255,0.22)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+          {Ico.trophy('#fff')}
+        </div>
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ fontSize:10.5, fontWeight:700, color:'rgba(255,255,255,0.82)', letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:1 }}>Session complete</div>
+          <div style={{ fontSize:17, fontWeight:700, color:'#fff', letterSpacing:'-0.3px', fontVariantNumeric:'tabular-nums' }}>+{xp} XP</div>
+        </div>
+        <div style={{ textAlign:'right' }}>
+          <div style={{ fontSize:10, fontWeight:600, color:'rgba(255,255,255,0.7)', letterSpacing:'0.3px', textTransform:'uppercase' }}>Level</div>
+          <div style={{ fontSize:22, fontWeight:700, color:'#fff', lineHeight:1, letterSpacing:'-0.5px' }}>7</div>
+        </div>
+      </div>
+      {/* level progress */}
+      <div style={{ marginTop:12 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
+          <div style={{ fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.85)', fontVariantNumeric:'tabular-nums' }}>{dispXP.toLocaleString()} / 4,000 XP</div>
+          <div style={{ fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.7)', fontVariantNumeric:'tabular-nums' }}>{4000 - dispXP} to L8</div>
+        </div>
+        <div style={{ height:8, borderRadius:4, background:'rgba(255,255,255,0.22)', overflow:'hidden', position:'relative' }}>
+          <div className="xp-bar" style={{ height:'100%', background:'linear-gradient(90deg, #fff 0%, rgba(255,255,255,0.85) 100%)', borderRadius:4, width:`${progressPct}%`, boxShadow:'0 0 10px rgba(255,255,255,0.6)' }}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— exercises (collapsible)
+function ExercisesRow({ expanded, onToggle }) {
+  const list = [
+    { n:'Bench Press', sets:'4 × 8', vol:'620 kg', pb:true },
+    { n:'Overhead Press', sets:'3 × 10', vol:'270 kg' },
+    { n:'Tricep Pushdown', sets:'3 × 12', vol:'144 kg' },
+    { n:'Lateral Raise', sets:'3 × 15', vol:'108 kg' },
+    { n:'Face Pull', sets:'3 × 15', vol:'98 kg' },
+  ];
+  return (
+    <div className="rise" style={{ margin:'0 18px 14px', background:WW.card, borderRadius:16, boxShadow:WW.shadow, overflow:'hidden', animationDelay:'460ms' }}>
+      <button onClick={onToggle} style={{ width:'100%', background:'none', border:'none', padding:'14px 16px', display:'flex', alignItems:'center', gap:12, cursor:'pointer', fontFamily:'inherit', textAlign:'left' }}>
+        <div style={{ width:32, height:32, borderRadius:10, background:WW.elevated, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+          {Ico.layers(WW.primary)}
+        </div>
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ fontSize:14.5, fontWeight:600, color:WW.text, letterSpacing:'-0.1px' }}>Exercises completed</div>
+          <div style={{ fontSize:12, color:WW.textSec, fontWeight:500, marginTop:1 }}>5 exercises · 18 sets · 1 PB</div>
+        </div>
+        <div style={{ color:WW.textSec, transition:'transform 250ms', transform: expanded ? 'rotate(90deg)' : 'none' }}>
+          {Ico.chev(WW.textSec)}
+        </div>
+      </button>
+      {expanded && (
+        <div style={{ padding:'2px 12px 10px' }}>
+          {list.map((e, i) => (
+            <div key={e.n} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 6px', borderTop: i===0 ? `0.5px solid ${WW.borderSoft}` : `0.5px solid ${WW.borderSoft}` }}>
+              <div style={{ width:22, height:22, borderRadius:11, background:WW.successBg || '#E6F5EC', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                {Ico.check(WW.success, 12)}
+              </div>
+              <div style={{ flex:1, minWidth:0, display:'flex', alignItems:'center', gap:6 }}>
+                <span style={{ fontSize:13.5, fontWeight:600, color:WW.text, letterSpacing:'-0.1px' }}>{e.n}</span>
+                {e.pb && <span style={{ fontSize:9, fontWeight:700, color:'#fff', background:WW.teal, padding:'2px 5px', borderRadius:4, letterSpacing:'0.4px' }}>PB</span>}
+              </div>
+              <div style={{ fontSize:12, color:WW.textSec, fontWeight:500, fontVariantNumeric:'tabular-nums' }}>{e.sets}</div>
+              <div style={{ fontSize:12, color:WW.primaryDark, fontWeight:600, fontVariantNumeric:'tabular-nums', minWidth:56, textAlign:'right' }}>{e.vol}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ————————————————————————————————— bottom buttons
+function BottomActions() {
+  return (
+    <div style={{ position:'absolute', left:0, right:0, bottom:0, padding:'14px 18px 28px', background:'linear-gradient(180deg, rgba(247,248,255,0) 0%, rgba(247,248,255,0.9) 30%, rgba(247,248,255,1) 100%)', display:'flex', gap:10, zIndex:10 }}>
+      <button style={{ flex:1, height:52, borderRadius:26, background:'#fff', border:`1px solid ${WW.border}`, display:'flex', alignItems:'center', justifyContent:'center', gap:7, cursor:'pointer', fontFamily:'inherit' }}>
+        {Ico.share(WW.text)}
+        <span style={{ fontSize:14, fontWeight:600, color:WW.text, letterSpacing:'-0.1px' }}>Share</span>
+      </button>
+      <button style={{ flex:1.5, height:52, borderRadius:26, background:WW.primary, border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontFamily:'inherit', boxShadow:'0 8px 20px rgba(108,126,232,0.3)' }}>
+        <span style={{ fontSize:14.5, fontWeight:600, color:'#fff', letterSpacing:'-0.1px' }}>Done</span>
+      </button>
+    </div>
+  );
+}
+
+// ————————————————————————————————— screen
+
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "showConfetti": true,
+  "exExpanded": false,
+  "xp": 50,
+  "progressPct": 81
+}/*EDITMODE-END*/;
+
+function SummaryScreen({ tw, toggleEx }) {
+  return (
+    <div style={{ width:390, height:844, background:WW.bg, fontFamily:'-apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif', color:WW.text, position:'relative', overflow:'hidden', WebkitFontSmoothing:'antialiased' }}>
+      <StatusBar/>
+      <div style={{ position:'absolute', top:47, left:0, right:0, bottom:0, overflowY:'auto', paddingBottom:104 }}>
+        <Hero showConfetti={tw.showConfetti}/>
+        <StatCards/>
+        <CoachSummary/>
+        <XPBanner xp={tw.xp} progressPct={tw.progressPct}/>
+        <ExercisesRow expanded={tw.exExpanded} onToggle={toggleEx}/>
+      </div>
+      <BottomActions/>
+    </div>
+  );
+}
+
+function App() {
+  const [tw, setTw] = React.useState(TWEAKS);
+  window.__getTweaks = () => tw;
+  window.__updateTweaks = (patch) => {
+    setTw(prev => {
+      const next = { ...prev, ...patch };
+      window.parent.postMessage({ type:'__edit_mode_set_keys', edits:patch }, '*');
+      return next;
+    });
+  };
+  const toggleEx = () => window.__updateTweaks({ exExpanded: !tw.exExpanded });
+  return <SummaryScreen tw={tw} toggleEx={toggleEx}/>;
+}
+
+function __mountWhenReady() {
+  if (!window.ReactDOM) return setTimeout(__mountWhenReady, 30);
+  ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+}
+__mountWhenReady();
+</script>
+
+<script>
+(function () {
+  const panel = document.getElementById('tweaks');
+  const cf = document.getElementById('tw-confetti');
+  const ex = document.getElementById('tw-expand');
+  const xp = document.getElementById('tw-xp');
+  const xpV = document.getElementById('tw-xp-v');
+  const pr = document.getElementById('tw-prog');
+  const prV = document.getElementById('tw-prog-v');
+
+  function syncFrom(tw) {
+    cf.checked = !!tw.showConfetti;
+    ex.checked = !!tw.exExpanded;
+    xp.value = tw.xp;
+    xpV.textContent = tw.xp;
+    pr.value = tw.progressPct;
+    prV.textContent = tw.progressPct + '%';
+  }
+  function whenReady(cb) {
+    if (window.__updateTweaks) return cb();
+    setTimeout(() => whenReady(cb), 30);
+  }
+  whenReady(() => {
+    syncFrom(window.__getTweaks());
+    cf.addEventListener('change', e => window.__updateTweaks({ showConfetti: e.target.checked }));
+    ex.addEventListener('change', e => window.__updateTweaks({ exExpanded: e.target.checked }));
+    xp.addEventListener('input', e => { const v = parseInt(e.target.value,10); xpV.textContent = v; window.__updateTweaks({ xp: v }); });
+    pr.addEventListener('input', e => { const v = parseInt(e.target.value,10); prV.textContent = v + '%'; window.__updateTweaks({ progressPct: v }); });
+  });
+  window.addEventListener('message', (ev) => {
+    const d = ev.data;
+    if (!d || typeof d !== 'object') return;
+    if (d.type === '__activate_edit_mode') panel.classList.add('open');
+    else if (d.type === '__deactivate_edit_mode') panel.classList.remove('open');
+  });
+  window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+})();
+</script>
+
+</body></html>

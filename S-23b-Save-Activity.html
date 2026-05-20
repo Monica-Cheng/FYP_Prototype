@@ -1,0 +1,190 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-23b Save Activity</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-23b · Save Activity</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',lavenderText:'#7B5CB8',lavenderBody:'#5B3F9E',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+const STATS=[
+  {icon:c=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>,label:'Distance',val:'2.34 km',color:WW.teal},
+  {icon:c=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,label:'Duration',val:'20:45',color:WW.primary},
+  {icon:c=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,label:'Pace',val:'5:19/km',color:'#6366F1'},
+  {icon:c=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,label:'Avg HR',val:'148 bpm',color:'#EF4444'},
+];
+
+const EFFORT=[
+  {emoji:'😴',label:'Easy'},
+  {emoji:'🙂',label:'Moderate'},
+  {emoji:'💪',label:'Hard'},
+  {emoji:'🔥',label:'Intense'},
+  {emoji:'💀',label:'Max'},
+];
+
+const PRIVACY=[
+  {id:'public',label:'Public',icon:c=><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>},
+  {id:'friends',label:'Friends',icon:c=><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>},
+  {id:'private',label:'Private',icon:c=><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>},
+];
+
+function StatusBar(){
+  return(
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [title,setTitle]=React.useState('Morning Run · May 15');
+  const [effort,setEffort]=React.useState(2);
+  const [privacy,setPrivacy]=React.useState('friends');
+  const [notes,setNotes]=React.useState('');
+
+  return(
+    <div style={{width:390,height:844,background:WW.bg,display:'flex',flexDirection:'column',position:'relative',overflow:'hidden'}}>
+      <StatusBar/>
+
+      {/* Header */}
+      <div style={{display:'flex',alignItems:'center',padding:'0 16px 12px',gap:10,flexShrink:0}}>
+        <a href="S-21-Live-Outdoor-GPS-Cardio.html" style={{width:36,height:36,borderRadius:10,background:WW.card,border:`0.5px solid ${WW.border}`,display:'flex',alignItems:'center',justifyContent:'center',boxShadow:WW.shadow,flexShrink:0,textDecoration:'none'}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={WW.text} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+        <div>
+          <div style={{fontSize:17,fontWeight:800,color:WW.primaryDark,lineHeight:1.1}}>Save Activity</div>
+          <div style={{fontSize:11,color:WW.textSec,marginTop:1}}>Thu, 15 May 2026 · 9:15 AM</div>
+        </div>
+        {/* Activity type badge */}
+        <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:5,background:WW.tealBg,borderRadius:10,padding:'5px 10px'}}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={WW.teal} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 4.5a2.5 2.5 0 0 0-5 0v6a2.5 2.5 0 0 0 5 0z"/><path d="M8 10a2.5 2.5 0 0 0 0 5h1.5"/><path d="M16 13a2.5 2.5 0 0 1 0 5h-1.5M9.5 15h5"/><path d="M17.5 4.5a2.5 2.5 0 0 1 2.5 2.5v1a2.5 2.5 0 0 1-2.5 2.5"/></svg>
+          <span style={{fontSize:11,fontWeight:700,color:'#1A7A8C'}}>Outdoor Run</span>
+        </div>
+      </div>
+
+      {/* Scroll content */}
+      <div style={{flex:1,overflowY:'auto',padding:'0 16px 20px'}}>
+
+        {/* Stats strip */}
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:14}}>
+          {STATS.map(s=>(
+            <div key={s.label} style={{background:WW.card,borderRadius:12,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'10px 12px',display:'flex',alignItems:'center',gap:8}}>
+              <div style={{width:30,height:30,borderRadius:8,background:s.color+'18',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                {s.icon(s.color)}
+              </div>
+              <div>
+                <div style={{fontSize:13,fontWeight:800,color:WW.primaryDark}}>{s.val}</div>
+                <div style={{fontSize:10,color:WW.textSec,marginTop:1}}>{s.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Title */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'13px 14px',marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.5,marginBottom:7}}>Activity Title</div>
+          <input
+            value={title}
+            onChange={e=>setTitle(e.target.value)}
+            style={{width:'100%',border:'none',outline:'none',fontSize:15,fontWeight:700,color:WW.primaryDark,background:'transparent',padding:0,boxSizing:'border-box'}}
+          />
+          <div style={{height:.5,background:WW.border,marginTop:8}}/>
+          <div style={{fontSize:10,color:WW.textSec,marginTop:5}}>Tap to edit · auto-generated from time and activity</div>
+        </div>
+
+        {/* Effort / Feel */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'13px 14px',marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.5,marginBottom:10}}>How did it feel?</div>
+          <div style={{display:'flex',gap:6}}>
+            {EFFORT.map((e,i)=>{
+              const sel=effort===i;
+              return(
+                <button key={i} onClick={()=>setEffort(i)}
+                  style={{flex:1,padding:'8px 4px',borderRadius:12,border:`1.5px solid ${sel?WW.primary:WW.border}`,background:sel?WW.chipBg:'transparent',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:3,transition:'all .15s'}}>
+                  <span style={{fontSize:20}}>{e.emoji}</span>
+                  <span style={{fontSize:9,fontWeight:700,color:sel?WW.primary:WW.textSec}}>{e.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Privacy */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'13px 14px',marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.5,marginBottom:10}}>Who can see this?</div>
+          <div style={{display:'flex',background:WW.elevated,borderRadius:11,padding:3,gap:3}}>
+            {PRIVACY.map(p=>{
+              const sel=privacy===p.id;
+              return(
+                <button key={p.id} onClick={()=>setPrivacy(p.id)}
+                  style={{flex:1,padding:'8px 4px',borderRadius:9,border:'none',background:sel?WW.card:'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:5,boxShadow:sel?'0 1px 4px rgba(45,58,140,.12)':'none',transition:'all .15s'}}>
+                  {p.icon(sel?WW.primary:WW.textSec)}
+                  <span style={{fontSize:12,fontWeight:sel?800:600,color:sel?WW.primaryDark:WW.textSec}}>{p.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Notes */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'13px 14px',marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.5,marginBottom:8}}>Notes (optional)</div>
+          <textarea
+            value={notes}
+            onChange={e=>setNotes(e.target.value)}
+            placeholder="How was the run? Any notes to remember…"
+            rows={3}
+            style={{width:'100%',border:'none',outline:'none',fontSize:13,color:WW.text,background:'transparent',resize:'none',padding:0,boxSizing:'border-box',fontFamily:'inherit',lineHeight:1.5}}
+          />
+        </div>
+
+        {/* WiseCoach nudge */}
+        <div style={{background:WW.lavenderBg,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'12px 14px',borderLeft:`3px solid ${WW.lavender}`,marginBottom:14,display:'flex',gap:10,alignItems:'flex-start'}}>
+          <div style={{width:28,height:28,borderRadius:14,background:WW.lavender,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div>
+            <div style={{fontSize:10,fontWeight:800,color:WW.lavenderText,marginBottom:3,textTransform:'uppercase',letterSpacing:.4}}>WiseCoach</div>
+            <div style={{fontSize:12,color:WW.lavenderBody,lineHeight:1.5}}>Great pace consistency today! Your 5:19/km average is 12 sec faster than last week. Keep it up!</div>
+          </div>
+        </div>
+
+        {/* Save button */}
+        <a href="S-23-Post-Cardio-Summary.html" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,height:52,borderRadius:14,background:WW.teal,color:'#fff',fontWeight:800,fontSize:16,textDecoration:'none',boxShadow:'0 4px 14px rgba(75,184,204,.35)'}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Save Activity
+        </a>
+
+        <div style={{height:8}}/>
+
+        {/* Discard link */}
+        <div style={{textAlign:'center'}}>
+          <button onClick={()=>{window.location.href='S-09-Home.html';}} style={{background:'none',border:'none',fontSize:13,color:WW.textSec,cursor:'pointer',padding:'6px 0'}}>Discard activity</button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout Admin · Login</title>
+<style>
+  :root{color-scheme:light}*{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#F7F8FF;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
+</style>
+</head><body>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<div id="app"></div>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',teal:'#4BB8CC',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 12px rgba(45,58,140,.10)'};
+
+function App(){
+  const [email,setEmail]=React.useState('');
+  const [password,setPassword]=React.useState('');
+  const [error,setError]=React.useState(null);
+  const [showPw,setShowPw]=React.useState(false);
+
+  const handleLogin=(e)=>{
+    e.preventDefault();
+    if(!email||!password){setError('invalid');return;}
+    if(email.toLowerCase()==='admin@wiseworkout.com'&&password==='admin123'){
+      window.location.href='A-02-Admin-Dashboard.html';
+    } else if(email.includes('@')&&password.length>0){
+      setError('role');
+    } else {
+      setError('invalid');
+    }
+  };
+
+  return(
+    <div style={{width:'100%',minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:WW.bg,padding:'40px 20px'}}>
+      {/* Card */}
+      <div style={{width:'100%',maxWidth:420,background:WW.card,borderRadius:20,padding:'40px 36px',boxShadow:'0 8px 40px rgba(45,58,140,.12)',border:`0.5px solid ${WW.border}`}}>
+        {/* Logo */}
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:32,justifyContent:'center'}}>
+          <div style={{width:40,height:40,borderRadius:12,background:`linear-gradient(135deg,${WW.primary},#9B84E8)`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
+          </div>
+          <div>
+            <div style={{fontSize:17,fontWeight:800,color:WW.primaryDark,lineHeight:1}}>WiseWorkout</div>
+            <div style={{fontSize:11,fontWeight:600,color:WW.textSec,letterSpacing:.5}}>ADMIN PORTAL</div>
+          </div>
+        </div>
+
+        <div style={{fontSize:22,fontWeight:800,color:WW.primaryDark,marginBottom:6,textAlign:'center'}}>Administrator Login</div>
+        <div style={{fontSize:14,color:WW.textSec,marginBottom:28,textAlign:'center'}}>Sign in to manage the WiseWorkout platform</div>
+
+        {/* Error banners */}
+        {error==='invalid'&&(
+          <div style={{background:'#FEE2E2',border:'0.5px solid rgba(239,68,68,.3)',borderRadius:10,padding:'10px 14px',marginBottom:18,display:'flex',gap:8,alignItems:'center'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#EF4444" strokeWidth="1.8"/><path d="M12 8v4M12 16h.01" stroke="#EF4444" strokeWidth="1.8" strokeLinecap="round"/></svg>
+            <span style={{fontSize:13,color:'#DC2626',fontWeight:600}}>Invalid email or password. Please try again.</span>
+          </div>
+        )}
+        {error==='role'&&(
+          <div style={{background:'#FEF3C7',border:'0.5px solid rgba(245,158,11,.3)',borderRadius:10,padding:'10px 14px',marginBottom:18,display:'flex',gap:8,alignItems:'flex-start'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{flexShrink:0,marginTop:1}}><circle cx="12" cy="12" r="10" stroke="#F59E0B" strokeWidth="1.8"/><path d="M12 8v4M12 16h.01" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round"/></svg>
+            <span style={{fontSize:13,color:'#92400E',fontWeight:600}}>You do not have permission to access this dashboard. Contact your system administrator.</span>
+          </div>
+        )}
+
+        <form onSubmit={handleLogin}>
+          <div style={{marginBottom:14}}>
+            <label style={{display:'block',fontSize:12,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.5,marginBottom:6}}>Email address</label>
+            <input type="email" value={email} onChange={e=>{setEmail(e.target.value);setError(null);}} placeholder="admin@wiseworkout.com"
+              style={{width:'100%',height:46,borderRadius:12,border:`1.5px solid ${error==='invalid'?'#EF4444':WW.border}`,padding:'0 14px',fontSize:14,color:WW.text,outline:'none',fontFamily:'inherit'}}/>
+          </div>
+          <div style={{marginBottom:24}}>
+            <label style={{display:'block',fontSize:12,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.5,marginBottom:6}}>Password</label>
+            <div style={{position:'relative'}}>
+              <input type={showPw?'text':'password'} value={password} onChange={e=>{setPassword(e.target.value);setError(null);}} placeholder="Enter your password"
+                style={{width:'100%',height:46,borderRadius:12,border:`1.5px solid ${error==='invalid'?'#EF4444':WW.border}`,padding:'0 44px 0 14px',fontSize:14,color:WW.text,outline:'none',fontFamily:'inherit'}}/>
+              <button type="button" onClick={()=>setShowPw(p=>!p)} style={{position:'absolute',right:14,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:WW.textSec,padding:0}}>
+                {showPw
+                  ?<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                  :<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/></svg>
+                }
+              </button>
+            </div>
+          </div>
+          <button type="submit" style={{width:'100%',height:48,borderRadius:13,background:WW.primary,color:'#fff',border:'none',fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'0 4px 14px rgba(108,126,232,.35)'}}>
+            Sign In
+          </button>
+        </form>
+
+        <div style={{marginTop:20,textAlign:'center'}}>
+          <span style={{fontSize:12,color:WW.textSec}}>Hint: admin@wiseworkout.com / admin123</span>
+        </div>
+      </div>
+
+      <div style={{marginTop:20,fontSize:12,color:WW.textSec}}>WiseWorkout Admin Portal · v1.0.0</div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

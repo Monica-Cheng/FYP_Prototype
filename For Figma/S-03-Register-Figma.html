@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiseWorkout · S-03 Register · For Figma</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F7F8FF;
+      --canvas: #EDEEF5;
+      --card: #FFFFFF;
+      --primary: #6C7EE8;
+      --primary-dark: #2D3A8C;
+      --text: #3D3D5C;
+      --text-sec: #8A8A9E;
+      --border: #C8C8D8;
+      --shadow: 0 2px 8px rgba(45, 58, 140, 0.06);
+      --frame-shadow: 0 30px 70px rgba(20, 25, 60, 0.20), 0 0 0 1px rgba(0, 0, 0, 0.12);
+      --button-shadow: 0 4px 14px rgba(108, 126, 232, 0.35);
+      --error: #EF4444;
+      --error-bg: #FFF5F5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 48px 40px 64px;
+    }
+
+    .page-title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.04em;
+    }
+
+    .page-subtitle {
+      margin: 0 0 32px;
+      color: var(--text-sec);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 760px;
+    }
+
+    .storyboard {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .frame-block {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .frame-label {
+      font-size: 12px;
+      color: #6B6B80;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .phone-shell {
+      width: 390px;
+      height: auto;
+      min-height: 844px;
+      border-radius: 52px;
+      background: #0A0A12;
+      padding: 5px;
+      box-shadow: var(--frame-shadow);
+      position: relative;
+    }
+
+    .phone-inner {
+      width: 100%;
+      height: auto;
+      min-height: 834px;
+      border-radius: 47px;
+      overflow: hidden;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 33px;
+      border-radius: 20px;
+      background: #000;
+      z-index: 3;
+    }
+
+    .status-bar {
+      height: 47px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .status-time,
+    .status-icons {
+      padding-top: 10px;
+    }
+
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .screen-content {
+      padding: 16px 24px 36px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .heading-group {
+      margin-bottom: 26px;
+    }
+
+    .heading {
+      margin: 0 0 6px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.6px;
+    }
+
+    .subheading {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-sec);
+      font-weight: 450;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .input,
+    .password-shell {
+      width: 100%;
+      height: 50px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .input {
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+    }
+
+    .password-shell {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 44px 0 14px;
+    }
+
+    .eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-sec);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .field-error .input,
+    .field-error .password-shell {
+      border-color: var(--error);
+      background: var(--error-bg);
+    }
+
+    .error-text {
+      font-size: 12px;
+      color: var(--error);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .button-link,
+    .social-button,
+    .social-button-dark {
+      width: 100%;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .button-link {
+      background: var(--primary);
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 700;
+      box-shadow: var(--button-shadow);
+      margin-bottom: 22px;
+      margin-top: 4px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider-text {
+      font-size: 12px;
+      color: var(--text-sec);
+      font-weight: 600;
+    }
+
+    .social-button {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      gap: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 10px;
+    }
+
+    .social-button-dark {
+      background: #000000;
+      color: #FFFFFF;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-sec);
+      line-height: 1.5;
+      margin-top: auto;
+    }
+
+    .footer-link {
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">S-03 Register for Figma</h1>
+  <p class="page-subtitle">
+    This version is flattened for HTML-to-Figma import. The base registration screen and the validation-error state are
+    rendered as separate static frames so nothing depends on React form logic.
+  </p>
+
+  <div class="storyboard">
+    <section class="frame-block" aria-labelledby="register-default-label">
+      <div class="frame-label" id="register-default-label">Default</div>
+      <div class="phone-shell">
+        <div class="island"></div>
+        <div class="phone-inner">
+          <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-icons" aria-hidden="true">
+              <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+                <rect x="0" y="7" width="3" height="4" rx="0.6" fill="#3D3D5C"/>
+                <rect x="4.5" y="5" width="3" height="6" rx="0.6" fill="#3D3D5C"/>
+                <rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill="#3D3D5C"/>
+                <rect x="13.5" y="0" width="3" height="11" rx="0.6" fill="#3D3D5C"/>
+              </svg>
+              <svg width="24" height="11" viewBox="0 0 24 11" fill="none">
+                <rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity="0.4"/>
+                <rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/>
+                <rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill="#3D3D5C" opacity="0.4"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="screen-content">
+            <a class="back-link" href="S-01-Onboarding-Walkthrough.html">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Back
+            </a>
+
+            <div class="heading-group">
+              <h2 class="heading">Create your account</h2>
+              <p class="subheading">Start your fitness journey today</p>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Display Name</div>
+              <div class="input">How should we call you?</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Email</div>
+              <div class="input">you@example.com</div>
+            </div>
+
+            <div class="field">
+              <div class="field-label">Password</div>
+              <div class="password-shell">
+                Min. 8 characters
+                <div class="eye" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M1 12S5 5 12 5s11 7 11 7-4 7-11 7S1 12 1 12z" stroke="currentColor" stroke-width="1.6"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <a class="button-link" href="S-05-Onboarding-Body-Health.html">Sign Up</a>
+
+            <div class="divider" aria-hidden="true">
+              <div class="divider-line"></div>
+              <div class="divider-text">or</div>
+              <div class="divider-line"></div>
+            </div>
+
+            <div class="social-button">
+              <svg width="20" height="20" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <path d="M43.6 20.5H42V20H24v8h11.3C33.7 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.4 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z" fill="#FFC107"/>
+                <path d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.4 29.3 4 24 4c-7.5 0-14 4.3-17.7 10.7z" fill="#FF3D00"/>
+                <path d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.4 35.4 26.8 36 24 36c-5.3 0-9.7-3.4-11.3-8H6.3C9.9 37.8 16.4 44 24 44z" fill="#4CAF50"/>
+                <path d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.3 5.6l6.2 5.2C37.5 38 44 33 44 24c0-1.2-.1-2.4-.4-3.5z" fill="#1976D2"/>
+              </svg>
+              Sign up with Google
+            </div>
+
+            <div class="social-button-dark">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+              Sign up with Apple
+            </div>
+
+            <div class="footer-note">
+              Registering as a fitness professional?
+              <a class="footer-link" href="S-37-BP-Registration.html">Tap here</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="frame-block" aria-labelledby="register-error-label">
+      <div class="frame-label" id="register-error-label">Validation Errors</div>
+      <div class="phone-shell">
+        <div class="island"></div>
+        <div class="phone-inner">
+          <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-icons" aria-hidden="true">
+              <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+                <rect x="0" y="7" width="3" height="4" rx="0.6" fill="#3D3D5C"/>
+                <rect x="4.5" y="5" width="3" height="6" rx="0.6" fill="#3D3D5C"/>
+                <rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill="#3D3D5C"/>
+                <rect x="13.5" y="0" width="3" height="11" rx="0.6" fill="#3D3D5C"/>
+              </svg>
+              <svg width="24" height="11" viewBox="0 0 24 11" fill="none">
+                <rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity="0.4"/>
+                <rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/>
+                <rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill="#3D3D5C" opacity="0.4"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="screen-content">
+            <a class="back-link" href="S-01-Onboarding-Walkthrough.html">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Back
+            </a>
+
+            <div class="heading-group">
+              <h2 class="heading">Create your account</h2>
+              <p class="subheading">Start your fitness journey today</p>
+            </div>
+
+            <div class="field field-error">
+              <div class="field-label">Display Name</div>
+              <div class="input"></div>
+              <div class="error-text">Display name is required</div>
+            </div>
+
+            <div class="field field-error">
+              <div class="field-label">Email</div>
+              <div class="input">youexample.com</div>
+              <div class="error-text">Enter a valid email address</div>
+            </div>
+
+            <div class="field field-error">
+              <div class="field-label">Password</div>
+              <div class="password-shell">
+                short
+                <div class="eye" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M1 12S5 5 12 5s11 7 11 7-4 7-11 7S1 12 1 12z" stroke="currentColor" stroke-width="1.6"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="error-text">Password must be at least 8 characters</div>
+            </div>
+
+            <a class="button-link" href="S-05-Onboarding-Body-Health.html">Sign Up</a>
+
+            <div class="divider" aria-hidden="true">
+              <div class="divider-line"></div>
+              <div class="divider-text">or</div>
+              <div class="divider-line"></div>
+            </div>
+
+            <div class="social-button">
+              <svg width="20" height="20" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <path d="M43.6 20.5H42V20H24v8h11.3C33.7 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.4 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z" fill="#FFC107"/>
+                <path d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.4 29.3 4 24 4c-7.5 0-14 4.3-17.7 10.7z" fill="#FF3D00"/>
+                <path d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.4 35.4 26.8 36 24 36c-5.3 0-9.7-3.4-11.3-8H6.3C9.9 37.8 16.4 44 24 44z" fill="#4CAF50"/>
+                <path d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.3 5.6l6.2 5.2C37.5 38 44 33 44 24c0-1.2-.1-2.4-.4-3.5z" fill="#1976D2"/>
+              </svg>
+              Sign up with Google
+            </div>
+
+            <div class="social-button-dark">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+              Sign up with Apple
+            </div>
+
+            <div class="footer-note">
+              Registering as a fitness professional?
+              <a class="footer-link" href="S-37-BP-Registration.html">Tap here</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

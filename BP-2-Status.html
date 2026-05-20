@@ -1,0 +1,226 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-38 BP Status</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  .tweaks-panel{position:fixed;bottom:20px;right:20px;width:240px;background:#fff;border-radius:14px;padding:14px 16px 16px;box-shadow:0 10px 40px rgba(20,25,60,.18),0 0 0 .5px rgba(0,0,0,.08);color:#3D3D5C;display:none;z-index:100}
+  .tweaks-panel.open{display:block}.tweaks-panel h3{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:#8A8A9E}
+  .tweak-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:10px}
+  .tweak-row label{font-size:13px;color:#3D3D5C;flex:1}.tweak-row input[type="radio"]{accent-color:#6C7EE8}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-38 · BP Status</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<div class="tweaks-panel" id="tweaks">
+  <h3>Status State</h3>
+  <div class="tweak-row"><label>Pending</label><input type="radio" name="status" value="pending" checked/></div>
+  <div class="tweak-row"><label>Rejected</label><input type="radio" name="status" value="rejected"/></div>
+  <div class="tweak-row"><label>Approved</label><input type="radio" name="status" value="approved"/></div>
+</div>
+<button onclick="document.getElementById('tweaks').classList.toggle('open')" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:#6C7EE8;color:#fff;border:none;font-size:18px;cursor:pointer;box-shadow:0 4px 12px rgba(108,126,232,.4);z-index:200">⚙</button>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+function StatusBar(){return(<div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}><div style={{paddingTop:10}}>9:41</div><div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg></div></div>);}
+
+const TIMELINE=[
+  {label:'Application submitted',date:'10 May 2026',done:true},
+  {label:'Document verification',date:'In progress',done:false},
+  {label:'Admin review',date:'Pending',done:false},
+  {label:'Decision',date:'Pending',done:false},
+];
+
+function PendingView(){
+  return(
+    <div style={{padding:'24px 18px'}}>
+      {/* Status card */}
+      <div style={{background:WW.card,borderRadius:20,border:`0.5px solid ${WW.border}`,padding:'28px 20px',textAlign:'center',marginBottom:20,boxShadow:WW.shadow}}>
+        {/* Icon */}
+        <div style={{width:72,height:72,borderRadius:36,background:'#EFF6FF',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}}>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3B82F6" strokeWidth="2"/><path d="M12 7v5l3 3" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round"/></svg>
+        </div>
+        <div style={{fontSize:11,fontWeight:700,color:'#3B82F6',textTransform:'uppercase',letterSpacing:.5,marginBottom:6}}>Under Review</div>
+        <div style={{fontSize:20,fontWeight:800,color:WW.primaryDark,marginBottom:10}}>Application pending</div>
+        <div style={{fontSize:14,color:WW.textSec,lineHeight:1.6}}>Your application is under review. We will notify you by email when it is reviewed.</div>
+      </div>
+
+      {/* Timeline */}
+      <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'16px 18px',marginBottom:20,boxShadow:WW.shadow}}>
+        <div style={{fontSize:13,fontWeight:700,color:WW.primaryDark,marginBottom:14}}>Application timeline</div>
+        {TIMELINE.map((t,i)=>(
+          <div key={i} style={{display:'flex',gap:12,marginBottom:i<TIMELINE.length-1?0:0}}>
+            {/* Line + dot */}
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',width:20,flexShrink:0}}>
+              <div style={{width:18,height:18,borderRadius:9,background:t.done?WW.primary:WW.elevated,border:`2px solid ${t.done?WW.primary:WW.border}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                {t.done&&<svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                {!t.done&&i===1&&<div style={{width:6,height:6,borderRadius:3,background:WW.primary}}/>}
+              </div>
+              {i<TIMELINE.length-1&&<div style={{width:2,height:32,background:t.done?WW.primary+'50':WW.border,margin:'2px 0'}}/>}
+            </div>
+            <div style={{paddingBottom:i<TIMELINE.length-1?16:0}}>
+              <div style={{fontSize:13,fontWeight:700,color:t.done?WW.text:WW.textSec}}>{t.label}</div>
+              <div style={{fontSize:11,color:t.done?WW.primary:WW.textSec,marginTop:2,fontWeight:t.done?600:400}}>{t.date}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Info note */}
+      <div style={{background:WW.tealBg,borderRadius:14,border:'0.5px solid rgba(75,184,204,.3)',padding:'12px 14px',marginBottom:20,display:'flex',gap:10,alignItems:'flex-start'}}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{flexShrink:0,marginTop:1}}><circle cx="12" cy="12" r="10" stroke={WW.teal} strokeWidth="1.7"/><path d="M12 8h.01M12 12v4" stroke={WW.teal} strokeWidth="1.7" strokeLinecap="round"/></svg>
+        <div style={{fontSize:12,color:'#1A7A8C',lineHeight:1.5}}>Review typically takes 3–5 business days. Ensure your certification documents are clear and legible.</div>
+      </div>
+
+      {/* Contact support */}
+      <div style={{textAlign:'center'}}>
+        <div style={{fontSize:13,color:WW.textSec,marginBottom:6}}>Questions about your application?</div>
+        <button style={{background:'none',border:'none',color:WW.primary,fontSize:14,fontWeight:700,cursor:'pointer',textDecoration:'underline'}}>Contact Support</button>
+      </div>
+    </div>
+  );
+}
+
+function RejectedView(){
+  return(
+    <div style={{padding:'24px 18px'}}>
+      {/* Status card */}
+      <div style={{background:WW.card,borderRadius:20,border:'0.5px solid rgba(239,68,68,.2)',padding:'28px 20px',textAlign:'center',marginBottom:20,boxShadow:WW.shadow}}>
+        <div style={{width:72,height:72,borderRadius:36,background:'#FEE2E2',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}}>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#EF4444" strokeWidth="2"/><path d="M15 9l-6 6M9 9l6 6" stroke="#EF4444" strokeWidth="2" strokeLinecap="round"/></svg>
+        </div>
+        <div style={{fontSize:11,fontWeight:700,color:'#EF4444',textTransform:'uppercase',letterSpacing:.5,marginBottom:6}}>Not Approved</div>
+        <div style={{fontSize:20,fontWeight:800,color:WW.primaryDark,marginBottom:10}}>Application not approved</div>
+        <div style={{fontSize:14,color:WW.textSec,lineHeight:1.6}}>Unfortunately your application did not meet our verification requirements at this time.</div>
+      </div>
+
+      {/* Rejection reason */}
+      <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'16px 18px',marginBottom:20,boxShadow:WW.shadow}}>
+        <div style={{fontSize:12,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.4,marginBottom:8}}>Reason from admin</div>
+        <div style={{background:'#F9FAFB',borderRadius:12,border:`0.5px solid ${WW.border}`,padding:'12px 14px'}}>
+          <div style={{fontSize:13,color:WW.text,lineHeight:1.6}}>The uploaded certification document for "NASM Certified Personal Trainer" was not legible. Please re-upload a clear, high-resolution scan of the document. Additionally, please ensure the expiry date matches the certificate exactly.</div>
+        </div>
+        <div style={{fontSize:11,color:WW.textSec,marginTop:8}}>Reviewed on 12 May 2026</div>
+      </div>
+
+      {/* What to do */}
+      <div style={{background:WW.chipBg,borderRadius:14,border:`0.5px solid ${WW.primary}30`,padding:'12px 14px',marginBottom:20}}>
+        <div style={{fontSize:12,fontWeight:700,color:WW.primaryDark,marginBottom:6}}>What to do next</div>
+        {['Re-upload a clear scan of your certification','Ensure expiry dates match exactly','Check all required fields are complete'].map((s,i)=>(
+          <div key={i} style={{display:'flex',gap:8,alignItems:'flex-start',marginBottom:4}}>
+            <span style={{fontSize:12,color:WW.primary,fontWeight:700,marginTop:1}}>·</span>
+            <span style={{fontSize:12,color:WW.text,lineHeight:1.5}}>{s}</span>
+          </div>
+        ))}
+      </div>
+
+      <a href="S-37-BP-Registration.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:52,borderRadius:14,background:WW.primary,color:'#fff',fontSize:15,fontWeight:700,textDecoration:'none',boxShadow:'0 4px 14px rgba(108,126,232,.3)',marginBottom:12}}>
+        Resubmit Application
+      </a>
+      <div style={{textAlign:'center'}}>
+        <button style={{background:'none',border:'none',color:WW.textSec,fontSize:13,cursor:'pointer',textDecoration:'underline'}}>Contact Support</button>
+      </div>
+    </div>
+  );
+}
+
+function ApprovedView(){
+  return(
+    <div style={{padding:'24px 18px'}}>
+      {/* Status card */}
+      <div style={{background:`linear-gradient(135deg,${WW.primaryDark},#4a4ea8)`,borderRadius:20,padding:'28px 20px',textAlign:'center',marginBottom:20,color:'#fff',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',top:-20,right:-20,fontSize:90,opacity:.08}}>✅</div>
+        <div style={{width:72,height:72,borderRadius:36,background:'rgba(255,255,255,.2)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}}>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="rgba(255,255,255,.2)" stroke="#fff" strokeWidth="1.5"/><path d="M7 12l3.5 3.5L17 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </div>
+        <div style={{fontSize:11,fontWeight:700,opacity:.8,textTransform:'uppercase',letterSpacing:.5,marginBottom:6}}>Verified Professional</div>
+        <div style={{fontSize:22,fontWeight:800,marginBottom:10}}>You're approved! 🎉</div>
+        <div style={{fontSize:14,opacity:.9,lineHeight:1.6}}>Your profile is live! Users can discover you in the Find a Professional section of the app.</div>
+      </div>
+
+      {/* Stats preview */}
+      <div style={{background:WW.elevated,borderRadius:16,padding:'14px 18px',marginBottom:20}}>
+        <div style={{display:'flex',gap:0}}>
+          {[{v:'0',l:'Profile views'},{v:'0',l:'Contact requests'},{v:'Live',l:'Status'}].map((s,i,arr)=>(
+            <div key={s.l} style={{flex:1,textAlign:'center',borderRight:i<arr.length-1?`0.5px solid ${WW.border}`:'none',paddingRight:i<arr.length-1?8:0,paddingLeft:i>0?8:0}}>
+              <div style={{fontSize:20,fontWeight:800,color:i===2?'#10B981':WW.primaryDark}}>{s.v}</div>
+              <div style={{fontSize:10,color:WW.textSec,marginTop:2}}>{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Next steps */}
+      <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,padding:'16px 18px',marginBottom:20,boxShadow:WW.shadow}}>
+        <div style={{fontSize:13,fontWeight:700,color:WW.primaryDark,marginBottom:12}}>Get started</div>
+        {[{icon:'✏️',text:'Complete your profile bio and photo'},{icon:'📋',text:'Review your listed certifications'},{icon:'🔔',text:'Enable notifications for contact requests'}].map((s,i)=>(
+          <div key={i} style={{display:'flex',gap:10,alignItems:'center',padding:'8px 0',borderBottom:i<2?`0.5px solid ${WW.border}`:'none'}}>
+            <span style={{fontSize:18}}>{s.icon}</span>
+            <span style={{fontSize:13,color:WW.text,lineHeight:1.4}}>{s.text}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Verified badge note */}
+      <div style={{background:'#D1FAE5',borderRadius:14,border:'0.5px solid rgba(5,150,105,.25)',padding:'12px 14px',marginBottom:20,display:'flex',gap:10,alignItems:'center'}}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#D1FAE5" stroke="#059669" strokeWidth="1.5"/><path d="M9 12l2 2 4-4" stroke="#059669" strokeWidth="1.8" strokeLinecap="round"/></svg>
+        <div style={{fontSize:12,color:'#065F46',lineHeight:1.5,fontWeight:600}}>Verified badge will appear on your profile visible to all users.</div>
+      </div>
+
+      <a href="S-39-BP-Profile-Management.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:52,borderRadius:14,background:WW.primary,color:'#fff',fontSize:15,fontWeight:700,textDecoration:'none',boxShadow:'0 4px 14px rgba(108,126,232,.3)'}}>
+        Go to Profile Management
+      </a>
+    </div>
+  );
+}
+
+function App(){
+  const [status,setStatus]=React.useState('pending');
+
+  React.useEffect(()=>{
+    const cb=()=>{
+      const v=document.querySelector('input[name="status"]:checked')?.value;
+      if(v)setStatus(v);
+    };
+    document.querySelectorAll('input[name="status"]').forEach(el=>el.addEventListener('change',cb));
+    cb();
+  },[]);
+
+  const statusColors={pending:'#EFF6FF',rejected:'#FEF2F2',approved:'#F0FDF4'};
+  const statusLabels={pending:'Pending Review',rejected:'Not Approved',approved:'Approved'};
+  const statusTextColors={pending:'#3B82F6',rejected:'#EF4444',approved:'#10B981'};
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,position:'relative'}}>
+      <StatusBar/>
+      {/* Top bar */}
+      <div style={{display:'flex',alignItems:'center',padding:'10px 18px 14px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',gap:12,flexShrink:0}}>
+        <a href="S-02-Login.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,textDecoration:'none',flexShrink:0}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke={WW.primaryDark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </a>
+        <div style={{fontSize:18,fontWeight:800,color:WW.primaryDark,flex:1}}>Application Status</div>
+        <span style={{background:statusColors[status],color:statusTextColors[status],fontSize:11,fontWeight:700,padding:'4px 10px',borderRadius:20}}>
+          {statusLabels[status]}
+        </span>
+      </div>
+
+      <div style={{flex:1,overflowY:'auto'}}>
+        {status==='pending'&&<PendingView/>}
+        {status==='rejected'&&<RejectedView/>}
+        {status==='approved'&&<ApprovedView/>}
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

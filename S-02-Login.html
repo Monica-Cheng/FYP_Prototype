@@ -1,0 +1,208 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-02 Login</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell { width: 390px; height: 844px; border-radius: 52px; background: #0A0A12; padding: 5px; box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12); position: relative; box-sizing: content-box; }
+  .phone-inner { width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #F7F8FF; position: relative; }
+  .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60; pointer-events: none; }
+  .tweaks-panel { position: fixed; bottom: 20px; right: 20px; width: 260px; background: #fff; border-radius: 14px; padding: 14px 16px 16px; box-shadow: 0 10px 40px rgba(20,25,60,0.18), 0 0 0 0.5px rgba(0,0,0,0.08); color: #3D3D5C; display: none; z-index: 100; }
+  .tweaks-panel.open { display: block; }
+  .tweaks-panel h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; color: #8A8A9E; }
+  .tweak-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; gap: 10px; }
+  .tweak-row label { font-size: 13px; color: #3D3D5C; flex: 1; }
+  .tweak-row select { font-size: 12px; padding: 5px 8px; border-radius: 8px; border: 0.5px solid #C8C8D8; background: #F7F8FF; color: #3D3D5C; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="label">S-02 · Login</div>
+  <div class="phone-shell">
+    <div class="island"></div>
+    <div class="phone-inner" id="app"></div>
+  </div>
+</div>
+
+<div class="tweaks-panel" id="tweaks">
+  <h3>State</h3>
+  <div class="tweak-row">
+    <label>Banner state</label>
+    <select id="tw-state">
+      <option value="none">None</option>
+      <option value="error">Invalid credentials</option>
+      <option value="suspended">Account suspended</option>
+    </select>
+  </div>
+</div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW = {
+  bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',
+  primary:'#6C7EE8',primaryDark:'#2D3A8C',
+  text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',
+  shadow:'0 2px 8px rgba(45,58,140,0.06)',
+};
+
+function StatusBar() {
+  return (
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11">
+          <rect x="0" y="7" width="3" height="4" rx="0.6" fill={WW.text}/>
+          <rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={WW.text}/>
+          <rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={WW.text}/>
+          <rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={WW.text}/>
+        </svg>
+        <svg width="24" height="11" viewBox="0 0 24 11">
+          <rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity="0.4" fill="none"/>
+          <rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/>
+          <rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={WW.text} opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function PasswordInput({value, onChange}) {
+  const [show, setShow] = React.useState(false);
+  return (
+    <div style={{position:'relative'}}>
+      <input type={show ? 'text' : 'password'} placeholder="••••••••" value={value} onChange={e=>onChange(e.target.value)}
+        style={{width:'100%',height:50,borderRadius:12,border:`1px solid ${WW.border}`,background:WW.card,fontSize:15,color:WW.text,padding:'0 44px 0 14px',boxSizing:'border-box',outline:'none',fontFamily:'inherit'}}/>
+      <button onClick={()=>setShow(s=>!s)} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',padding:4,color:WW.textSec}}>
+        {show ? (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" strokeWidth="1.6"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6"/><path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
+        ) : (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" strokeWidth="1.6"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6"/></svg>
+        )}
+      </button>
+    </div>
+  );
+}
+
+const GoogleLogo = () => (
+  <svg width="20" height="20" viewBox="0 0 48 48" fill="none">
+    <path d="M43.6 20.5H42V20H24v8h11.3C33.7 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.4 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z" fill="#FFC107"/>
+    <path d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.4 29.3 4 24 4c-7.5 0-14 4.3-17.7 10.7z" fill="#FF3D00"/>
+    <path d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.4 35.4 26.8 36 24 36c-5.3 0-9.7-3.4-11.3-8H6.3C9.9 37.8 16.4 44 24 44z" fill="#4CAF50"/>
+    <path d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.3 5.6l6.2 5.2C37.5 38 44 33 44 24c0-1.2-.1-2.4-.4-3.5z" fill="#1976D2"/>
+  </svg>
+);
+
+const AppleLogo = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill={WW.text}>
+    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+  </svg>
+);
+
+function App() {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [banner, setBanner] = React.useState('none');
+
+  React.useEffect(() => {
+    const sel = document.getElementById('tw-state');
+    if (!sel) return;
+    sel.addEventListener('change', e => setBanner(e.target.value));
+    document.querySelector('.tweaks-panel').style.display = 'none';
+    const btn = document.createElement('button');
+    btn.textContent = '⚙';
+    btn.style.cssText = 'position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:22px;background:#6C7EE8;color:#fff;border:none;font-size:20px;cursor:pointer;z-index:200;box-shadow:0 4px 12px rgba(108,126,232,0.4)';
+    btn.onclick = () => document.getElementById('tweaks').classList.toggle('open');
+    document.body.appendChild(btn);
+  }, []);
+
+  return (
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',overflowY:'auto'}}>
+      <StatusBar/>
+      <div style={{padding:'20px 24px 36px',flex:1,display:'flex',flexDirection:'column'}}>
+
+        {/* Heading */}
+        <div style={{marginBottom:26}}>
+          <div style={{fontSize:28,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.6px',marginBottom:6}}>Welcome back</div>
+          <div style={{fontSize:14,color:WW.textSec,fontWeight:450}}>Log in to continue your training</div>
+        </div>
+
+        {/* Banner */}
+        {banner === 'error' && (
+          <div style={{marginBottom:16,padding:'12px 14px',borderRadius:10,background:'#FEE2E2',border:'1px solid #FCA5A5',fontSize:13,color:'#B91C1C',fontWeight:500,display:'flex',gap:8,alignItems:'flex-start'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{flexShrink:0,marginTop:1}}><circle cx="12" cy="12" r="9" stroke="#B91C1C" strokeWidth="1.8"/><path d="M12 8v5M12 16v.5" stroke="#B91C1C" strokeWidth="2" strokeLinecap="round"/></svg>
+            Incorrect email or password. Please try again.
+          </div>
+        )}
+        {banner === 'suspended' && (
+          <div style={{marginBottom:16,padding:'12px 14px',borderRadius:10,background:'#FEF3C7',border:'1px solid #FCD34D',fontSize:13,color:'#92400E',fontWeight:500,display:'flex',gap:8,alignItems:'flex-start'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{flexShrink:0,marginTop:1}}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#92400E" strokeWidth="1.8"/><path d="M12 9v5M12 17v.5" stroke="#92400E" strokeWidth="2" strokeLinecap="round"/></svg>
+            Your account has been suspended. Please contact support at support@wiseworkout.app.
+          </div>
+        )}
+
+        {/* Email */}
+        <div style={{marginBottom:14}}>
+          <div style={{fontSize:13,fontWeight:600,color:WW.text,marginBottom:6}}>Email</div>
+          <input type="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)}
+            style={{width:'100%',height:50,borderRadius:12,border:`1px solid ${WW.border}`,background:WW.card,fontSize:15,color:WW.text,padding:'0 14px',boxSizing:'border-box',outline:'none',fontFamily:'inherit'}}/>
+        </div>
+
+        {/* Password */}
+        <div style={{marginBottom:20}}>
+          <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',marginBottom:6}}>
+            <div style={{fontSize:13,fontWeight:600,color:WW.text}}>Password</div>
+            <a href="S-04-Password-Reset.html" style={{fontSize:13,color:WW.primary,fontWeight:600,textDecoration:'none'}}>Forgot password?</a>
+          </div>
+          <PasswordInput value={password} onChange={setPassword}/>
+        </div>
+
+        {/* Log in */}
+        <a href="S-09-Home.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:52,borderRadius:14,background:WW.primary,color:'#fff',fontSize:16,fontWeight:700,textDecoration:'none',marginBottom:22,boxShadow:'0 4px 14px rgba(108,126,232,0.35)'}}>
+          Log in
+        </a>
+
+        {/* Divider */}
+        <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:16}}>
+          <div style={{flex:1,height:1,background:WW.border}}/>
+          <div style={{fontSize:12,color:WW.textSec,fontWeight:600}}>or</div>
+          <div style={{flex:1,height:1,background:WW.border}}/>
+        </div>
+
+        {/* Google */}
+        <button style={{width:'100%',height:52,borderRadius:14,background:WW.card,border:`1px solid ${WW.border}`,display:'flex',alignItems:'center',justifyContent:'center',gap:10,fontSize:15,fontWeight:600,color:WW.text,cursor:'pointer',boxShadow:WW.shadow,marginBottom:10}}>
+          <GoogleLogo/>
+          Continue with Google
+        </button>
+
+        {/* Apple */}
+        <button style={{width:'100%',height:52,borderRadius:14,background:'#000',border:'none',display:'flex',alignItems:'center',justifyContent:'center',gap:10,fontSize:15,fontWeight:600,color:'#fff',cursor:'pointer',marginBottom:26}}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+          Continue with Apple
+        </button>
+
+        {/* Footer row */}
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div style={{fontSize:14,color:WW.textSec}}>
+            New here?{' '}
+            <a href="S-03-Register.html" style={{color:WW.primary,fontWeight:700,textDecoration:'none'}}>Create account</a>
+          </div>
+          <a href="S-37-BP-Registration.html" style={{fontSize:12,color:WW.textSec,textDecoration:'none',borderBottom:`1px solid ${WW.border}`,lineHeight:1.4}}>
+            Register as Professional
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiseWorkout · S-13 Plan Detail · For Figma</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F7F8FF;
+      --canvas: #EDEEF5;
+      --card: #FFFFFF;
+      --elevated: #EEF0FB;
+      --primary: #6C7EE8;
+      --primary-dark: #2D3A8C;
+      --lavender: #9B84E8;
+      --lavender-bg: #F0EEFE;
+      --lavender-text: #7B5CB8;
+      --lavender-body: #5B3F9E;
+      --teal: #4BB8CC;
+      --teal-bg: #E0F4F8;
+      --text: #3D3D5C;
+      --text-sec: #8A8A9E;
+      --border: #C8C8D8;
+      --chip-bg: #E6EAFE;
+      --gold: #F59E0B;
+      --orange: #F97316;
+      --orange-bg: #FFF3E0;
+      --green: #10B981;
+      --green-bg: #F0FFF4;
+      --success: #059669;
+      --success-bg: #D1FAE5;
+      --shadow: 0 2px 8px rgba(45,58,140,.06);
+      --frame-shadow: 0 30px 70px rgba(20,25,60,.20), 0 0 0 1px rgba(0,0,0,.12);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    }
+    body { min-height: 100vh; padding: 48px 40px 64px; }
+    .page-title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.04em;
+    }
+    .page-subtitle {
+      margin: 0 0 32px;
+      color: var(--text-sec);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 940px;
+    }
+    .storyboard {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .frame-block {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    .frame-label {
+      font-size: 12px;
+      color: #6B6B80;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      font-weight: 700;
+      text-align: center;
+    }
+    .phone-shell {
+      width: 390px;
+      height: auto;
+      min-height: 844px;
+      border-radius: 52px;
+      background: #0A0A12;
+      padding: 5px;
+      box-shadow: var(--frame-shadow);
+      position: relative;
+    }
+    .phone-inner {
+      width: 100%;
+      height: auto;
+      min-height: 834px;
+      border-radius: 47px;
+      overflow: hidden;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 33px;
+      border-radius: 20px;
+      background: #000;
+      z-index: 60;
+      pointer-events: none;
+    }
+    .status-bar {
+      height: 47px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .status-time, .status-icons { padding-top: 10px; }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .hero {
+      position: relative;
+      flex-shrink: 0;
+      background: linear-gradient(160deg, #2D3A8C 0%, #4C5FC4 55%, #6C7EE8 100%);
+      padding-bottom: 20px;
+    }
+    .hero-actions {
+      position: absolute;
+      top: 47px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 10;
+    }
+    .round-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 17px;
+      background: rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .hero-content { padding: 44px 20px 0; text-align: center; }
+    .hero-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .hero-coach {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .coach-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      background: rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .coach-name { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 600; }
+    .hero-tags { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .hero-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.18);
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: .5px solid rgba(255,255,255,0.3);
+    }
+    .stats-row {
+      display: flex;
+      background: var(--card);
+      border-bottom: .5px solid var(--border);
+      flex-shrink: 0;
+    }
+    .stat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 4px;
+    }
+    .stat + .stat { border-left: .5px solid var(--border); }
+    .stat-val { font-size: 12px; font-weight: 800; color: var(--text); margin-top: 4px; }
+    .stat-sub { font-size: 10px; color: var(--text-sec); }
+    .scroll {
+      overflow: visible;
+      padding-bottom: 0;
+    }
+    .content { padding: 16px 16px 0; }
+    .section { margin-bottom: 20px; }
+    .section-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.2px;
+      margin-bottom: 10px;
+    }
+    .body-copy { font-size: 14px; color: var(--text); line-height: 1.65; }
+    .injury {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 13px;
+      background: var(--lavender-bg);
+      border-radius: 12px;
+      border: .5px solid rgba(155,132,232,.3);
+      margin-bottom: 16px;
+    }
+    .injury-copy {
+      font-size: 13px;
+      color: var(--lavender-body);
+      line-height: 1.45;
+      font-weight: 500;
+    }
+    .level-bars { display: flex; gap: 4px; }
+    .level-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    .level-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--elevated);
+      position: relative;
+      overflow: hidden;
+    }
+    .level-bar.fill { background: var(--primary); }
+    .level-bar.current::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.35);
+    }
+    .level-label { font-size: 10px; font-weight: 500; color: var(--text-sec); letter-spacing: -0.1px; }
+    .level-label.active { color: var(--primary-dark); font-weight: 800; }
+    .overview-card {
+      background: var(--card);
+      border-radius: 14px;
+      border: .5px solid var(--border);
+      padding: 13px 14px;
+      box-shadow: var(--shadow);
+    }
+    .overview-fade {
+      max-height: 72px;
+      overflow: hidden;
+      position: relative;
+    }
+    .overview-fade::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 28px;
+      background: linear-gradient(transparent, #fff);
+    }
+    .readmore {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .week-tabs {
+      display: flex;
+      gap: 6px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      padding-bottom: 2px;
+    }
+    .week-tab {
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text-sec);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .week-tab.active {
+      border-color: var(--primary);
+      background: var(--chip-bg);
+      color: var(--primary);
+    }
+    .week-tab.more {
+      border-style: dashed;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .day-card {
+      background: var(--card);
+      border-radius: 12px;
+      border: .5px solid var(--border);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .day-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 13px;
+    }
+    .day-pill {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--chip-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .day-main { flex: 1; }
+    .day-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .day-sub { font-size: 11px; color: var(--text-sec); }
+    .day-arrow { flex-shrink: 0; }
+    .ex-list {
+      padding: 0 13px 12px;
+      border-top: 1px solid var(--border);
+    }
+    .ex-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      font-size: 12px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 3px;
+      background: var(--primary);
+      flex-shrink: 0;
+    }
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .soft-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: var(--card);
+      border: .5px solid var(--border);
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .goal-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: .5px solid transparent;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .saves {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 0;
+      margin-bottom: 20px;
+      border-top: .5px solid var(--border);
+      border-bottom: .5px solid var(--border);
+    }
+    .saves span {
+      font-size: 13px;
+      color: var(--text-sec);
+      font-weight: 600;
+    }
+    .coach-card {
+      background: var(--lavender-bg);
+      border-radius: 14px;
+      border: .5px solid rgba(155,132,232,.25);
+      border-left: 3px solid var(--lavender);
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+    }
+    .coach-head { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+    .coach-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 13px;
+      background: var(--lavender);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .coach-over {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--lavender-text);
+      letter-spacing: .3px;
+    }
+    .coach-sub {
+      font-size: 10px;
+      color: rgba(123,92,184,.7);
+      font-weight: 600;
+    }
+    .coach-copy { font-size: 13px; color: var(--lavender-body); line-height: 1.6; }
+    .cta-bar {
+      position: static;
+      padding: 12px 16px 28px;
+      background: var(--card);
+      border-top: .5px solid var(--border);
+      display: flex;
+      gap: 10px;
+      z-index: 20;
+    }
+    .save-btn, .start-btn {
+      height: 50px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .save-btn {
+      flex: 1;
+      border: 1.5px solid var(--primary);
+      background: transparent;
+      color: var(--primary);
+    }
+    .save-btn.saved {
+      border-color: var(--success);
+      background: var(--success-bg);
+      color: var(--success);
+    }
+    .start-btn {
+      flex: 2;
+      background: var(--primary);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      box-shadow: 0 4px 14px rgba(108,126,232,.35);
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">S-13 Plan Detail for Figma</h1>
+  <p class="page-subtitle">
+    This version keeps the original visual structure more closely while flattening
+    the interactive states for HTML-to-Figma import. It includes the default view,
+    an expanded reading and sample-week state, and a saved version without the
+    injury notice.
+  </p>
+
+  <div class="storyboard">
+    <section class="frame-block">
+      <div class="frame-label">Default View</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner">
+        <div class="hero">
+          <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#fff"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#fff"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#fff"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#fff"/></svg>
+              <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#fff" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#fff"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#fff" opacity=".4"/></svg>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <div class="round-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="round-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a1 1 0 001 1h14a1 1 0 001-1v-8M16 6l-4-4-4 4M12 2v13" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="hero-content">
+            <div class="hero-title">Beginner Push-Pull-Legs</div>
+            <div class="hero-coach">
+              <div class="coach-avatar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#fff" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <div class="coach-name">Coach Alex Rivera</div>
+            </div>
+            <div class="hero-tags">
+              <div class="hero-tag">Build Muscle</div>
+              <div class="hero-tag">Beginner</div>
+              <div class="hero-tag">3 days/wk</div>
+              <div class="hero-tag">8 weeks</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="#6C7EE8" stroke-width="1.6"/><path d="M3 9h18M8 2v4M16 2v4" stroke="#6C7EE8" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div class="stat-val">3 days</div>
+            <div class="stat-sub">per week</div>
+          </div>
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#4BB8CC" stroke-width="1.6"/><path d="M12 7v5l3 3" stroke="#4BB8CC" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div class="stat-val">45 min</div>
+            <div class="stat-sub">per session</div>
+          </div>
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 17l4-8 4 5 4-3 4 6" stroke="#9B84E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="stat-val">Beginner</div>
+            <div class="stat-sub">level</div>
+          </div>
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#F59E0B" stroke-width="1.6"/><path d="M12 8v4l2.5 2.5" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div class="stat-val">8 weeks</div>
+            <div class="stat-sub">programme</div>
+          </div>
+        </div>
+
+        <div class="scroll">
+          <div class="content">
+            <div class="injury">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-.8-8-4.5-8-9V6l8-3z" stroke="#9B84E8" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#9B84E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="injury-copy">Some exercises adjusted based on your health profile. Shoulder exercises replaced with safer alternatives.</div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Best For</div>
+              <div class="body-copy">Perfect for gym newcomers who can commit 3 days per week. You&apos;ll learn the fundamental pushing, pulling, and lower-body movements that underpin every advanced programme.</div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Experience Level</div>
+              <div class="level-bars">
+                <div class="level-item"><div class="level-bar fill"></div><div class="level-label">Beginner</div></div>
+                <div class="level-item"><div class="level-bar fill current"></div><div class="level-label active">Intermediate</div></div>
+                <div class="level-item"><div class="level-bar"></div><div class="level-label">Advanced</div></div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Plan Overview</div>
+              <div class="overview-card">
+                <div class="body-copy overview-fade">Each week alternates between two versions of each day (A and B) to keep your body adapting. The first 4 weeks focus on form and motor patterns at moderate volume. Weeks 5-8 progressively increase load and introduce intensity techniques. Every session ends with a core finisher.</div>
+                <div class="readmore">Read more <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg></div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Sample Week</div>
+              <div class="week-tabs">
+                <div class="week-tab active">Week 1</div>
+                <div class="week-tab">Week 2</div>
+                <div class="week-tab more">+6 more</div>
+              </div>
+              <div class="day-card">
+                <div class="day-head">
+                  <div class="day-pill">Mon</div>
+                  <div class="day-main"><div class="day-name">Push A</div><div class="day-sub">4 exercises</div></div>
+                  <div class="day-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg></div>
+                </div>
+              </div>
+              <div class="day-card">
+                <div class="day-head">
+                  <div class="day-pill">Wed</div>
+                  <div class="day-main"><div class="day-name">Pull A</div><div class="day-sub">4 exercises</div></div>
+                  <div class="day-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg></div>
+                </div>
+              </div>
+              <div class="day-card">
+                <div class="day-head">
+                  <div class="day-pill">Fri</div>
+                  <div class="day-main"><div class="day-name">Legs A</div><div class="day-sub">4 exercises</div></div>
+                  <div class="day-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Equipment Needed</div>
+              <div class="chip-row">
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Barbell</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Bench</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Squat Rack</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Pull-up Bar</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Cable Machine</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Dumbbells</div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Goals You&apos;ll Hit</div>
+              <div class="chip-row">
+                <div class="goal-chip" style="background:var(--chip-bg);color:var(--primary);border-color:rgba(108,126,232,.2)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#6C7EE8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Build Muscle</div>
+                <div class="goal-chip" style="background:var(--teal-bg);color:var(--teal);border-color:rgba(75,184,204,.2)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#4BB8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Strength Foundation</div>
+                <div class="goal-chip" style="background:var(--lavender-bg);color:var(--lavender-text);border-color:rgba(155,132,232,.2)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#9B84E8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Improved Posture</div>
+                <div class="goal-chip" style="background:var(--orange-bg);color:var(--orange);border-color:rgba(249,115,22,.18)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#F97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Compound Movements</div>
+              </div>
+            </div>
+
+            <div class="saves">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>2,847 people have saved this plan</span>
+            </div>
+
+            <div class="section">
+              <div class="coach-card">
+                <div class="coach-head">
+                  <div class="coach-mark">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.5L12 14.5 7.1 17.2l.9-5.5L4 7.8 9.5 7z" fill="#fff"/></svg>
+                  </div>
+                  <div><div class="coach-over">WISECOACH</div><div class="coach-sub">Why this plan matches you</div></div>
+                </div>
+                <div class="coach-copy">This plan matches your goal of building muscle and fits your 3-day schedule. The beginner level aligns with your 6-month training history, and shoulder exercises have been pre-adjusted based on your health profile.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-bar">
+          <div class="save-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Save
+          </div>
+          <div class="start-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>
+            Start This Plan
+          </div>
+        </div>
+      </div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Expanded Details</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner">
+        <div class="hero">
+          <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#fff"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#fff"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#fff"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#fff"/></svg>
+              <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#fff" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#fff"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#fff" opacity=".4"/></svg>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <div class="round-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="round-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a1 1 0 001 1h14a1 1 0 001-1v-8M16 6l-4-4-4 4M12 2v13" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="hero-content">
+            <div class="hero-title">Beginner Push-Pull-Legs</div>
+            <div class="hero-coach">
+              <div class="coach-avatar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#fff" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <div class="coach-name">Coach Alex Rivera</div>
+            </div>
+            <div class="hero-tags">
+              <div class="hero-tag">Build Muscle</div>
+              <div class="hero-tag">Beginner</div>
+              <div class="hero-tag">3 days/wk</div>
+              <div class="hero-tag">8 weeks</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="#6C7EE8" stroke-width="1.6"/><path d="M3 9h18M8 2v4M16 2v4" stroke="#6C7EE8" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div class="stat-val">3 days</div>
+            <div class="stat-sub">per week</div>
+          </div>
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#4BB8CC" stroke-width="1.6"/><path d="M12 7v5l3 3" stroke="#4BB8CC" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div class="stat-val">45 min</div>
+            <div class="stat-sub">per session</div>
+          </div>
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 17l4-8 4 5 4-3 4 6" stroke="#9B84E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="stat-val">Beginner</div>
+            <div class="stat-sub">level</div>
+          </div>
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#F59E0B" stroke-width="1.6"/><path d="M12 8v4l2.5 2.5" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div class="stat-val">8 weeks</div>
+            <div class="stat-sub">programme</div>
+          </div>
+        </div>
+
+        <div class="scroll">
+          <div class="content">
+            <div class="injury">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-.8-8-4.5-8-9V6l8-3z" stroke="#9B84E8" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#9B84E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="injury-copy">Some exercises adjusted based on your health profile. Shoulder exercises replaced with safer alternatives.</div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Plan Overview</div>
+              <div class="overview-card">
+                <div class="body-copy">Each week alternates between two versions of each day (A and B) to keep your body adapting. The first 4 weeks focus on form and motor patterns at moderate volume. Weeks 5-8 progressively increase load and introduce intensity techniques. Every session ends with a core finisher.</div>
+                <div class="readmore">Show less <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 15l6-6 6 6" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg></div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Sample Week</div>
+              <div class="week-tabs">
+                <div class="week-tab">Week 1</div>
+                <div class="week-tab active">Week 2</div>
+                <div class="week-tab more">+6 more</div>
+              </div>
+              <div class="day-card">
+                <div class="day-head">
+                  <div class="day-pill">Mon</div>
+                  <div class="day-main"><div class="day-name">Push B</div><div class="day-sub">4 exercises</div></div>
+                  <div class="day-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 15l6-6 6 6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg></div>
+                </div>
+                <div class="ex-list">
+                  <div class="ex-row"><div class="dot"></div><div>Incline Press 4×8</div></div>
+                  <div class="ex-row"><div class="dot"></div><div>Dumbbell Press 3×10</div></div>
+                  <div class="ex-row"><div class="dot"></div><div>Overhead Tricep 3×12</div></div>
+                  <div class="ex-row"><div class="dot"></div><div>Cable Lateral 3×15</div></div>
+                </div>
+              </div>
+              <div class="day-card">
+                <div class="day-head">
+                  <div class="day-pill">Wed</div>
+                  <div class="day-main"><div class="day-name">Pull B</div><div class="day-sub">4 exercises</div></div>
+                  <div class="day-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg></div>
+                </div>
+              </div>
+              <div class="day-card">
+                <div class="day-head">
+                  <div class="day-pill">Fri</div>
+                  <div class="day-main"><div class="day-name">Legs B</div><div class="day-sub">4 exercises</div></div>
+                  <div class="day-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Equipment Needed</div>
+              <div class="chip-row">
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Barbell</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Bench</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Squat Rack</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Pull-up Bar</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Cable Machine</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Resistance Bands</div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Goals You&apos;ll Hit</div>
+              <div class="chip-row">
+                <div class="goal-chip" style="background:var(--chip-bg);color:var(--primary);border-color:rgba(108,126,232,.2)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#6C7EE8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Build Muscle</div>
+                <div class="goal-chip" style="background:var(--teal-bg);color:var(--teal);border-color:rgba(75,184,204,.2)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#4BB8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Strength Foundation</div>
+                <div class="goal-chip" style="background:var(--lavender-bg);color:var(--lavender-text);border-color:rgba(155,132,232,.2)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#9B84E8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Compound Movements</div>
+                <div class="goal-chip" style="background:var(--orange-bg);color:var(--orange);border-color:rgba(249,115,22,.18)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#F97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Mind-Muscle Connection</div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="coach-card">
+                <div class="coach-head">
+                  <div class="coach-mark">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.5L12 14.5 7.1 17.2l.9-5.5L4 7.8 9.5 7z" fill="#fff"/></svg>
+                  </div>
+                  <div><div class="coach-over">WISECOACH</div><div class="coach-sub">Why this plan matches you</div></div>
+                </div>
+                <div class="coach-copy">The beginner level aligns with your training history, and shoulder exercises have been pre-adjusted based on your health profile for safer pressing volume.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-bar">
+          <div class="save-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Save
+          </div>
+          <div class="start-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>
+            Start This Plan
+          </div>
+        </div>
+      </div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Saved, No Injury Notice</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner">
+        <div class="hero">
+          <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#fff"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#fff"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#fff"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#fff"/></svg>
+              <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#fff" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#fff"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#fff" opacity=".4"/></svg>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <div class="round-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="round-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a1 1 0 001 1h14a1 1 0 001-1v-8M16 6l-4-4-4 4M12 2v13" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="hero-content">
+            <div class="hero-title">Beginner Push-Pull-Legs</div>
+            <div class="hero-coach">
+              <div class="coach-avatar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#fff" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <div class="coach-name">Coach Alex Rivera</div>
+            </div>
+            <div class="hero-tags">
+              <div class="hero-tag">Build Muscle</div>
+              <div class="hero-tag">Beginner</div>
+              <div class="hero-tag">3 days/wk</div>
+              <div class="hero-tag">8 weeks</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="#6C7EE8" stroke-width="1.6"/><path d="M3 9h18M8 2v4M16 2v4" stroke="#6C7EE8" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div class="stat-val">3 days</div>
+            <div class="stat-sub">per week</div>
+          </div>
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#4BB8CC" stroke-width="1.6"/><path d="M12 7v5l3 3" stroke="#4BB8CC" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div class="stat-val">45 min</div>
+            <div class="stat-sub">per session</div>
+          </div>
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 17l4-8 4 5 4-3 4 6" stroke="#9B84E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="stat-val">Beginner</div>
+            <div class="stat-sub">level</div>
+          </div>
+          <div class="stat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#F59E0B" stroke-width="1.6"/><path d="M12 8v4l2.5 2.5" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div class="stat-val">8 weeks</div>
+            <div class="stat-sub">programme</div>
+          </div>
+        </div>
+
+        <div class="scroll">
+          <div class="content">
+            <div class="section">
+              <div class="section-title">Best For</div>
+              <div class="body-copy">Perfect for gym newcomers who can commit 3 days per week. You&apos;ll learn the fundamental pushing, pulling, and lower-body movements that underpin every advanced programme.</div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Experience Level</div>
+              <div class="level-bars">
+                <div class="level-item"><div class="level-bar fill"></div><div class="level-label">Beginner</div></div>
+                <div class="level-item"><div class="level-bar fill current"></div><div class="level-label active">Intermediate</div></div>
+                <div class="level-item"><div class="level-bar"></div><div class="level-label">Advanced</div></div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Plan Overview</div>
+              <div class="overview-card">
+                <div class="body-copy overview-fade">Each week alternates between two versions of each day (A and B) to keep your body adapting. The first 4 weeks focus on form and motor patterns at moderate volume. Weeks 5-8 progressively increase load and introduce intensity techniques. Every session ends with a core finisher.</div>
+                <div class="readmore">Read more <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg></div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Sample Week</div>
+              <div class="week-tabs">
+                <div class="week-tab active">Week 1</div>
+                <div class="week-tab">Week 2</div>
+                <div class="week-tab more">+6 more</div>
+              </div>
+              <div class="day-card">
+                <div class="day-head">
+                  <div class="day-pill">Mon</div>
+                  <div class="day-main"><div class="day-name">Push A</div><div class="day-sub">4 exercises</div></div>
+                  <div class="day-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg></div>
+                </div>
+              </div>
+              <div class="day-card">
+                <div class="day-head">
+                  <div class="day-pill">Wed</div>
+                  <div class="day-main"><div class="day-name">Pull A</div><div class="day-sub">4 exercises</div></div>
+                  <div class="day-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Equipment Needed</div>
+              <div class="chip-row">
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Barbell</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Bench</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Cable Machine</div>
+                <div class="soft-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke="#6C7EE8" stroke-width="2" stroke-linecap="round"/></svg>Dumbbells</div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Goals You&apos;ll Hit</div>
+              <div class="chip-row">
+                <div class="goal-chip" style="background:var(--chip-bg);color:var(--primary);border-color:rgba(108,126,232,.2)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#6C7EE8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Build Muscle</div>
+                <div class="goal-chip" style="background:var(--teal-bg);color:var(--teal);border-color:rgba(75,184,204,.2)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#4BB8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Strength Foundation</div>
+                <div class="goal-chip" style="background:var(--green-bg);color:var(--green);border-color:rgba(16,185,129,.2)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Improved Posture</div>
+              </div>
+            </div>
+
+            <div class="saves">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>2,847 people have saved this plan</span>
+            </div>
+
+            <div class="section">
+              <div class="coach-card">
+                <div class="coach-head">
+                  <div class="coach-mark">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.5L12 14.5 7.1 17.2l.9-5.5L4 7.8 9.5 7z" fill="#fff"/></svg>
+                  </div>
+                  <div><div class="coach-over">WISECOACH</div><div class="coach-sub">Why this plan matches you</div></div>
+                </div>
+                <div class="coach-copy">This plan matches your goal of building muscle and fits your 3-day schedule. The beginner level aligns with your 6-month training history.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-bar">
+          <div class="save-btn saved">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            Saved
+          </div>
+          <div class="start-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>
+            Start This Plan
+          </div>
+        </div>
+      </div></div>
+    </section>
+  </div>
+</body>
+</html>

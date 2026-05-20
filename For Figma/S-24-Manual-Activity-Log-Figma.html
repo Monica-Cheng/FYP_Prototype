@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiseWorkout · S-24 Manual Activity Log · For Figma</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F7F8FF;
+      --canvas: #EDEEF5;
+      --card: #FFFFFF;
+      --elevated: #EEF0FB;
+      --primary: #6C7EE8;
+      --primary-dark: #2D3A8C;
+      --teal: #4BB8CC;
+      --teal-bg: #E0F4F8;
+      --text: #3D3D5C;
+      --text-sec: #8A8A9E;
+      --border: #C8C8D8;
+      --chip-bg: #E6EAFE;
+      --shadow: 0 2px 8px rgba(45,58,140,.06);
+      --frame-shadow: 0 30px 70px rgba(20,25,60,.20), 0 0 0 1px rgba(0,0,0,.12);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      padding: 48px 40px 64px;
+    }
+    .page-title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.04em;
+    }
+    .page-subtitle {
+      margin: 0 0 32px;
+      color: var(--text-sec);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 980px;
+    }
+    .storyboard {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .frame-block {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    .frame-label {
+      font-size: 12px;
+      color: #6B6B80;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      font-weight: 700;
+      text-align: center;
+    }
+    .phone-shell {
+      width: 390px;
+      border-radius: 52px;
+      background: #0A0A12;
+      padding: 5px;
+      box-shadow: var(--frame-shadow);
+      position: relative;
+    }
+    .phone-inner {
+      width: 100%;
+      min-height: 844px;
+      border-radius: 47px;
+      overflow: hidden;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 33px;
+      border-radius: 20px;
+      background: #000;
+      z-index: 60;
+      pointer-events: none;
+    }
+    .status-bar {
+      height: 47px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .status-time, .status-icons { padding-top: 10px; }
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .screen {
+      position: relative;
+      min-height: 797px;
+      background: rgba(10,10,18,.45);
+      display: flex;
+      flex-direction: column;
+    }
+    .home-hint {
+      flex: 1;
+      background: var(--bg);
+      opacity: .6;
+    }
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 84px;
+      background: var(--card);
+      border-top: .5px solid #E8EAF8;
+      display: flex;
+      z-index: 30;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding-bottom: 8px;
+      color: var(--text-sec);
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border-radius: 22px 22px 0 0;
+      box-shadow: 0 -8px 40px rgba(20,25,60,.18);
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+    }
+    .handle-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 12px 0 6px;
+    }
+    .handle {
+      width: 36px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+    }
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px 14px;
+    }
+    .sheet-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+    .cancel {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-sec);
+    }
+    .sheet-body {
+      padding: 0 18px 32px;
+    }
+    .field-group {
+      margin-bottom: 14px;
+    }
+    .field-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sec);
+      margin-bottom: 6px;
+    }
+    .field-label .optional {
+      font-size: 11px;
+      font-weight: 400;
+    }
+    .field-label .required {
+      color: #EF4444;
+    }
+    .chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      padding: 7px 12px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .chip.selected {
+      border-color: var(--primary);
+      background: var(--chip-bg);
+      color: var(--primary);
+    }
+    .field-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .field-col {
+      flex: 1;
+    }
+    .input {
+      width: 100%;
+      height: 42px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      padding: 0 12px;
+      font-size: 13px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      background: #fff;
+    }
+    .input.strong {
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .textarea {
+      width: 100%;
+      min-height: 64px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      padding: 10px 12px;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+      background: #fff;
+      white-space: pre-line;
+    }
+    .placeholder {
+      color: #B0B0C0;
+    }
+    .estimate {
+      background: var(--teal-bg);
+      border-radius: 12px;
+      border: .5px solid rgba(75,184,204,.3);
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .estimate-copy {
+      font-size: 13px;
+      color: #1A7A8C;
+      line-height: 1.4;
+    }
+    .estimate-copy strong {
+      font-weight: 700;
+    }
+    .save-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 50px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .save-btn.disabled {
+      background: #C8C8D8;
+      color: #8A8A9E;
+    }
+    .save-btn.enabled {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(108,126,232,.35);
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">S-24 Manual Activity Log for Figma</h1>
+  <p class="page-subtitle">
+    This version stays close to <code>S-24-Manual-Activity-Log.html</code> and keeps
+    the original bottom-sheet pattern. It flattens the meaningful states into static
+    frames: empty/default, cardio entry with distance and calorie estimate, and a gym
+    entry without distance.
+  </p>
+
+  <div class="storyboard">
+    <section class="frame-block">
+      <div class="frame-label">Default Empty Form</div>
+      <div class="phone-shell">
+        <div class="island"></div>
+        <div class="phone-inner">
+          <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+              <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+            </div>
+          </div>
+          <div class="screen">
+            <div class="home-hint"></div>
+            <div class="sheet">
+              <div class="handle-wrap"><div class="handle"></div></div>
+              <div class="sheet-head">
+                <div class="sheet-title">Log Activity</div>
+                <div class="cancel">Cancel</div>
+              </div>
+              <div class="sheet-body">
+                <div class="field-group">
+                  <div class="field-label">Activity type</div>
+                  <div class="chips">
+                    <div class="chip selected"><span>🏃</span>Run</div>
+                    <div class="chip"><span>🚶</span>Walk</div>
+                    <div class="chip"><span>🚴</span>Cycle</div>
+                    <div class="chip"><span>🏋️</span>Gym</div>
+                    <div class="chip"><span>⚡</span>Other</div>
+                  </div>
+                </div>
+                <div class="field-row">
+                  <div class="field-col">
+                    <div class="field-label">Date</div>
+                    <div class="input">2026-05-11</div>
+                  </div>
+                  <div class="field-col">
+                    <div class="field-label">Time</div>
+                    <div class="input">09:00</div>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Duration (minutes) <span class="required">*</span></div>
+                  <div class="input strong placeholder">e.g. 45</div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Distance (km) <span class="optional">optional</span></div>
+                  <div class="input strong placeholder">e.g. 5.0</div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Notes <span class="optional">optional</span></div>
+                  <div class="textarea placeholder">How did it feel?</div>
+                </div>
+                <div class="save-btn disabled">Save Activity</div>
+              </div>
+            </div>
+            <div class="bottom-nav">
+              <div class="nav-item">Home</div>
+              <div class="nav-item">Plans</div>
+              <div class="nav-item">Coach</div>
+              <div class="nav-item">Club</div>
+              <div class="nav-item">Progress</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Run Entry With Estimate</div>
+      <div class="phone-shell">
+        <div class="island"></div>
+        <div class="phone-inner">
+          <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+              <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+            </div>
+          </div>
+          <div class="screen">
+            <div class="home-hint"></div>
+            <div class="sheet">
+              <div class="handle-wrap"><div class="handle"></div></div>
+              <div class="sheet-head">
+                <div class="sheet-title">Log Activity</div>
+                <div class="cancel">Cancel</div>
+              </div>
+              <div class="sheet-body">
+                <div class="field-group">
+                  <div class="field-label">Activity type</div>
+                  <div class="chips">
+                    <div class="chip selected"><span>🏃</span>Run</div>
+                    <div class="chip"><span>🚶</span>Walk</div>
+                    <div class="chip"><span>🚴</span>Cycle</div>
+                    <div class="chip"><span>🏋️</span>Gym</div>
+                    <div class="chip"><span>⚡</span>Other</div>
+                  </div>
+                </div>
+                <div class="field-row">
+                  <div class="field-col">
+                    <div class="field-label">Date</div>
+                    <div class="input">2026-05-11</div>
+                  </div>
+                  <div class="field-col">
+                    <div class="field-label">Time</div>
+                    <div class="input">09:00</div>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Duration (minutes) <span class="required">*</span></div>
+                  <div class="input strong">45</div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Distance (km) <span class="optional">optional</span></div>
+                  <div class="input strong">8.2</div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Notes <span class="optional">optional</span></div>
+                  <div class="textarea">Easy aerobic run before work.
+Kept it conversational and relaxed.</div>
+                </div>
+                <div class="estimate">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#4BB8CC"/></svg>
+                  <div class="estimate-copy"><strong>Estimated 450 kcal</strong> based on run for 45 min.</div>
+                </div>
+                <div class="save-btn enabled">Save Activity</div>
+              </div>
+            </div>
+            <div class="bottom-nav">
+              <div class="nav-item">Home</div>
+              <div class="nav-item">Plans</div>
+              <div class="nav-item">Coach</div>
+              <div class="nav-item">Club</div>
+              <div class="nav-item">Progress</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Gym Entry No Distance</div>
+      <div class="phone-shell">
+        <div class="island"></div>
+        <div class="phone-inner">
+          <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+              <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+            </div>
+          </div>
+          <div class="screen">
+            <div class="home-hint"></div>
+            <div class="sheet">
+              <div class="handle-wrap"><div class="handle"></div></div>
+              <div class="sheet-head">
+                <div class="sheet-title">Log Activity</div>
+                <div class="cancel">Cancel</div>
+              </div>
+              <div class="sheet-body">
+                <div class="field-group">
+                  <div class="field-label">Activity type</div>
+                  <div class="chips">
+                    <div class="chip"><span>🏃</span>Run</div>
+                    <div class="chip"><span>🚶</span>Walk</div>
+                    <div class="chip"><span>🚴</span>Cycle</div>
+                    <div class="chip selected"><span>🏋️</span>Gym</div>
+                    <div class="chip"><span>⚡</span>Other</div>
+                  </div>
+                </div>
+                <div class="field-row">
+                  <div class="field-col">
+                    <div class="field-label">Date</div>
+                    <div class="input">2026-05-11</div>
+                  </div>
+                  <div class="field-col">
+                    <div class="field-label">Time</div>
+                    <div class="input">18:30</div>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Duration (minutes) <span class="required">*</span></div>
+                  <div class="input strong">60</div>
+                </div>
+                <div class="field-group">
+                  <div class="field-label">Notes <span class="optional">optional</span></div>
+                  <div class="textarea">Upper body session.
+Bench, rows, incline dumbbell press, and cable flys.</div>
+                </div>
+                <div class="estimate">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#4BB8CC"/></svg>
+                  <div class="estimate-copy"><strong>Estimated 420 kcal</strong> based on gym for 60 min.</div>
+                </div>
+                <div class="save-btn enabled">Save Activity</div>
+              </div>
+            </div>
+            <div class="bottom-nav">
+              <div class="nav-item">Home</div>
+              <div class="nav-item">Plans</div>
+              <div class="nav-item">Coach</div>
+              <div class="nav-item">Club</div>
+              <div class="nav-item">Progress</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

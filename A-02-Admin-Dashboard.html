@@ -1,0 +1,239 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout Admin · Dashboard</title>
+<style>
+  :root{color-scheme:light}*{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#F7F8FF;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif;min-height:100vh;color:#3D3D5C}
+  ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#C8C8D8;border-radius:3px}
+</style>
+</head><body>
+<div id="app"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.07)'};
+
+const NAV=[
+  {id:'dashboard',label:'Dashboard',href:'A-02-Admin-Dashboard.html',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="1.7"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="1.7"/><rect x="3" y="14" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="1.7"/><rect x="14" y="14" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="1.7"/></svg>},
+  {id:'users',label:'Users',href:'A-03-Admin-Users.html',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.7"/><path d="M2 21c0-4 3.1-7 7-7s7 3 7 7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/><path d="M19 8v6M22 11h-6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>},
+  {id:'bp',label:'Business Partners',href:'A-04-Admin-BP-Queue.html',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.7"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" stroke="currentColor" strokeWidth="1.7"/><path d="M12 12v4M10 14h4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>},
+  {id:'content',label:'Content',href:'A-05-Admin-Content.html',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" strokeWidth="1.7"/><path d="M14 2v6h6M8 13h8M8 17h5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>},
+  {id:'challenges',label:'Challenges',href:'A-06-Admin-Challenges.html',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/></svg>},
+  {id:'analytics',label:'Analytics',href:'A-07-Admin-Analytics.html',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>},
+  {id:'settings',label:'Settings',href:'#',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.7"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" strokeWidth="1.7"/></svg>},
+];
+
+function Sidebar({active}){
+  return(
+    <div style={{width:240,minHeight:'100vh',background:WW.card,borderRight:`1px solid ${WW.border}`,display:'flex',flexDirection:'column',flexShrink:0,position:'sticky',top:0,height:'100vh',overflowY:'auto'}}>
+      {/* Logo */}
+      <div style={{padding:'24px 20px 20px',borderBottom:`1px solid ${WW.border}`}}>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <div style={{width:36,height:36,borderRadius:10,background:`linear-gradient(135deg,${WW.primary},#9B84E8)`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
+          </div>
+          <div>
+            <div style={{fontSize:14,fontWeight:800,color:WW.primaryDark,lineHeight:1}}>WiseWorkout</div>
+            <div style={{fontSize:10,fontWeight:600,color:WW.textSec,letterSpacing:.5}}>ADMIN PORTAL</div>
+          </div>
+        </div>
+      </div>
+      {/* Nav */}
+      <nav style={{padding:'12px 12px',flex:1}}>
+        {NAV.map(n=>{
+          const a=n.id===active;
+          return(
+            <a key={n.id} href={n.href} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',borderRadius:10,marginBottom:2,textDecoration:'none',background:a?WW.chipBg:'transparent',color:a?WW.primary:WW.textSec,fontWeight:a?700:500,fontSize:14,transition:'background .15s'}}>
+              <span style={{color:a?WW.primary:WW.textSec}}>{n.icon}</span>{n.label}
+            </a>
+          );
+        })}
+      </nav>
+      {/* Footer */}
+      <div style={{padding:'16px 20px',borderTop:`1px solid ${WW.border}`}}>
+        <a href="A-01-Admin-Login.html" style={{display:'flex',alignItems:'center',gap:8,fontSize:13,color:'#EF4444',textDecoration:'none',fontWeight:600}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17 16l4-4m0 0l-4-4m4 4H7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+          Sign out
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function TopBar({title,sub}){
+  return(
+    <div style={{height:64,background:WW.card,borderBottom:`1px solid ${WW.border}`,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 32px',flexShrink:0}}>
+      <div>
+        <div style={{fontSize:20,fontWeight:800,color:WW.primaryDark}}>{title}</div>
+        {sub&&<div style={{fontSize:12,color:WW.textSec,marginTop:1}}>{sub}</div>}
+      </div>
+      <div style={{display:'flex',alignItems:'center',gap:12}}>
+        <div style={{fontSize:13,color:WW.textSec}}>admin@wiseworkout.com</div>
+        <div style={{width:36,height:36,borderRadius:18,background:`linear-gradient(135deg,${WW.primary},#9B84E8)`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+          <span style={{fontSize:14,fontWeight:800,color:'#fff'}}>A</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function KpiCard({label,value,sub,badge,color='#6C7EE8',icon}){
+  return(
+    <div style={{background:WW.card,borderRadius:16,padding:'20px 22px',border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,flex:1,minWidth:0}}>
+      <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:14}}>
+        <div style={{width:40,height:40,borderRadius:12,background:color+'22',display:'flex',alignItems:'center',justifyContent:'center'}}>
+          <span style={{color}}>{icon}</span>
+        </div>
+        {badge!=null&&<span style={{background:'#FEF3C7',color:'#92400E',fontSize:12,fontWeight:700,padding:'3px 10px',borderRadius:20}}>{badge} pending</span>}
+      </div>
+      <div style={{fontSize:28,fontWeight:900,color:WW.primaryDark,marginBottom:4}}>{value}</div>
+      <div style={{fontSize:13,fontWeight:600,color:WW.textSec}}>{label}</div>
+      {sub&&<div style={{fontSize:11,color:WW.textSec,marginTop:3}}>{sub}</div>}
+    </div>
+  );
+}
+
+const DAU=[{l:'Mon',v:1240},{l:'Tue',v:980},{l:'Wed',v:1420},{l:'Thu',v:1100},{l:'Fri',v:1380},{l:'Sat',v:1620},{l:'Sun',v:1290}];
+const SPORTS=[{l:'Gym',v:840,c:'#6C7EE8'},{l:'Cardio',v:620,c:'#4BB8CC'},{l:'Manual',v:290,c:'#9B84E8'}];
+
+function LineChart({data,color,h=140}){
+  const vals=data.map(d=>d.v);const min=Math.min(...vals)-100;const max=Math.max(...vals)+100;
+  const W=500,H=h;const pts=data.map((d,i)=>({x:20+i*(W-40)/(data.length-1),y:H-10-((d.v-min)/(max-min))*(H-20)}));
+  const path=pts.map((p,i)=>i===0?`M${p.x},${p.y}`:`L${p.x},${p.y}`).join(' ');
+  const fill=path+`L${pts[pts.length-1].x},${H} L${pts[0].x},${H} Z`;
+  return(
+    <div>
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{height:h,display:'block'}}>
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity=".2"/><stop offset="100%" stopColor={color} stopOpacity="0"/></linearGradient></defs>
+        <path d={fill} fill="url(#lg)"/>
+        <path d={path} stroke={color} strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
+        {pts.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r="4" fill={color}/>)}
+      </svg>
+      <div style={{display:'flex',justifyContent:'space-between',padding:'0 4px',marginTop:4}}>
+        {data.map((d,i)=><div key={i} style={{fontSize:11,color:WW.textSec,textAlign:'center'}}>{d.l}</div>)}
+      </div>
+    </div>
+  );
+}
+function BarChart({data,h=120}){
+  const max=Math.max(...data.map(d=>d.v));
+  return(
+    <div style={{display:'flex',gap:16,alignItems:'flex-end',height:h+30}}>
+      {data.map((d,i)=>(
+        <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
+          <div style={{fontSize:12,fontWeight:700,color:WW.primaryDark}}>{d.v}</div>
+          <div style={{width:'100%',borderRadius:'6px 6px 0 0',background:d.c,height:`${(d.v/max)*h}px`}}/>
+          <div style={{fontSize:12,color:WW.textSec}}>{d.l}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const ALERTS=[
+  {type:'warn',icon:'⚠️',msg:'Missed workout spike — 34% of users skipped sessions this week',time:'2h ago'},
+  {type:'info',icon:'📋',msg:'5 new Business Partner applications pending review',time:'4h ago',link:'A-04-Admin-BP-Queue.html'},
+  {type:'flag',icon:'🚩',msg:'Challenge "5k Every Day" has been reported by 3 users',time:'Yesterday',link:'A-06-Admin-Challenges.html'},
+  {type:'info',icon:'👤',msg:'New user registrations up 18% compared to last week',time:'Yesterday'},
+];
+
+const ACTIVITY=[
+  {time:'09:41',type:'User',desc:'New registration — sarah.tan@email.com','status':'Active'},
+  {time:'09:28',type:'BP','desc':'Application submitted — FitLife Coaching','status':'Pending'},
+  {time:'08:55',type:'Challenge','desc':'Challenge reported — "30-Day Plank Challenge"','status':'Flagged'},
+  {time:'08:30',type:'User','desc':'Account suspended — spammer@fake.com','status':'Suspended'},
+  {time:'07:45',type:'BP','desc':'Application approved — Run Smart Coaching','status':'Approved'},
+  {time:'07:12',type:'User','desc':'Premium upgrade — marcus.tan@email.com','status':'Active'},
+];
+
+function App(){
+  return(
+    <div style={{display:'flex',minHeight:'100vh'}}>
+      <Sidebar active="dashboard"/>
+      <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'auto'}}>
+        <TopBar title="Dashboard" sub="Tuesday, 12 May 2026"/>
+        <div style={{flex:1,padding:'28px 32px',display:'flex',flexDirection:'column',gap:24}}>
+
+          {/* KPI row */}
+          <div style={{display:'flex',gap:20}}>
+            <KpiCard label="Total Users" value="12,847" sub="+234 this week" color={WW.primary}
+              icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.7"/><path d="M2 21c0-4 3.1-7 7-7s7 3 7 7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/><path d="M19 8v6M22 11h-6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>}/>
+            <KpiCard label="Active Today" value="1,290" sub="10% of user base" color={WW.teal}
+              icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>}/>
+            <KpiCard label="New This Week" value="234" sub="+18% vs last week" color="#10B981"
+              icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12l7-7 7 7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>}/>
+            <KpiCard label="Pending BP Approvals" value="5" badge={5} color={WW.gold}
+              icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.7"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" stroke="currentColor" strokeWidth="1.7"/></svg>}/>
+          </div>
+
+          {/* Charts row */}
+          <div style={{display:'flex',gap:20}}>
+            <div style={{flex:2,background:WW.card,borderRadius:16,padding:'22px 24px',border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}}>
+                <div>
+                  <div style={{fontSize:15,fontWeight:700,color:WW.primaryDark}}>Daily Active Users</div>
+                  <div style={{fontSize:12,color:WW.textSec}}>Last 7 days</div>
+                </div>
+                <div style={{fontSize:22,fontWeight:800,color:WW.primary}}>1,290</div>
+              </div>
+              <LineChart data={DAU} color={WW.primary} h={140}/>
+            </div>
+            <div style={{flex:1,background:WW.card,borderRadius:16,padding:'22px 24px',border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow}}>
+              <div style={{fontSize:15,fontWeight:700,color:WW.primaryDark,marginBottom:4}}>Sessions by Sport</div>
+              <div style={{fontSize:12,color:WW.textSec,marginBottom:18}}>Today</div>
+              <BarChart data={SPORTS} h={110}/>
+            </div>
+          </div>
+
+          {/* Bottom row */}
+          <div style={{display:'flex',gap:20}}>
+            {/* Alerts */}
+            <div style={{flex:1,background:WW.card,borderRadius:16,padding:'22px 24px',border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow}}>
+              <div style={{fontSize:15,fontWeight:700,color:WW.primaryDark,marginBottom:16}}>Recent Alerts</div>
+              {ALERTS.map((a,i)=>(
+                <div key={i} style={{display:'flex',gap:12,padding:'10px 0',borderBottom:i<ALERTS.length-1?`0.5px solid ${WW.border}`:'none'}}>
+                  <span style={{fontSize:18,flexShrink:0}}>{a.icon}</span>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:13,color:WW.text,lineHeight:1.4}}>{a.msg}</div>
+                    <div style={{fontSize:11,color:WW.textSec,marginTop:3}}>{a.time}</div>
+                  </div>
+                  {a.link&&<a href={a.link} style={{fontSize:12,fontWeight:700,color:WW.primary,textDecoration:'none',flexShrink:0,alignSelf:'center'}}>View →</a>}
+                </div>
+              ))}
+            </div>
+
+            {/* Activity log */}
+            <div style={{flex:2,background:WW.card,borderRadius:16,padding:'22px 24px',border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow}}>
+              <div style={{fontSize:15,fontWeight:700,color:WW.primaryDark,marginBottom:16}}>Recent Activity Log</div>
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{borderBottom:`1px solid ${WW.border}`}}>
+                    {['Time','Type','Description','Status'].map(h=>(
+                      <th key={h} style={{textAlign:'left',padding:'0 0 10px',fontSize:11,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.4}}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {ACTIVITY.map((r,i)=>(
+                    <tr key={i} style={{borderBottom:i<ACTIVITY.length-1?`0.5px solid ${WW.border}`:'none'}}>
+                      <td style={{padding:'10px 0',fontSize:12,color:WW.textSec,whiteSpace:'nowrap'}}>{r.time}</td>
+                      <td style={{padding:'10px 12px 10px 0',fontSize:12,fontWeight:700,color:WW.text}}>{r.type}</td>
+                      <td style={{padding:'10px 12px 10px 0',fontSize:13,color:WW.text}}>{r.desc}</td>
+                      <td style={{padding:'10px 0'}}>
+                        <span style={{fontSize:11,fontWeight:700,padding:'3px 9px',borderRadius:20,background:r.status==='Active'?'#D1FAE5':r.status==='Pending'?'#FEF3C7':r.status==='Approved'?'#DBEAFE':r.status==='Flagged'?'#FEE2E2':'#F2F2F7',color:r.status==='Active'?'#059669':r.status==='Pending'?'#92400E':r.status==='Approved'?'#1D4ED8':r.status==='Flagged'?'#DC2626':'#6B7280'}}>{r.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

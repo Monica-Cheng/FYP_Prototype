@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiseWorkout · S-22 Indoor Cardio Logging · For Figma</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F7F8FF;
+      --canvas: #EDEEF5;
+      --card: #FFFFFF;
+      --elevated: #EEF0FB;
+      --primary: #6C7EE8;
+      --primary-dark: #2D3A8C;
+      --lavender: #9B84E8;
+      --lavender-bg: #F0EEFE;
+      --lavender-body: #5B3F9E;
+      --teal: #4BB8CC;
+      --teal-bg: #E0F4F8;
+      --text: #3D3D5C;
+      --text-sec: #8A8A9E;
+      --border: #C8C8D8;
+      --chip-bg: #E6EAFE;
+      --gold: #F59E0B;
+      --shadow: 0 2px 8px rgba(45,58,140,.06);
+      --frame-shadow: 0 30px 70px rgba(20,25,60,.20), 0 0 0 1px rgba(0,0,0,.12);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    }
+    body { min-height: 100vh; padding: 48px 40px 64px; }
+    .page-title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.04em;
+    }
+    .page-subtitle {
+      margin: 0 0 32px;
+      color: var(--text-sec);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 980px;
+    }
+    .storyboard {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .frame-block {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    .frame-label {
+      font-size: 12px;
+      color: #6B6B80;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      font-weight: 700;
+      text-align: center;
+    }
+    .phone-shell {
+      width: 390px;
+      min-height: 844px;
+      border-radius: 52px;
+      background: #0A0A12;
+      padding: 5px;
+      box-shadow: var(--frame-shadow);
+      position: relative;
+    }
+    .phone-inner {
+      width: 100%;
+      min-height: 834px;
+      border-radius: 47px;
+      overflow: hidden;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 33px;
+      border-radius: 20px;
+      background: #000;
+      z-index: 60;
+    }
+    .app {
+      width: 100%;
+      min-height: 834px;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      position: relative;
+    }
+    .status-bar {
+      height: 47px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+    .status-time, .status-icons { padding-top: 10px; }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      height: 48px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .nav-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--card);
+      border: .5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      flex-shrink: 0;
+    }
+    .screen-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+    .save-link {
+      margin-left: auto;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      padding: 8px 4px;
+    }
+    .menu {
+      position: absolute;
+      top: 42px;
+      right: 0;
+      background: var(--card);
+      border-radius: 12px;
+      border: .5px solid var(--border);
+      box-shadow: 0 8px 24px rgba(45,58,140,.14);
+      z-index: 40;
+      min-width: 160px;
+      overflow: hidden;
+    }
+    .menu-item {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      background: transparent;
+      border-bottom: .5px solid var(--border);
+    }
+    .menu-item:last-child { border-bottom: none; }
+    .goal-wrap {
+      padding: 8px 16px 6px;
+      flex-shrink: 0;
+    }
+    .goal-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sec);
+      margin-bottom: 5px;
+    }
+    .goal-head span:last-child {
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .goal-track {
+      height: 6px;
+      border-radius: 8px;
+      background: var(--chip-bg);
+      overflow: hidden;
+    }
+    .goal-fill {
+      height: 100%;
+      border-radius: 8px;
+      background: var(--primary);
+    }
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 0 24px;
+      flex-shrink: 0;
+    }
+    .hero-kicker {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sec);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .hero-time {
+      font-size: 52px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .hero-time.muted { opacity: .5; }
+    .paused-note {
+      margin-top: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .stats-grid {
+      padding: 0 16px;
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .paused-fade {
+      position: absolute;
+      inset: 0;
+      background: rgba(247,248,255,.65);
+      z-index: 10;
+      border-radius: 16px;
+      margin: 0 16px;
+    }
+    .stat-card {
+      flex: 1;
+      background: var(--card);
+      border-radius: 16px;
+      border: .5px solid var(--border);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-sec);
+      margin-bottom: 4px;
+    }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .stat-value span {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .stat-sub {
+      font-size: 10px;
+      color: var(--text-sec);
+      margin-top: 3px;
+    }
+    .stat-sub.italic { font-style: italic; }
+    .zone-note {
+      font-size: 10px;
+      font-weight: 600;
+      margin-top: 3px;
+    }
+    .pace-row {
+      text-align: center;
+      padding: 14px 16px 0;
+      font-size: 13px;
+      color: var(--text-sec);
+      flex-shrink: 0;
+    }
+    .pace-row strong { color: var(--text); }
+    .spacer { flex: 1; }
+    .bottom-actions {
+      padding: 0 16px 16px;
+      display: flex;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .btn {
+      flex: 1;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .btn-outline {
+      border: 1.5px solid var(--primary);
+      background: transparent;
+      color: var(--primary);
+    }
+    .btn-danger {
+      border: none;
+      background: #EF4444;
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(239,68,68,.3);
+    }
+    .modal-scrim {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,18,.5);
+      z-index: 50;
+      display: flex;
+      align-items: flex-end;
+    }
+    .sheet {
+      width: 100%;
+      background: var(--card);
+      border-radius: 22px 22px 0 0;
+      padding: 20px 20px 40px;
+      box-shadow: 0 -8px 40px rgba(20,25,60,.2);
+    }
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      margin: 0 auto 20px;
+    }
+    .sheet-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+    .sheet-copy {
+      font-size: 14px;
+      color: var(--text-sec);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .sheet-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .coach-card {
+      background: var(--lavender-bg);
+      border-radius: 14px;
+      border-left: 3px solid var(--lavender);
+      padding: 12px 14px;
+      margin: 16px;
+      margin-top: 12px;
+      box-shadow: var(--shadow);
+    }
+    .coach-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .coach-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 14px;
+      background: var(--lavender);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .coach-copy {
+      font-size: 14px;
+      color: var(--lavender-body);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">S-22 Indoor Cardio Logging for Figma</h1>
+  <p class="page-subtitle">
+    This version keeps the indoor cardio logging screen visually close to the original while
+    flattening the meaningful state variations for HTML-to-Figma import. It includes the
+    default treadmill run, quick-actions menu, paused state, stop confirmation, and a
+    no-wearable duration-goal variant.
+  </p>
+
+  <div class="storyboard">
+    <section class="frame-block">
+      <div class="frame-label">Default Indoor Logging</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+          </div>
+        </div>
+        <div class="topbar">
+          <div class="nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D3D5C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+          <div class="screen-title">Treadmill Run</div>
+          <div class="nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="#3D3D5C"/><circle cx="12" cy="12" r="1.5" fill="#3D3D5C"/><circle cx="12" cy="19" r="1.5" fill="#3D3D5C"/></svg></div>
+        </div>
+        <div class="goal-wrap">
+          <div class="goal-head"><span>2.1 km of 5.0 km</span><span>42%</span></div>
+          <div class="goal-track"><div class="goal-fill" style="width:42%"></div></div>
+        </div>
+        <div class="hero">
+          <div class="hero-kicker">TIME</div>
+          <div class="hero-time">00:18:32</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Calories</div>
+            <div class="stat-value">186 <span>kcal</span></div>
+            <div class="stat-sub italic">MET estimate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Heart Rate</div>
+            <div class="stat-value" style="color:#6C7EE8;">142 <span>bpm</span></div>
+            <div class="zone-note" style="color:#6C7EE8;">Zone 3 · Aerobic</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Distance</div>
+            <div class="stat-value">2.1 <span>km</span></div>
+            <div class="stat-sub italic">Accel. estimate</div>
+          </div>
+        </div>
+        <div class="pace-row">Avg Pace <strong>8:49 /km</strong> · Current <strong>6:15 /km</strong></div>
+        <div class="spacer"></div>
+        <div class="bottom-actions">
+          <div class="btn btn-outline">Pause</div>
+          <div class="btn btn-danger">Stop</div>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Quick Actions Menu</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+          </div>
+        </div>
+        <div class="topbar">
+          <div class="nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D3D5C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+          <div class="screen-title">Treadmill Run</div>
+          <div style="margin-left:auto;position:relative">
+            <div class="nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="#3D3D5C"/><circle cx="12" cy="12" r="1.5" fill="#3D3D5C"/><circle cx="12" cy="19" r="1.5" fill="#3D3D5C"/></svg></div>
+            <div class="menu">
+              <div class="menu-item">Add Note</div>
+              <div class="menu-item">End Session</div>
+            </div>
+          </div>
+        </div>
+        <div class="goal-wrap">
+          <div class="goal-head"><span>2.1 km of 5.0 km</span><span>42%</span></div>
+          <div class="goal-track"><div class="goal-fill" style="width:42%"></div></div>
+        </div>
+        <div class="hero">
+          <div class="hero-kicker">TIME</div>
+          <div class="hero-time">00:18:32</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Calories</div>
+            <div class="stat-value">186 <span>kcal</span></div>
+            <div class="stat-sub italic">MET estimate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Heart Rate</div>
+            <div class="stat-value" style="color:#6C7EE8;">142 <span>bpm</span></div>
+            <div class="zone-note" style="color:#6C7EE8;">Zone 3 · Aerobic</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Distance</div>
+            <div class="stat-value">2.1 <span>km</span></div>
+            <div class="stat-sub italic">Accel. estimate</div>
+          </div>
+        </div>
+        <div class="pace-row">Avg Pace <strong>8:49 /km</strong> · Current <strong>6:15 /km</strong></div>
+        <div class="spacer"></div>
+        <div class="bottom-actions">
+          <div class="btn btn-outline">Pause</div>
+          <div class="btn btn-danger">Stop</div>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Paused Session</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+          </div>
+        </div>
+        <div class="topbar">
+          <div class="nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D3D5C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+          <div class="screen-title">Treadmill Run</div>
+          <div class="nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="#3D3D5C"/><circle cx="12" cy="12" r="1.5" fill="#3D3D5C"/><circle cx="12" cy="19" r="1.5" fill="#3D3D5C"/></svg></div>
+        </div>
+        <div class="goal-wrap">
+          <div class="goal-head"><span>2.1 km of 5.0 km</span><span>42%</span></div>
+          <div class="goal-track"><div class="goal-fill" style="width:42%"></div></div>
+        </div>
+        <div class="hero">
+          <div class="hero-kicker">TIME</div>
+          <div class="hero-time muted">00:18:32</div>
+          <div class="paused-note">Paused</div>
+        </div>
+        <div class="stats-grid">
+          <div class="paused-fade"></div>
+          <div class="stat-card">
+            <div class="stat-label">Calories</div>
+            <div class="stat-value">186 <span>kcal</span></div>
+            <div class="stat-sub italic">MET estimate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Heart Rate</div>
+            <div class="stat-value" style="color:#6C7EE8;">142 <span>bpm</span></div>
+            <div class="zone-note" style="color:#6C7EE8;">Zone 3 · Aerobic</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Distance</div>
+            <div class="stat-value">2.1 <span>km</span></div>
+            <div class="stat-sub italic">Accel. estimate</div>
+          </div>
+        </div>
+        <div class="pace-row">Avg Pace <strong>8:49 /km</strong> · Current <strong>6:15 /km</strong></div>
+        <div class="spacer"></div>
+        <div class="bottom-actions">
+          <div class="btn btn-outline">Resume</div>
+          <div class="btn btn-danger">Stop</div>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Stop Confirmation</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+          </div>
+        </div>
+        <div class="topbar">
+          <div class="nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D3D5C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+          <div class="screen-title">Treadmill Run</div>
+          <div class="nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="#3D3D5C"/><circle cx="12" cy="12" r="1.5" fill="#3D3D5C"/><circle cx="12" cy="19" r="1.5" fill="#3D3D5C"/></svg></div>
+        </div>
+        <div class="goal-wrap">
+          <div class="goal-head"><span>2.1 km of 5.0 km</span><span>42%</span></div>
+          <div class="goal-track"><div class="goal-fill" style="width:42%"></div></div>
+        </div>
+        <div class="hero">
+          <div class="hero-kicker">TIME</div>
+          <div class="hero-time">00:18:32</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Calories</div>
+            <div class="stat-value">186 <span>kcal</span></div>
+            <div class="stat-sub italic">MET estimate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Heart Rate</div>
+            <div class="stat-value" style="color:#6C7EE8;">142 <span>bpm</span></div>
+            <div class="zone-note" style="color:#6C7EE8;">Zone 3 · Aerobic</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Distance</div>
+            <div class="stat-value">2.1 <span>km</span></div>
+            <div class="stat-sub italic">Accel. estimate</div>
+          </div>
+        </div>
+        <div class="pace-row">Avg Pace <strong>8:49 /km</strong> · Current <strong>6:15 /km</strong></div>
+        <div class="spacer"></div>
+        <div class="bottom-actions">
+          <div class="btn btn-outline">Pause</div>
+          <div class="btn btn-danger">Stop</div>
+        </div>
+        <div class="modal-scrim">
+          <div class="sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">End session?</div>
+            <div class="sheet-copy">Your session will be saved. You can add details on the next screen.</div>
+            <div class="sheet-actions">
+              <div class="btn btn-outline">Keep going</div>
+              <div class="btn btn-danger">Yes, end session</div>
+            </div>
+          </div>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">No Wearable Duration Goal</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+          </div>
+        </div>
+        <div class="topbar">
+          <div class="nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D3D5C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+          <div class="screen-title">Indoor Cycle</div>
+          <div class="nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="#3D3D5C"/><circle cx="12" cy="12" r="1.5" fill="#3D3D5C"/><circle cx="12" cy="19" r="1.5" fill="#3D3D5C"/></svg></div>
+        </div>
+        <div class="goal-wrap">
+          <div class="goal-head"><span>00:18:32 of 30:00</span><span>62%</span></div>
+          <div class="goal-track"><div class="goal-fill" style="width:62%"></div></div>
+        </div>
+        <div class="hero">
+          <div class="hero-kicker">TIME</div>
+          <div class="hero-time">00:18:32</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Calories</div>
+            <div class="stat-value">130 <span>kcal</span></div>
+            <div class="stat-sub italic">MET estimate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Heart Rate</div>
+            <div class="stat-value" style="color:#8A8A9E;">--</div>
+            <div class="stat-sub">Connect a wearable</div>
+          </div>
+        </div>
+        <div class="pace-row">Avg Speed <strong>16.8 km/h</strong></div>
+        <div class="coach-card">
+          <div class="coach-head">
+            <div class="coach-mark"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"/></svg></div>
+            <div style="font-size:12px;font-weight:700;color:#7B5CB8;">Indoor estimate mode</div>
+          </div>
+          <div class="coach-copy">No wearable connected. Distance and heart-rate based insights will stay limited until you connect one or manually save more details after the session.</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="bottom-actions">
+          <div class="btn btn-outline">Pause</div>
+          <div class="btn btn-danger">Stop</div>
+        </div>
+      </div></div></div>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-05 Body Profile</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell { width: 390px; height: 844px; border-radius: 52px; background: #0A0A12; padding: 5px; box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12); position: relative; box-sizing: content-box; }
+  .phone-inner { width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #F7F8FF; position: relative; }
+  .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="label">S-05 · Body Profile — Step 1 of 3</div>
+  <div class="phone-shell">
+    <div class="island"></div>
+    <div class="phone-inner" id="app"></div>
+  </div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW = {
+  bg:'#F7F8FF', card:'#FFFFFF', elevated:'#EEF0FB',
+  primary:'#6C7EE8', primaryDark:'#2D3A8C',
+  lavender:'#9B84E8', lavenderBg:'#F0EEFE',
+  teal:'#4BB8CC', tealBg:'#E0F4F8',
+  text:'#3D3D5C', textSec:'#8A8A9E', border:'#C8C8D8',
+  chipBg:'#E6EAFE', shadow:'0 2px 8px rgba(45,58,140,0.06)',
+};
+
+const WEARABLES = ['Apple Watch', 'Garmin', 'Samsung', 'Polar', 'Fitbit', 'None'];
+
+function StatusBar() {
+  return (
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={WW.text} opacity="0.4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [connected, setConnected] = React.useState(false);
+  const [wearable, setWearable] = React.useState(null);
+  const [dob, setDob] = React.useState('');
+  const [sex, setSex] = React.useState('');
+  const [height, setHeight] = React.useState('');
+  const [weight, setWeight] = React.useState('');
+  const [units, setUnits] = React.useState('metric');
+
+  const inputStyle = {
+    width:'100%', height:48, borderRadius:12, border:`1px solid ${WW.border}`,
+    background:WW.card, fontSize:15, color:WW.text, padding:'0 14px',
+    boxSizing:'border-box', outline:'none', fontFamily:'inherit',
+  };
+
+  return (
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column'}}>
+      <StatusBar/>
+
+      {/* Step indicator */}
+      <div style={{padding:'0 24px 14px',flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+          <div style={{fontSize:12,fontWeight:700,color:WW.textSec,letterSpacing:'.3px'}}>Step 1 of 3</div>
+          <div style={{fontSize:12,fontWeight:600,color:WW.textSec}}>Body Profile</div>
+        </div>
+        <div style={{height:6,borderRadius:3,background:WW.elevated,overflow:'hidden'}}>
+          <div style={{height:'100%',width:'33.3%',borderRadius:3,background:WW.primary}}/>
+        </div>
+      </div>
+
+      {/* Scrollable content */}
+      <div style={{flex:1,overflowY:'auto',padding:'0 24px'}}>
+
+        {/* ── Section 1: Health Connection ── */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'18px',marginBottom:22}}>
+          <div style={{display:'flex',gap:14,alignItems:'flex-start',marginBottom:16}}>
+            {/* Apple Health icon */}
+            <div style={{width:52,height:52,borderRadius:14,background:'linear-gradient(145deg,#FF6B8A 0%,#FF2D55 100%)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,boxShadow:'0 4px 12px rgba(255,45,85,0.3)'}}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+                <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/>
+              </svg>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:15,fontWeight:800,color:WW.primaryDark,marginBottom:3,letterSpacing:'-0.3px'}}>Supercharge with Health data</div>
+              <div style={{fontSize:12,color:WW.textSec,lineHeight:1.55}}>Auto-sync workouts, heart rate &amp; steps from Apple Health or Google Fit — no manual logging needed.</div>
+            </div>
+          </div>
+
+          {/* Benefit chips */}
+          <div style={{display:'flex',gap:6,marginBottom:14,flexWrap:'wrap'}}>
+            {['Heart Rate','Workouts','Steps','Sleep'].map(b => (
+              <div key={b} style={{padding:'4px 10px',borderRadius:20,background:'#FFF0F4',border:'0.5px solid #FFCCD9',fontSize:11,fontWeight:600,color:'#CC2244'}}>{b}</div>
+            ))}
+          </div>
+
+          {connected ? (
+            <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',background:'#D1FAE5',borderRadius:10}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#059669"/><path d="M7.5 12l3 3 6-6" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <span style={{fontSize:13,fontWeight:600,color:'#059669'}}>Connected to Apple Health</span>
+            </div>
+          ) : (
+            <div style={{display:'flex',gap:10}}>
+              <button onClick={()=>setConnected(true)} style={{flex:1,height:44,borderRadius:12,background:WW.primary,color:'#fff',fontSize:14,fontWeight:700,border:'none',cursor:'pointer',boxShadow:'0 4px 12px rgba(108,126,232,0.3)'}}>
+                Connect Health
+              </button>
+              <button style={{height:44,padding:'0 18px',borderRadius:12,background:'none',border:`1.5px solid ${WW.border}`,color:WW.textSec,fontSize:14,fontWeight:600,cursor:'pointer'}}>
+                Skip
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* ── Section 2: Wearables ── */}
+        <div style={{marginBottom:24}}>
+          <div style={{fontSize:15,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.3px',marginBottom:3}}>Any wearables?</div>
+          <div style={{fontSize:13,color:WW.textSec,marginBottom:12}}>We'll optimise data tracking for your device.</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
+            {WEARABLES.map(w => {
+              const sel = wearable === w;
+              return (
+                <button key={w} onClick={()=>setWearable(sel ? null : w)} style={{
+                  padding:'9px 16px',borderRadius:22,fontSize:13,fontWeight:600,cursor:'pointer',
+                  background:sel?WW.primary:WW.card,
+                  color:sel?'#fff':WW.text,
+                  border:`1.5px solid ${sel?WW.primary:WW.border}`,
+                  boxShadow:sel?'0 2px 8px rgba(108,126,232,0.25)':WW.shadow,
+                  transition:'all 0.15s',
+                }}>
+                  {w}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Section 3: Body Fields ── */}
+        <div style={{marginBottom:8}}>
+          <div style={{fontSize:15,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.3px',marginBottom:16}}>Tell us about you</div>
+
+          {/* Date of Birth */}
+          <div style={{marginBottom:14}}>
+            <div style={{fontSize:13,fontWeight:600,color:WW.text,marginBottom:6}}>Date of Birth</div>
+            <input type="date" value={dob} onChange={e=>setDob(e.target.value)} style={inputStyle}/>
+          </div>
+
+          {/* Biological Sex */}
+          <div style={{marginBottom:14}}>
+            <div style={{fontSize:13,fontWeight:600,color:WW.text,marginBottom:8}}>Biological Sex</div>
+            <div style={{display:'flex',background:WW.elevated,borderRadius:12,padding:3,gap:2}}>
+              {['Male','Female','Other'].map(o => (
+                <button key={o} onClick={()=>setSex(o)} style={{
+                  flex:1,height:38,borderRadius:10,border:'none',cursor:'pointer',
+                  background:sex===o?WW.card:'transparent',
+                  color:sex===o?WW.primary:WW.textSec,
+                  fontSize:13,fontWeight:sex===o?700:500,
+                  boxShadow:sex===o?WW.shadow:'none',transition:'all 0.2s',
+                }}>{o}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Height + Weight */}
+          <div style={{display:'flex',gap:12,marginBottom:14}}>
+            <div style={{flex:1}}>
+              <div style={{fontSize:13,fontWeight:600,color:WW.text,marginBottom:6}}>Height</div>
+              <div style={{position:'relative'}}>
+                <input type="number" placeholder={units==='metric'?'175':'69'} value={height} onChange={e=>setHeight(e.target.value)}
+                  style={{...inputStyle,padding:'0 40px 0 14px'}}/>
+                <span style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',fontSize:12,color:WW.textSec,fontWeight:600}}>{units==='metric'?'cm':'in'}</span>
+              </div>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:13,fontWeight:600,color:WW.text,marginBottom:6}}>Weight</div>
+              <div style={{position:'relative'}}>
+                <input type="number" placeholder={units==='metric'?'70':'154'} value={weight} onChange={e=>setWeight(e.target.value)}
+                  style={{...inputStyle,padding:'0 40px 0 14px'}}/>
+                <span style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',fontSize:12,color:WW.textSec,fontWeight:600}}>{units==='metric'?'kg':'lbs'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Units toggle */}
+          <div style={{marginBottom:36}}>
+            <div style={{fontSize:13,fontWeight:600,color:WW.text,marginBottom:8}}>Preferred Units</div>
+            <div style={{display:'flex',background:WW.elevated,borderRadius:12,padding:3,gap:2}}>
+              {[{id:'metric',label:'Metric (kg, cm)'},{id:'imperial',label:'Imperial (lbs, ft)'}].map(u => (
+                <button key={u.id} onClick={()=>setUnits(u.id)} style={{
+                  flex:1,height:38,borderRadius:10,border:'none',cursor:'pointer',
+                  background:units===u.id?WW.card:'transparent',
+                  color:units===u.id?WW.primary:WW.textSec,
+                  fontSize:12,fontWeight:units===u.id?700:500,
+                  boxShadow:units===u.id?WW.shadow:'none',transition:'all 0.2s',
+                }}>{u.label}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sticky CTA */}
+      <div style={{padding:'12px 24px 0',flexShrink:0,borderTop:`0.5px solid ${WW.border}`,background:WW.bg}}>
+        <a href="S-06-Onboarding-Goals.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:52,borderRadius:14,background:WW.primary,color:'#fff',fontSize:16,fontWeight:700,textDecoration:'none',boxShadow:'0 4px 14px rgba(108,126,232,0.35)'}}>
+          Continue →
+        </a>
+        <div style={{textAlign:'center',padding:'12px 0 28px'}}>
+          <a href="S-06-Onboarding-Goals.html" style={{fontSize:14,color:WW.textSec,textDecoration:'none',fontWeight:600}}>Skip for now</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

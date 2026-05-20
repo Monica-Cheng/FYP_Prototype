@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>WiseWorkout — Prototype Navigator</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F7F8FF;color:#3D3D5C;min-height:100vh}
+  header{background:#fff;border-bottom:0.5px solid #C8C8D8;padding:20px 40px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(45,58,140,0.06)}
+  .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#6C7EE8,#9B84E8);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .logo svg{display:block}
+  h1{font-size:20px;font-weight:800;color:#2D3A8C;letter-spacing:-.3px}
+  .subtitle{font-size:13px;color:#8A8A9E;font-weight:500}
+  main{max-width:1280px;margin:0 auto;padding:36px 40px 60px}
+  .batch{margin-bottom:40px}
+  .batch-title{font-size:13px;font-weight:700;color:#8A8A9E;letter-spacing:.6px;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:0.5px solid #C8C8D8}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+  .card{background:#fff;border-radius:14px;border:0.5px solid #C8C8D8;box-shadow:0 2px 8px rgba(45,58,140,0.06);padding:14px 16px;text-decoration:none;color:inherit;display:block;transition:box-shadow .15s,transform .15s}
+  .card:hover{box-shadow:0 6px 20px rgba(108,126,232,0.18);transform:translateY(-2px)}
+  .card-id{font-size:10px;font-weight:700;color:#6C7EE8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+  .card-name{font-size:14px;font-weight:700;color:#2D3A8C;margin-bottom:4px;line-height:1.3}
+  .card-route{font-size:11px;color:#8A8A9E;font-weight:500;font-family:'SF Mono',Consolas,monospace}
+  .badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;margin-top:5px;letter-spacing:.3px;text-transform:uppercase}
+  .badge-mobile{background:#E6EAFE;color:#2D3A8C}
+  .badge-desktop{background:#E0F4F8;color:#1A7A8C}
+  .badge-bp{background:#F0EEFE;color:#7B5CB8}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+  </div>
+  <div>
+    <h1>WiseWorkout</h1>
+    <div class="subtitle">Prototype Navigator — 47 screens · FYP-26-S2-15</div>
+  </div>
+</header>
+<main>
+
+  <!-- Batch 1 -->
+  <div class="batch">
+    <div class="batch-title">Batch 1 — Auth &amp; Onboarding Start (S00–S05)</div>
+    <div class="grid">
+      <a href="S-00-Splash.html" class="card">
+        <div class="card-id">S00</div>
+        <div class="card-name">Splash</div>
+        <div class="card-route">/splash</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-01-Onboarding-Walkthrough.html" class="card">
+        <div class="card-id">S01</div>
+        <div class="card-name">Onboarding Walkthrough</div>
+        <div class="card-route">/welcome</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-02-Login.html" class="card">
+        <div class="card-id">S02</div>
+        <div class="card-name">Login</div>
+        <div class="card-route">/login</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-03-Register.html" class="card">
+        <div class="card-id">S03</div>
+        <div class="card-name">Register</div>
+        <div class="card-route">/register</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-04-Password-Reset.html" class="card">
+        <div class="card-id">S04</div>
+        <div class="card-name">Password Reset</div>
+        <div class="card-route">/forgot-password</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-05-Onboarding-Body-Health.html" class="card">
+        <div class="card-id">S05</div>
+        <div class="card-name">Onboarding Body &amp; Health</div>
+        <div class="card-route">/onboarding/body-health</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-05b-Health-Connection.html" class="card">
+        <div class="card-id">S05b</div>
+        <div class="card-name">Health Connection</div>
+        <div class="card-route">/onboarding/health-connect</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Batch 2 -->
+  <div class="batch">
+    <div class="batch-title">Batch 2 — Onboarding Completion &amp; Home (S06–S09)</div>
+    <div class="grid">
+      <a href="S-06-Onboarding-Goals.html" class="card">
+        <div class="card-id">S06</div>
+        <div class="card-name">Onboarding Goals</div>
+        <div class="card-route">/onboarding/goals</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-07-Onboarding-Plan-Result.html" class="card">
+        <div class="card-id">S07</div>
+        <div class="card-name">Permission Priming</div>
+        <div class="card-route">/onboarding/permissions</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-08-Health-Declaration.html" class="card">
+        <div class="card-id">S08</div>
+        <div class="card-name">Health Declaration</div>
+        <div class="card-route">/health-declaration</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-09-Home.html" class="card">
+        <div class="card-id">S09</div>
+        <div class="card-name">Home</div>
+        <div class="card-route">/tabs/home</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Batch 3 -->
+  <div class="batch">
+    <div class="batch-title">Batch 3 — Plans Hub &amp; Plan Management (S10–S16)</div>
+    <div class="grid">
+      <a href="S-10-Plans-Hub.html" class="card">
+        <div class="card-id">S10</div>
+        <div class="card-name">Plans Hub</div>
+        <div class="card-route">/tabs/plans</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-11-Build-Custom-Routine.html" class="card">
+        <div class="card-id">S11</div>
+        <div class="card-name">Build Custom Routine</div>
+        <div class="card-route">/plans/build</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-11b-Exercise-Detail-Sheet.html" class="card">
+        <div class="card-id">S11b</div>
+        <div class="card-name">Exercise Detail Sheet</div>
+        <div class="card-route">/exercise/:id/detail</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-12-Explore-Plan-Catalog.html" class="card">
+        <div class="card-id">S12</div>
+        <div class="card-name">Explore Plan Catalog</div>
+        <div class="card-route">/plans/explore</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-13-Plan-Detail.html" class="card">
+        <div class="card-id">S13</div>
+        <div class="card-name">Plan Detail</div>
+        <div class="card-route">/plans/:planId</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-14-Plan-Match.html" class="card">
+        <div class="card-id">S14</div>
+        <div class="card-name">Plan Match</div>
+        <div class="card-route">/plans/match</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-15-My-Plans-Library.html" class="card">
+        <div class="card-id">S15</div>
+        <div class="card-name">My Plans Library</div>
+        <div class="card-route">/plans/my-plans</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-16-Tracked-Plan-Schedule.html" class="card">
+        <div class="card-id">S16</div>
+        <div class="card-name">Tracked Plan Schedule</div>
+        <div class="card-route">/plans/tracked</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Batch 4 -->
+  <div class="batch">
+    <div class="batch-title">Batch 4 — Gym &amp; Cardio Sessions (S17–S24)</div>
+    <div class="grid">
+      <a href="S-17-Gym-Session-Active.html" class="card">
+        <div class="card-id">S17</div>
+        <div class="card-name">Gym Session Active</div>
+        <div class="card-route">/session/gym/:id</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-18-Exercise-Demo.html" class="card">
+        <div class="card-id">S18</div>
+        <div class="card-name">Exercise Demo</div>
+        <div class="card-route">/exercise/:id</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-19-Post-Gym-Summary.html" class="card">
+        <div class="card-id">S19</div>
+        <div class="card-name">Post-Gym Summary</div>
+        <div class="card-route">/session/gym/summary</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-20-Cardio-Setup.html" class="card">
+        <div class="card-id">S20</div>
+        <div class="card-name">Cardio Setup</div>
+        <div class="card-route">/session/cardio/setup</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-21-Live-Outdoor-GPS-Cardio.html" class="card">
+        <div class="card-id">S21</div>
+        <div class="card-name">Live Outdoor GPS Cardio</div>
+        <div class="card-route">/session/cardio/live</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-22-Indoor-Cardio-Logging.html" class="card">
+        <div class="card-id">S22</div>
+        <div class="card-name">Indoor Cardio Logging</div>
+        <div class="card-route">/session/cardio/indoor</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-23-Post-Cardio-Summary.html" class="card">
+        <div class="card-id">S23</div>
+        <div class="card-name">Post-Cardio Summary</div>
+        <div class="card-route">/session/cardio/summary</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-24-Manual-Activity-Log.html" class="card">
+        <div class="card-id">S24</div>
+        <div class="card-name">Manual Activity Log</div>
+        <div class="card-route">/manual-log</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Batch 5 -->
+  <div class="batch">
+    <div class="batch-title">Batch 5 — Coach Tab (S25–S27)</div>
+    <div class="grid">
+      <a href="S-25-Coach-Chat.html" class="card">
+        <div class="card-id">S25</div>
+        <div class="card-name">Coach Chat</div>
+        <div class="card-route">/tabs/coach</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-26-Find-A-Professional.html" class="card">
+        <div class="card-id">S26</div>
+        <div class="card-name">Find a Professional</div>
+        <div class="card-route">/coach/professionals</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-27-Professional-Profile.html" class="card">
+        <div class="card-id">S27</div>
+        <div class="card-name">Professional Profile</div>
+        <div class="card-route">/coach/professionals/:id</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Batch 6 -->
+  <div class="batch">
+    <div class="batch-title">Batch 6 — Club Tab (S28–S31)</div>
+    <div class="grid">
+      <a href="S-28-Club-Tab.html" class="card">
+        <div class="card-id">S28</div>
+        <div class="card-name">Club Tab</div>
+        <div class="card-route">/tabs/club</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-29-Add-Friends.html" class="card">
+        <div class="card-id">S29</div>
+        <div class="card-name">Add Friends</div>
+        <div class="card-route">/club/add-friends</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-30-Challenge-Detail.html" class="card">
+        <div class="card-id">S30</div>
+        <div class="card-name">Challenge Detail</div>
+        <div class="card-route">/club/challenges/:id</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-31-Create-Squad-Challenge.html" class="card">
+        <div class="card-id">S31</div>
+        <div class="card-name">Create Squad Challenge</div>
+        <div class="card-route">/club/create-challenge</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Batch 7 -->
+  <div class="batch">
+    <div class="batch-title">Batch 7 — Progress Tab &amp; Profile (S32–S36)</div>
+    <div class="grid">
+      <a href="S-32-Progress-Tab.html" class="card">
+        <div class="card-id">S32</div>
+        <div class="card-name">Progress Tab</div>
+        <div class="card-route">/tabs/progress</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-33-Activity-Detail.html" class="card">
+        <div class="card-id">S33</div>
+        <div class="card-name">Activity Detail</div>
+        <div class="card-route">/progress/activity/:id</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-34-Profile-Overlay.html" class="card">
+        <div class="card-id">S34</div>
+        <div class="card-name">Profile Overlay</div>
+        <div class="card-route">/profile</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-35-Settings.html" class="card">
+        <div class="card-id">S35</div>
+        <div class="card-name">Settings</div>
+        <div class="card-route">/settings</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+      <a href="S-36-Health-Profile-Settings.html" class="card">
+        <div class="card-id">S36</div>
+        <div class="card-name">Health Profile Settings</div>
+        <div class="card-route">/settings/health-profile</div>
+        <span class="badge badge-mobile">Mobile</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Batch 8 -->
+  <div class="batch">
+    <div class="batch-title">Batch 8 — Business Partner (S37–S39)</div>
+    <div class="grid">
+      <a href="S-37-BP-Registration.html" class="card">
+        <div class="card-id">S37</div>
+        <div class="card-name">BP Registration</div>
+        <div class="card-route">/professional/register</div>
+        <span class="badge badge-bp">Business Partner</span>
+      </a>
+      <a href="S-38-BP-Status.html" class="card">
+        <div class="card-id">S38</div>
+        <div class="card-name">BP Status</div>
+        <div class="card-route">/professional/status</div>
+        <span class="badge badge-bp">Business Partner</span>
+      </a>
+      <a href="S-39-BP-Profile-Management.html" class="card">
+        <div class="card-id">S39</div>
+        <div class="card-name">BP Profile Management</div>
+        <div class="card-route">/professional/profile</div>
+        <span class="badge badge-bp">Business Partner</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Batch 9 -->
+  <div class="batch">
+    <div class="batch-title">Batch 9 — Admin Web Dashboard (A01–A07)</div>
+    <div class="grid">
+      <a href="A-01-Admin-Login.html" class="card">
+        <div class="card-id">A01</div>
+        <div class="card-name">Admin Login</div>
+        <div class="card-route">/admin/login</div>
+        <span class="badge badge-desktop">Desktop</span>
+      </a>
+      <a href="A-02-Admin-Dashboard.html" class="card">
+        <div class="card-id">A02</div>
+        <div class="card-name">Admin Dashboard</div>
+        <div class="card-route">/admin</div>
+        <span class="badge badge-desktop">Desktop</span>
+      </a>
+      <a href="A-03-Admin-Users.html" class="card">
+        <div class="card-id">A03</div>
+        <div class="card-name">Admin Users</div>
+        <div class="card-route">/admin/users</div>
+        <span class="badge badge-desktop">Desktop</span>
+      </a>
+      <a href="A-04-Admin-BP-Queue.html" class="card">
+        <div class="card-id">A04</div>
+        <div class="card-name">Admin BP Queue</div>
+        <div class="card-route">/admin/business-partners</div>
+        <span class="badge badge-desktop">Desktop</span>
+      </a>
+      <a href="A-05-Admin-Content.html" class="card">
+        <div class="card-id">A05</div>
+        <div class="card-name">Admin Content</div>
+        <div class="card-route">/admin/content</div>
+        <span class="badge badge-desktop">Desktop</span>
+      </a>
+      <a href="A-06-Admin-Challenges.html" class="card">
+        <div class="card-id">A06</div>
+        <div class="card-name">Admin Challenges</div>
+        <div class="card-route">/admin/challenges</div>
+        <span class="badge badge-desktop">Desktop</span>
+      </a>
+      <a href="A-07-Admin-Analytics.html" class="card">
+        <div class="card-id">A07</div>
+        <div class="card-name">Admin Analytics</div>
+        <div class="card-route">/admin/analytics</div>
+        <span class="badge badge-desktop">Desktop</span>
+      </a>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

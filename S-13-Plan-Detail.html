@@ -1,0 +1,344 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-13 Plan Detail</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  .tweaks-panel{position:fixed;bottom:20px;right:20px;width:250px;background:#fff;border-radius:14px;padding:14px 16px 16px;box-shadow:0 10px 40px rgba(20,25,60,.18),0 0 0 .5px rgba(0,0,0,.08);color:#3D3D5C;display:none;z-index:100}
+  .tweaks-panel.open{display:block}.tweaks-panel h3{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:#8A8A9E}
+  .tweak-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:10px}
+  .tweak-row label{font-size:13px;color:#3D3D5C;flex:1}.tweak-row input[type="checkbox"]{accent-color:#6C7EE8}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-13 · Plan Detail</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<div class="tweaks-panel" id="tweaks">
+  <h3>State</h3>
+  <div class="tweak-row"><label>Injury notice</label><input type="checkbox" id="tw-injury" checked/></div>
+  <div class="tweak-row"><label>Already saved</label><input type="checkbox" id="tw-saved"/></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',lavenderText:'#7B5CB8',lavenderBody:'#5B3F9E',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+const PLAN={
+  name:'Beginner Push-Pull-Legs',
+  coach:'Coach Alex Rivera',
+  coachHandle:'@alexrivera',
+  level:1,
+  days:3,
+  duration:'8 weeks',
+  sessionLen:'45 min',
+  goal:'Build Muscle',
+  sport:'Gym',
+  saves:2847,
+  desc:'A classic 3-day split designed for beginners who want to build a strong foundation of muscle and movement patterns.',
+  bestFor:'Perfect for gym newcomers who can commit 3 days per week. You\'ll learn the fundamental pushing, pulling, and lower-body movements that underpin every advanced programme.',
+  overview:'Each week alternates between two versions of each day (A and B) to keep your body adapting. The first 4 weeks focus on form and motor patterns at moderate volume. Weeks 5–8 progressively increase load and introduce intensity techniques. Every session ends with a core finisher.',
+  equipment:['Barbell','Bench','Squat Rack','Pull-up Bar','Cable Machine','Dumbbells','Resistance Bands'],
+  goals:['Build Muscle','Strength Foundation','Improved Posture','Compound Movements','Mind-Muscle Connection'],
+  wiseCoachNote:'This plan matches your goal of building muscle and fits your 3-day schedule. The beginner level aligns with your 6-month training history, and shoulder exercises have been pre-adjusted based on your health profile.',
+};
+
+const WEEKS=[
+  {week:1,days:[
+    {day:'Mon',session:'Push A',exercises:['Bench Press 4×8','Overhead Press 3×10','Tricep Pushdown 3×12','Lateral Raise 3×15']},
+    {day:'Wed',session:'Pull A',exercises:['Pull-ups 4×8','Barbell Row 3×10','Face Pull 3×15','Bicep Curl 3×12']},
+    {day:'Fri',session:'Legs A',exercises:['Squat 4×8','Romanian Deadlift 3×10','Leg Press 3×12','Calf Raise 4×15']},
+  ]},
+  {week:2,days:[
+    {day:'Mon',session:'Push B',exercises:['Incline Press 4×8','Dumbbell Press 3×10','Overhead Tricep 3×12','Cable Lateral 3×15']},
+    {day:'Wed',session:'Pull B',exercises:['Deadlift 4×5','Lat Pulldown 3×10','Seated Row 3×12','Hammer Curl 3×12']},
+    {day:'Fri',session:'Legs B',exercises:['Front Squat 4×6','Leg Curl 3×12','Walking Lunge 3×10','Seated Calf 4×15']},
+  ]},
+];
+
+function StatusBar({light}){
+  const c=light?'#fff':WW.text;
+  return(
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:c,flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={c}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={c}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={c}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={c}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={c} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={c}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={c} opacity=".4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function DayCard({dayData}){
+  const [open,setOpen]=React.useState(false);
+  return(
+    <div style={{background:WW.card,borderRadius:12,border:`0.5px solid ${WW.border}`,marginBottom:8,overflow:'hidden'}}>
+      <div onClick={()=>setOpen(o=>!o)} style={{display:'flex',alignItems:'center',gap:10,padding:'11px 13px',cursor:'pointer'}}>
+        <div style={{width:36,height:36,borderRadius:9,background:WW.chipBg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+          <span style={{fontSize:11,fontWeight:800,color:WW.primary}}>{dayData.day}</span>
+        </div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:13,fontWeight:700,color:WW.text}}>{dayData.session}</div>
+          <div style={{fontSize:11,color:WW.textSec}}>{dayData.exercises.length} exercises</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{transform:open?'rotate(180deg)':'',transition:'transform .2s'}}><path d="M6 9l6 6 6-6" stroke={WW.textSec} strokeWidth="2" strokeLinecap="round"/></svg>
+      </div>
+      {open&&(
+        <div style={{padding:'0 13px 12px',borderTop:`1px solid ${WW.border}`}}>
+          {dayData.exercises.map((ex,i)=>(
+            <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 0',borderBottom:i<dayData.exercises.length-1?`1px solid ${WW.border}`:''}}>
+              <div style={{width:5,height:5,borderRadius:3,background:WW.primary,flexShrink:0}}/>
+              <div style={{fontSize:12,color:WW.text,fontWeight:500}}>{ex}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SectionHeader({title}){
+  return(
+    <div style={{fontSize:15,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.2px',marginBottom:10}}>
+      {title}
+    </div>
+  );
+}
+
+function App(){
+  const [weekIdx,setWeekIdx]=React.useState(0);
+  const [injury,setInjury]=React.useState(true);
+  const [isSaved,setIsSaved]=React.useState(false);
+  const [overviewOpen,setOverviewOpen]=React.useState(false);
+
+  React.useEffect(()=>{
+    const el1=document.getElementById('tw-injury');
+    const el2=document.getElementById('tw-saved');
+    if(el1){el1.checked=true;el1.addEventListener('change',e=>setInjury(e.target.checked));}
+    if(el2){el2.addEventListener('change',e=>setIsSaved(e.target.checked));}
+    const panel=document.getElementById('tweaks');
+    if(panel)panel.style.display='none';
+    const btn=document.createElement('button');
+    btn.textContent='⚙';
+    btn.style.cssText='position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:22px;background:#6C7EE8;color:#fff;border:none;font-size:20px;cursor:pointer;z-index:200;box-shadow:0 4px 12px rgba(108,126,232,.4)';
+    btn.onclick=()=>panel?.classList.toggle('open');
+    document.body.appendChild(btn);
+  },[]);
+
+  const levelLabels=['Beginner','Intermediate','Advanced'];
+
+  return(
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',position:'relative'}}>
+
+      {/* ① Hero banner */}
+      <div style={{position:'relative',flexShrink:0,background:'linear-gradient(160deg,#2D3A8C 0%,#4C5FC4 55%,#6C7EE8 100%)',paddingBottom:20}}>
+        <StatusBar light/>
+        {/* Back button */}
+        <div style={{position:'absolute',top:47,left:16,zIndex:10}}>
+          <a href="S-12-Explore-Plan-Catalog.html" style={{width:34,height:34,borderRadius:17,background:'rgba(255,255,255,0.18)',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </a>
+        </div>
+        {/* Share button */}
+        <div style={{position:'absolute',top:47,right:16,zIndex:10}}>
+          <div style={{width:34,height:34,borderRadius:17,background:'rgba(255,255,255,0.18)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a1 1 0 001 1h14a1 1 0 001-1v-8M16 6l-4-4-4 4M12 2v13" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+        </div>
+
+        {/* Plan name + coach */}
+        <div style={{padding:'44px 20px 0',textAlign:'center'}}>
+          <div style={{fontSize:22,fontWeight:900,color:'#fff',letterSpacing:'-0.5px',lineHeight:1.2,marginBottom:6}}>
+            {PLAN.name}
+          </div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,marginBottom:14}}>
+            <div style={{width:22,height:22,borderRadius:11,background:'rgba(255,255,255,0.25)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#fff" strokeWidth="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
+            </div>
+            <div style={{fontSize:13,color:'rgba(255,255,255,0.85)',fontWeight:600}}>{PLAN.coach}</div>
+          </div>
+          {/* Tag chips */}
+          <div style={{display:'flex',justifyContent:'center',flexWrap:'wrap',gap:6}}>
+            {[PLAN.goal,'Beginner',`${PLAN.days} days/wk`,PLAN.duration].map(t=>(
+              <span key={t} style={{fontSize:11,fontWeight:700,color:'rgba(255,255,255,0.9)',background:'rgba(255,255,255,0.18)',padding:'3px 10px',borderRadius:20,border:'0.5px solid rgba(255,255,255,0.3)'}}>
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Scrollable content */}
+      <div style={{flex:1,overflowY:'auto',paddingBottom:90}}>
+
+        {/* ② Quick stats icon row */}
+        <div style={{display:'flex',background:WW.card,borderBottom:`0.5px solid ${WW.border}`,flexShrink:0}}>
+          {[
+            {icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke={WW.primary} strokeWidth="1.6"/><path d="M3 9h18M8 2v4M16 2v4" stroke={WW.primary} strokeWidth="1.6" strokeLinecap="round"/></svg>,val:`${PLAN.days} days`,sub:'per week'},
+            {icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={WW.teal} strokeWidth="1.6"/><path d="M12 7v5l3 3" stroke={WW.teal} strokeWidth="1.6" strokeLinecap="round"/></svg>,val:PLAN.sessionLen,sub:'per session'},
+            {icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 17l4-8 4 5 4-3 4 6" stroke={WW.lavender} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,val:'Beginner',sub:'level'},
+            {icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={WW.gold} strokeWidth="1.6"/><path d="M12 8v4l2.5 2.5" stroke={WW.gold} strokeWidth="1.6" strokeLinecap="round"/></svg>,val:PLAN.duration,sub:'programme'},
+          ].map((s,i)=>(
+            <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',padding:'12px 4px',borderRight:i<3?`0.5px solid ${WW.border}`:''}}>
+              {s.icon}
+              <div style={{fontSize:12,fontWeight:800,color:WW.text,marginTop:4}}>{s.val}</div>
+              <div style={{fontSize:10,color:WW.textSec}}>{s.sub}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{padding:'16px 16px 0'}}>
+
+          {/* Injury banner */}
+          {injury&&(
+            <div style={{display:'flex',alignItems:'flex-start',gap:10,padding:'11px 13px',background:WW.lavenderBg,borderRadius:12,border:`0.5px solid rgba(155,132,232,.3)`,marginBottom:16}}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style={{flexShrink:0,marginTop:1}}><path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-.8-8-4.5-8-9V6l8-3z" stroke={WW.lavender} strokeWidth="1.8" strokeLinejoin="round"/><path d="M9 12l2 2 4-4" stroke={WW.lavender} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <div style={{fontSize:13,color:WW.lavenderBody,fontWeight:500,lineHeight:1.4}}>Some exercises adjusted based on your health profile. Shoulder exercises replaced with safer alternatives.</div>
+            </div>
+          )}
+
+          {/* ③ Best For */}
+          <div style={{marginBottom:20}}>
+            <SectionHeader title="Best For"/>
+            <div style={{fontSize:14,color:WW.text,lineHeight:1.65}}>
+              {PLAN.bestFor}
+            </div>
+          </div>
+
+          {/* ④ Experience Level bar */}
+          <div style={{marginBottom:20}}>
+            <SectionHeader title="Experience Level"/>
+            <div style={{display:'flex',gap:4}}>
+              {levelLabels.map((l,i)=>{
+                const active=i<=PLAN.level;
+                const isCurrent=i===PLAN.level;
+                return(
+                  <div key={l} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:5}}>
+                    <div style={{width:'100%',height:6,borderRadius:3,background:active?WW.primary:WW.elevated,position:'relative',overflow:'hidden'}}>
+                      {isCurrent&&<div style={{position:'absolute',inset:0,background:'rgba(255,255,255,0.35)',animation:'shimmer 2s ease-in-out infinite'}}/>}
+                    </div>
+                    <div style={{fontSize:10,fontWeight:isCurrent?800:500,color:isCurrent?WW.primaryDark:WW.textSec,letterSpacing:'-0.1px'}}>{l}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ⑤ Plan Overview (expandable) */}
+          <div style={{marginBottom:20}}>
+            <SectionHeader title="Plan Overview"/>
+            <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,padding:'13px 14px',boxShadow:WW.shadow}}>
+              <div style={{fontSize:14,color:WW.text,lineHeight:1.65,overflow:'hidden',maxHeight:overviewOpen?'none':'72px',position:'relative'}}>
+                {PLAN.overview}
+                {!overviewOpen&&<div style={{position:'absolute',bottom:0,left:0,right:0,height:28,background:'linear-gradient(transparent,#fff)'}}/>}
+              </div>
+              <button onClick={()=>setOverviewOpen(o=>!o)} style={{marginTop:8,fontSize:12,fontWeight:700,color:WW.primary,background:'none',border:'none',cursor:'pointer',padding:0,display:'flex',alignItems:'center',gap:4}}>
+                {overviewOpen?'Show less':'Read more'}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{transform:overviewOpen?'rotate(180deg)':'',transition:'transform .2s'}}><path d="M6 9l6 6 6-6" stroke={WW.primary} strokeWidth="2" strokeLinecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          {/* ⑥ Sample Week */}
+          <div style={{marginBottom:20}}>
+            <SectionHeader title="Sample Week"/>
+            {/* Week tabs */}
+            <div style={{display:'flex',gap:6,overflowX:'auto',marginBottom:10,paddingBottom:2}}>
+              {WEEKS.map((w,i)=>(
+                <button key={i} onClick={()=>setWeekIdx(i)} style={{padding:'5px 14px',borderRadius:20,border:`1.5px solid ${weekIdx===i?WW.primary:WW.border}`,background:weekIdx===i?WW.chipBg:'transparent',color:weekIdx===i?WW.primary:WW.textSec,fontSize:12,fontWeight:700,cursor:'pointer',flexShrink:0}}>
+                  Week {w.week}
+                </button>
+              ))}
+              <div style={{padding:'5px 12px',borderRadius:20,border:`1.5px dashed ${WW.border}`,color:WW.textSec,fontSize:11,fontWeight:500,flexShrink:0}}>+6 more</div>
+            </div>
+            {WEEKS[weekIdx].days.map((d,i)=><DayCard key={i} dayData={d}/>)}
+          </div>
+
+          {/* ⑦ Equipment */}
+          <div style={{marginBottom:20}}>
+            <SectionHeader title="Equipment Needed"/>
+            <div style={{display:'flex',flexWrap:'wrap',gap:7}}>
+              {PLAN.equipment.map(e=>(
+                <div key={e} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:20,background:WW.card,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow}}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M4 8h2M18 8h2M4 16h2M18 16h2" stroke={WW.primary} strokeWidth="2" strokeLinecap="round"/></svg>
+                  <span style={{fontSize:12,fontWeight:600,color:WW.text}}>{e}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ⑧ Goals */}
+          <div style={{marginBottom:20}}>
+            <SectionHeader title="Goals You'll Hit"/>
+            <div style={{display:'flex',flexWrap:'wrap',gap:7}}>
+              {PLAN.goals.map((g,i)=>{
+                const colors=[WW.primary,WW.teal,WW.lavender,'#F97316','#10B981'];
+                const bgs=[WW.chipBg,WW.tealBg,WW.lavenderBg,'#FFF3E0','#F0FFF4'];
+                return(
+                  <div key={g} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:20,background:bgs[i%bgs.length],border:`0.5px solid ${colors[i%colors.length]}33`}}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke={colors[i%colors.length]} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <span style={{fontSize:12,fontWeight:700,color:colors[i%colors.length]}}>{g}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Saves counter */}
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'12px 0',marginBottom:20,borderTop:`0.5px solid ${WW.border}`,borderBottom:`0.5px solid ${WW.border}`}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke={WW.textSec} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <span style={{fontSize:13,color:WW.textSec,fontWeight:600}}>{PLAN.saves.toLocaleString()} people have saved this plan</span>
+          </div>
+
+          {/* ⑨ WiseCoach match card */}
+          <div style={{marginBottom:20}}>
+            <div style={{background:WW.lavenderBg,borderRadius:14,border:`0.5px solid rgba(155,132,232,.25)`,borderLeft:`3px solid ${WW.lavender}`,padding:'12px 14px',boxShadow:WW.shadow}}>
+              <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:8}}>
+                <div style={{width:26,height:26,borderRadius:13,background:WW.lavender,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.5L12 14.5 7.1 17.2l.9-5.5L4 7.8 9.5 7z" fill="#fff"/></svg>
+                </div>
+                <div>
+                  <div style={{fontSize:11,fontWeight:800,color:WW.lavenderText,letterSpacing:'.3px'}}>WISECOACH</div>
+                  <div style={{fontSize:10,color:WW.lavenderText,opacity:.7,fontWeight:600}}>Why this plan matches you</div>
+                </div>
+              </div>
+              <div style={{fontSize:13,color:WW.lavenderBody,lineHeight:1.6}}>
+                {PLAN.wiseCoachNote}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ⑩ Sticky CTAs */}
+      <div style={{position:'absolute',bottom:0,left:0,right:0,padding:'12px 16px 28px',background:WW.card,borderTop:`0.5px solid ${WW.border}`,display:'flex',gap:10,zIndex:20}}>
+        <button
+          onClick={()=>setIsSaved(s=>!s)}
+          style={{flex:1,height:50,borderRadius:13,border:`1.5px solid ${isSaved?'#059669':WW.primary}`,background:isSaved?'#D1FAE5':'transparent',color:isSaved?'#059669':WW.primary,fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6,transition:'all .25s'}}
+        >
+          {isSaved?(
+            <><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/></svg>Saved</>
+          ):(
+            <><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>Save</>
+          )}
+        </button>
+        <a href="S-08-Health-Declaration.html" style={{flex:2,height:50,borderRadius:13,background:WW.primary,color:'#fff',fontSize:15,fontWeight:800,textDecoration:'none',display:'flex',alignItems:'center',justifyContent:'center',gap:7,boxShadow:'0 4px 14px rgba(108,126,232,.35)',letterSpacing:'-0.2px'}}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>
+          Start This Plan
+        </a>
+      </div>
+
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

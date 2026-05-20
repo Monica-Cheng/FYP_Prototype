@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiseWorkout · S-23 Post-Cardio Summary · For Figma</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F7F8FF;
+      --canvas: #EDEEF5;
+      --card: #FFFFFF;
+      --elevated: #EEF0FB;
+      --primary: #6C7EE8;
+      --primary-dark: #2D3A8C;
+      --lavender: #9B84E8;
+      --lavender-bg: #F0EEFE;
+      --lavender-dark: #7B5CB8;
+      --lavender-text: #5B3F9E;
+      --teal: #4BB8CC;
+      --teal-bg: #E0F4F8;
+      --text: #3D3D5C;
+      --text-sec: #8A8A9E;
+      --border: #C8C8D8;
+      --shadow: 0 2px 8px rgba(45,58,140,.06);
+      --frame-shadow: 0 30px 70px rgba(20,25,60,.20), 0 0 0 1px rgba(0,0,0,.12);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      padding: 48px 40px 64px;
+    }
+    .page-title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.04em;
+    }
+    .page-subtitle {
+      margin: 0 0 32px;
+      color: var(--text-sec);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 980px;
+    }
+    .storyboard {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .frame-block {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    .frame-label {
+      font-size: 12px;
+      color: #6B6B80;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      font-weight: 700;
+      text-align: center;
+    }
+    .phone-shell {
+      width: 390px;
+      border-radius: 52px;
+      background: #0A0A12;
+      padding: 5px;
+      box-shadow: var(--frame-shadow);
+      position: relative;
+    }
+    .phone-inner {
+      width: 100%;
+      border-radius: 47px;
+      overflow: hidden;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 844px;
+    }
+    .island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 33px;
+      border-radius: 20px;
+      background: #000;
+      z-index: 60;
+      pointer-events: none;
+    }
+    .status-bar {
+      height: 47px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .status-time, .status-icons { padding-top: 10px; }
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .hero {
+      background: linear-gradient(160deg, var(--teal), #3A9AB0);
+      padding: 16px 20px 22px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .hero-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 26px;
+      background: rgba(255,255,255,.2);
+      border: 2px solid rgba(255,255,255,.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+    .hero-title {
+      font-size: 21px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.3px;
+      margin-bottom: 3px;
+      text-align: center;
+    }
+    .hero-sub {
+      font-size: 13px;
+      color: rgba(255,255,255,.7);
+      font-weight: 500;
+      text-align: center;
+    }
+    .content {
+      padding: 0 16px 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 14px 0 12px;
+    }
+    .stat-card {
+      background: var(--elevated);
+      border-radius: 12px;
+      padding: 10px 6px;
+      text-align: center;
+      border: .5px solid var(--border);
+    }
+    .stat-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -.5px;
+      line-height: 1;
+    }
+    .stat-unit,
+    .stat-label {
+      font-size: 9px;
+      color: var(--text-sec);
+      font-weight: 600;
+    }
+    .stat-label {
+      font-weight: 500;
+      margin-top: 1px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      border: .5px solid var(--border);
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+    .route-map {
+      overflow: hidden;
+    }
+    .section-card {
+      padding: 13px 14px;
+    }
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .metric-row {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: .5px solid var(--border);
+    }
+    .metric-row.no-border {
+      border-bottom: 0;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .metric-row strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .metric-row span {
+      font-size: 11px;
+      color: var(--text-sec);
+    }
+    .subhead {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sec);
+      margin-bottom: 6px;
+    }
+    .split-row {
+      display: flex;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: .5px solid var(--border);
+    }
+    .split-row:last-child {
+      border-bottom: 0;
+    }
+    .split-km {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sec);
+      width: 50px;
+    }
+    .split-bar {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--elevated);
+      overflow: hidden;
+      margin: 0 8px;
+    }
+    .split-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--teal);
+    }
+    .split-pace {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      width: 44px;
+      text-align: right;
+    }
+    .hr-card {
+      padding: 13px 14px;
+    }
+    .hr-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .hr-head .label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .hr-head .meta {
+      font-size: 12px;
+      color: var(--text-sec);
+    }
+    .coach-card {
+      background: var(--lavender-bg);
+      border-radius: 16px;
+      border-left: 3px solid var(--lavender);
+      padding: 13px 14px;
+      margin-bottom: 12px;
+    }
+    .coach-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .coach-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 13px;
+      background: var(--lavender);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .coach-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--lavender-dark);
+    }
+    .coach-copy {
+      font-size: 13px;
+      color: var(--lavender-text);
+      line-height: 1.6;
+    }
+    .xp-banner {
+      background: var(--teal-bg);
+      border-radius: 14px;
+      border: .5px solid rgba(75,184,204,.35);
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .xp-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 17px;
+      background: var(--teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .xp-copy {
+      flex: 1;
+    }
+    .xp-copy strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A7A8C;
+    }
+    .xp-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(75,184,204,.25);
+      margin-top: 5px;
+      overflow: hidden;
+    }
+    .xp-fill {
+      height: 100%;
+      width: 52%;
+      background: var(--teal);
+      border-radius: 2px;
+    }
+    .bottom-actions {
+      margin-top: auto;
+      background: var(--card);
+      border-top: .5px solid var(--border);
+      padding: 10px 16px 24px;
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .ghost-btn,
+    .primary-btn {
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .ghost-btn {
+      flex: 1;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text);
+    }
+    .primary-btn {
+      flex: 2;
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(108,126,232,.35);
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">S-23 Post-Cardio Summary for Figma</h1>
+  <p class="page-subtitle">
+    This version stays close to the original <code>S-23-Post-Cardio-Summary.html</code>
+    and flattens the real state change into static frames for HTML-to-Figma import:
+    outdoor cardio with the route map and indoor cardio without the map.
+  </p>
+
+  <div class="storyboard">
+    <section class="frame-block">
+      <div class="frame-label">Outdoor Summary</div>
+      <div class="phone-shell">
+        <div class="island"></div>
+        <div class="phone-inner">
+          <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+              <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+            </div>
+          </div>
+
+          <div class="hero">
+            <div class="hero-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#fff"/></svg>
+            </div>
+            <div class="hero-title">Run Complete!</div>
+            <div class="hero-sub">Outdoor Run · Mon 11 May 2026</div>
+          </div>
+
+          <div class="content">
+            <div class="stats-grid">
+              <div class="stat-card"><div class="stat-val">5.34</div><div class="stat-unit">km</div><div class="stat-label">Distance</div></div>
+              <div class="stat-card"><div class="stat-val">26:48</div><div class="stat-unit">min</div><div class="stat-label">Duration</div></div>
+              <div class="stat-card"><div class="stat-val">5'01</div><div class="stat-unit">/ km</div><div class="stat-label">Avg Pace</div></div>
+              <div class="stat-card"><div class="stat-val">298</div><div class="stat-unit">kcal</div><div class="stat-label">Calories</div></div>
+            </div>
+
+            <div class="card route-map">
+              <div style="height:120px;background:#E8EDF0;position:relative;">
+                <svg width="100%" height="120" viewBox="0 0 360 120" style="display:block">
+                  <rect width="360" height="120" fill="#E8EDF0"/>
+                  <line x1="0" y1="40" x2="360" y2="40" stroke="#D4DAE0" stroke-width=".5"/>
+                  <line x1="0" y1="80" x2="360" y2="80" stroke="#D4DAE0" stroke-width=".5"/>
+                  <line x1="90" y1="0" x2="90" y2="120" stroke="#D4DAE0" stroke-width=".5"/>
+                  <line x1="180" y1="0" x2="180" y2="120" stroke="#D4DAE0" stroke-width=".5"/>
+                  <line x1="270" y1="0" x2="270" y2="120" stroke="#D4DAE0" stroke-width=".5"/>
+                  <path d="M30 70 L55 55 L85 60 L115 48 L140 58 L165 44 L190 55 L215 42 L240 52 L270 40 L300 50 L330 38" fill="none" stroke="#6C7EE8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="30" cy="70" r="5" fill="#10B981" stroke="#fff" stroke-width="1.5"/>
+                  <circle cx="330" cy="38" r="5" fill="#EF4444" stroke="#fff" stroke-width="1.5"/>
+                </svg>
+                <div style="position:absolute;bottom:6px;left:10px;display:flex;gap:12px;">
+                  <div style="display:flex;align-items:center;gap:4px;"><div style="width:8px;height:8px;border-radius:4px;background:#10B981;"></div><span style="font-size:9px;color:#8A8A9E;font-weight:600;">Start</span></div>
+                  <div style="display:flex;align-items:center;gap:4px;"><div style="width:8px;height:8px;border-radius:4px;background:#EF4444;"></div><span style="font-size:9px;color:#8A8A9E;font-weight:600;">Finish</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card section-card">
+              <div class="section-title">Elevation &amp; Splits</div>
+              <div class="metric-row">
+                <div><strong>+62m</strong><span>Elevation gain</span></div>
+                <div><strong>−34m</strong><span>Elevation loss</span></div>
+                <div><strong>182 spm</strong><span>Cadence</span></div>
+              </div>
+              <div class="subhead">Splits</div>
+              <div class="split-row"><div class="split-km">Km 1</div><div class="split-bar"><div class="split-fill" style="width:76%"></div></div><div class="split-pace">5:12</div></div>
+              <div class="split-row"><div class="split-km">Km 2</div><div class="split-bar"><div class="split-fill" style="width:64%"></div></div><div class="split-pace">5:24</div></div>
+              <div class="split-row"><div class="split-km">Km 3</div><div class="split-bar"><div class="split-fill" style="width:69%"></div></div><div class="split-pace">5:19</div></div>
+              <div class="split-row"><div class="split-km">Km 4</div><div class="split-bar"><div class="split-fill" style="width:82%"></div></div><div class="split-pace">5:08</div></div>
+              <div class="split-row"><div class="split-km">Km 5</div><div class="split-bar"><div class="split-fill" style="width:58%"></div></div><div class="split-pace">5:31</div></div>
+            </div>
+
+            <div class="card hr-card">
+              <div class="hr-head">
+                <div class="label">Heart Rate</div>
+                <div class="meta">Avg 148 bpm · Max 172</div>
+              </div>
+              <div style="height:80px;position:relative;overflow:hidden;border-radius:8px;">
+                <svg width="100%" height="80" viewBox="0 0 358 80" style="display:block">
+                  <rect x="0" y="0" width="358" height="20" fill="#EF444420"/>
+                  <rect x="0" y="20" width="358" height="20" fill="#F59E0B18"/>
+                  <rect x="0" y="40" width="358" height="20" fill="#6C7EE815"/>
+                  <rect x="0" y="60" width="358" height="20" fill="#4BB8CC12"/>
+                  <path d="M0 70 L30 55 L60 48 L90 40 L120 42 L150 38 L180 44 L210 36 L240 40 L270 35 L300 38 L330 32 L358 35" fill="none" stroke="#6C7EE8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M0 70 L30 55 L60 48 L90 40 L120 42 L150 38 L180 44 L210 36 L240 40 L270 35 L300 38 L330 32 L358 35 L358 80 L0 80 Z" fill="#6C7EE8" opacity=".08"/>
+                </svg>
+                <div style="position:absolute;top:1px;right:6px;font-size:9px;color:#EF4444;font-weight:700;">Z4</div>
+                <div style="position:absolute;top:21px;right:6px;font-size:9px;color:#F59E0B;font-weight:700;">Z3</div>
+                <div style="position:absolute;top:41px;right:6px;font-size:9px;color:#6C7EE8;font-weight:700;">Z2</div>
+                <div style="position:absolute;top:61px;right:6px;font-size:9px;color:#4BB8CC;font-weight:700;">Z1</div>
+              </div>
+            </div>
+
+            <div class="coach-card">
+              <div class="coach-head">
+                <div class="coach-mark">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"/></svg>
+                </div>
+                <div class="coach-name">WiseCoach</div>
+              </div>
+              <div class="coach-copy">Strong run — your pace was 12 seconds faster per km than last week's 5k. Zone 3 time improved too. Consider adding strides to your next easy run to build speed without adding stress.</div>
+            </div>
+
+            <div class="xp-banner">
+              <div class="xp-mark">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.2L12 16.5l-6.2 4.4 2.4-7.2L2 9.2h7.6L12 2z" fill="#fff"/></svg>
+              </div>
+              <div class="xp-copy">
+                <strong>+180 XP earned!</strong>
+                <div class="xp-bar"><div class="xp-fill"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bottom-actions">
+            <div class="ghost-btn">Share</div>
+            <div class="primary-btn">Done</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Indoor Summary</div>
+      <div class="phone-shell">
+        <div class="island"></div>
+        <div class="phone-inner">
+          <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+              <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+            </div>
+          </div>
+
+          <div class="hero">
+            <div class="hero-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#fff"/></svg>
+            </div>
+            <div class="hero-title">Session Complete!</div>
+            <div class="hero-sub">Indoor Bike · Mon 11 May 2026</div>
+          </div>
+
+          <div class="content">
+            <div class="stats-grid">
+              <div class="stat-card"><div class="stat-val">14.8</div><div class="stat-unit">km</div><div class="stat-label">Distance</div></div>
+              <div class="stat-card"><div class="stat-val">32:10</div><div class="stat-unit">min</div><div class="stat-label">Duration</div></div>
+              <div class="stat-card"><div class="stat-val">27.6</div><div class="stat-unit">km/h</div><div class="stat-label">Avg Speed</div></div>
+              <div class="stat-card"><div class="stat-val">342</div><div class="stat-unit">kcal</div><div class="stat-label">Calories</div></div>
+            </div>
+
+            <div class="card section-card">
+              <div class="section-title">Session Details</div>
+              <div class="metric-row">
+                <div><strong>Hard</strong><span>Effort</span></div>
+                <div><strong>148 bpm</strong><span>Avg HR</span></div>
+                <div><strong>91 rpm</strong><span>Cadence</span></div>
+              </div>
+              <div class="metric-row no-border">
+                <div><strong>430 mL</strong><span>Hydration</span></div>
+                <div><strong>7 / 10</strong><span>RPE</span></div>
+                <div><strong>Bike</strong><span>Equipment</span></div>
+              </div>
+            </div>
+
+            <div class="card hr-card">
+              <div class="hr-head">
+                <div class="label">Heart Rate</div>
+                <div class="meta">Avg 148 bpm · Max 166</div>
+              </div>
+              <div style="height:80px;position:relative;overflow:hidden;border-radius:8px;">
+                <svg width="100%" height="80" viewBox="0 0 358 80" style="display:block">
+                  <rect x="0" y="0" width="358" height="20" fill="#EF444420"/>
+                  <rect x="0" y="20" width="358" height="20" fill="#F59E0B18"/>
+                  <rect x="0" y="40" width="358" height="20" fill="#6C7EE815"/>
+                  <rect x="0" y="60" width="358" height="20" fill="#4BB8CC12"/>
+                  <path d="M0 58 L30 54 L60 46 L90 39 L120 34 L150 29 L180 31 L210 28 L240 33 L270 37 L300 43 L330 46 L358 44" fill="none" stroke="#6C7EE8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M0 58 L30 54 L60 46 L90 39 L120 34 L150 29 L180 31 L210 28 L240 33 L270 37 L300 43 L330 46 L358 44 L358 80 L0 80 Z" fill="#6C7EE8" opacity=".08"/>
+                </svg>
+                <div style="position:absolute;top:1px;right:6px;font-size:9px;color:#EF4444;font-weight:700;">Z4</div>
+                <div style="position:absolute;top:21px;right:6px;font-size:9px;color:#F59E0B;font-weight:700;">Z3</div>
+                <div style="position:absolute;top:41px;right:6px;font-size:9px;color:#6C7EE8;font-weight:700;">Z2</div>
+                <div style="position:absolute;top:61px;right:6px;font-size:9px;color:#4BB8CC;font-weight:700;">Z1</div>
+              </div>
+            </div>
+
+            <div class="coach-card">
+              <div class="coach-head">
+                <div class="coach-mark">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"/></svg>
+                </div>
+                <div class="coach-name">WiseCoach</div>
+              </div>
+              <div class="coach-copy">Solid aerobic work. You held a steady threshold effort without drifting too far into Zone 4. Keep one indoor cardio day like this each week to support your running volume.</div>
+            </div>
+
+            <div class="xp-banner">
+              <div class="xp-mark">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.2L12 16.5l-6.2 4.4 2.4-7.2L2 9.2h7.6L12 2z" fill="#fff"/></svg>
+              </div>
+              <div class="xp-copy">
+                <strong>+140 XP earned!</strong>
+                <div class="xp-bar"><div class="xp-fill" style="width:44%"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bottom-actions">
+            <div class="ghost-btn">Share</div>
+            <div class="primary-btn">Done</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

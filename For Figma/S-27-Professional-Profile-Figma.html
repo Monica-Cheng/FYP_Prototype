@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiseWorkout · S-27 Professional Profile · For Figma</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F7F8FF;
+      --canvas: #EDEEF5;
+      --card: #FFFFFF;
+      --elevated: #EEF0FB;
+      --primary: #6C7EE8;
+      --primary-dark: #2D3A8C;
+      --lavender: #9B84E8;
+      --lavender-bg: #F0EEFE;
+      --teal: #4BB8CC;
+      --text: #3D3D5C;
+      --text-sec: #8A8A9E;
+      --border: #C8C8D8;
+      --chip-bg: #E6EAFE;
+      --shadow: 0 2px 8px rgba(45,58,140,.06);
+      --frame-shadow: 0 30px 70px rgba(20,25,60,.20), 0 0 0 1px rgba(0,0,0,.12);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      padding: 48px 40px 64px;
+    }
+    .page-title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.04em;
+    }
+    .page-subtitle {
+      margin: 0 0 32px;
+      color: var(--text-sec);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 980px;
+    }
+    .storyboard {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .frame-block {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    .frame-label {
+      font-size: 12px;
+      color: #6B6B80;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      font-weight: 700;
+      text-align: center;
+    }
+    .phone-shell {
+      width: 390px;
+      border-radius: 52px;
+      background: #0A0A12;
+      padding: 5px;
+      box-shadow: var(--frame-shadow);
+      position: relative;
+    }
+    .phone-inner {
+      width: 100%;
+      border-radius: 47px;
+      overflow: hidden;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 844px;
+    }
+    .island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 33px;
+      border-radius: 20px;
+      background: #000;
+      z-index: 60;
+      pointer-events: none;
+    }
+    .status-bar {
+      height: 47px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+    .status-time, .status-icons { padding-top: 10px; }
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 16px 16px;
+      flex-shrink: 0;
+    }
+    .back-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 22px;
+      background: rgba(61,61,92,.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .top-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .content {
+      flex: 1;
+      padding: 0 16px 148px;
+      display: flex;
+      flex-direction: column;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      border: .5px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 18px 18px;
+      margin-bottom: 14px;
+    }
+    .hero-card {
+      border-radius: 20px;
+      padding: 22px 16px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .hero-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 40px;
+      background: #6C7EE8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 20px rgba(108,126,232,.33);
+    }
+    .hero-avatar span {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .hero-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -.3px;
+      margin-bottom: 4px;
+    }
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .hero-type {
+      font-size: 13px;
+      font-weight: 700;
+      color: #6C7EE8;
+    }
+    .verified {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      background: #D1FAE5;
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 10px;
+      font-weight: 800;
+      color: #059669;
+      letter-spacing: .2px;
+    }
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--text-sec);
+      font-weight: 500;
+      justify-content: center;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-sec);
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .body-copy {
+      font-size: 13.5px;
+      color: var(--text);
+      line-height: 1.65;
+      white-space: pre-line;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .chip {
+      padding: 8px 18px;
+      border-radius: 22px;
+      background: var(--chip-bg);
+      border: .5px solid rgba(108,126,232,.18);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+    .cert-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cert-card {
+      background: var(--bg);
+      border-radius: 18px;
+      border: .5px solid var(--border);
+      padding: 18px 16px;
+    }
+    .cert-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .cert-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--chip-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .cert-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .cert-body {
+      font-size: 12px;
+      color: var(--text-sec);
+      margin-bottom: 8px;
+    }
+    .cert-expiry {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--text-sec);
+      font-weight: 600;
+    }
+    .note {
+      background: var(--lavender-bg);
+      border-radius: 16px;
+      border: .5px solid rgba(155,132,232,.25);
+      padding: 16px 16px;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .note-copy {
+      font-size: 12px;
+      color: #5B3F9E;
+      line-height: 1.6;
+    }
+    .contact-wrap {
+      position: absolute;
+      bottom: 84px;
+      left: 0;
+      right: 0;
+      padding: 12px 16px 18px;
+      background: var(--card);
+      border-top: .5px solid var(--border);
+      z-index: 20;
+    }
+    .contact-btn {
+      width: 100%;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--primary);
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      box-shadow: 0 4px 16px rgba(108,126,232,.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 84px;
+      background: var(--card);
+      border-top: .5px solid #E8EAF8;
+      display: flex;
+      z-index: 30;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding-bottom: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-sec);
+    }
+    .nav-item svg {
+      display: block;
+    }
+    .nav-item.active {
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">S-27 Professional Profile for Figma</h1>
+  <p class="page-subtitle">
+    This version stays close to <code>S-27-Professional-Profile.html</code> and
+    preserves it as a single long profile-detail frame, since the original screen
+    does not expose meaningful alternate UI states beyond scrolling.
+  </p>
+
+  <div class="storyboard">
+    <section class="frame-block">
+      <div class="frame-label">Professional Profile Detail</div>
+      <div class="phone-shell">
+        <div class="island"></div>
+        <div class="phone-inner">
+          <div class="status-bar">
+            <div class="status-time">9:41</div>
+            <div class="status-icons">
+              <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+              <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+            </div>
+          </div>
+
+          <div class="topbar">
+            <div class="back-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#3D3D5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="top-title">Sarah Lim</div>
+          </div>
+
+          <div class="content">
+            <div class="card hero-card">
+              <div class="hero-avatar"><span>SL</span></div>
+              <div class="hero-name">Sarah Lim</div>
+              <div class="hero-meta">
+                <div class="hero-type">Personal Trainer</div>
+                <div class="verified">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-9" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span>Verified</span>
+                </div>
+              </div>
+              <div class="location">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="12" cy="9" r="2.5" stroke="#8A8A9E" stroke-width="1.5"/></svg>
+                <span>Central &amp; East Singapore · Online sessions available</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-title">About</div>
+              <div class="body-copy">I specialise in strength training and body recomposition for beginners and intermediate athletes. With 8 years of coaching experience across commercial gyms and private settings, I help clients build sustainable habits, improve their form, and reach their physique goals safely.
+
+My sessions are tailored to your schedule and current fitness level. I work with clients dealing with minor injuries and can design programmes around limitations while keeping progress moving forward.</div>
+            </div>
+
+            <div class="card">
+              <div class="section-title">Services</div>
+              <div class="chips">
+                <div class="chip">Strength training</div>
+                <div class="chip">Body recomposition</div>
+                <div class="chip">Beginner programming</div>
+                <div class="chip">Form coaching</div>
+                <div class="chip">Nutrition guidance (basic)</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-title">Certifications</div>
+              <div class="cert-list">
+                <div class="cert-card">
+                  <div class="cert-row">
+                    <div class="cert-icon">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.2L12 16.5l-6.2 4.4 2.4-7.2L2 9.2h7.6L12 2z" fill="#6C7EE8"/></svg>
+                    </div>
+                    <div>
+                      <div class="cert-name">NASM Certified Personal Trainer (CPT)</div>
+                      <div class="cert-body">National Academy of Sports Medicine</div>
+                      <div class="cert-expiry">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="3" stroke="#8A8A9E" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 9h18" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        <span>Expires Dec 2026</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cert-card">
+                  <div class="cert-row">
+                    <div class="cert-icon">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.2L12 16.5l-6.2 4.4 2.4-7.2L2 9.2h7.6L12 2z" fill="#6C7EE8"/></svg>
+                    </div>
+                    <div>
+                      <div class="cert-name">CrossFit Level 2 Trainer</div>
+                      <div class="cert-body">CrossFit Inc.</div>
+                      <div class="cert-expiry">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="3" stroke="#8A8A9E" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 9h18" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        <span>Expires Mar 2025</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cert-card">
+                  <div class="cert-row">
+                    <div class="cert-icon">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.2L12 16.5l-6.2 4.4 2.4-7.2L2 9.2h7.6L12 2z" fill="#6C7EE8"/></svg>
+                    </div>
+                    <div>
+                      <div class="cert-name">First Aid &amp; CPR</div>
+                      <div class="cert-body">Singapore Red Cross</div>
+                      <div class="cert-expiry">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="3" stroke="#8A8A9E" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 9h18" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        <span>Expires Aug 2026</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="note">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="9" stroke="#9B84E8" stroke-width="1.5"/><path d="M12 8v5M12 16v.5" stroke="#9B84E8" stroke-width="2" stroke-linecap="round"/></svg>
+              <div class="note-copy">Contacting opens your email app. Booking and payments are handled directly between you and the professional.</div>
+            </div>
+          </div>
+
+          <div class="contact-wrap">
+            <div class="contact-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#fff" stroke-width="1.8"/><polyline points="22,6 12,13 2,6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <span>Contact Sarah Lim</span>
+            </div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill="#8A8A9E"/></svg>
+              <span>Home</span>
+            </div>
+            <div class="nav-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="20" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill="#8A8A9E"/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill="#8A8A9E"/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill="#8A8A9E"/></svg>
+              <span>Plans</span>
+            </div>
+            <div class="nav-item active">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="#6C7EE8" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              <span>Coach</span>
+            </div>
+            <div class="nav-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#8A8A9E" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span>Club</span>
+            </div>
+            <div class="nav-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <span>Progress</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

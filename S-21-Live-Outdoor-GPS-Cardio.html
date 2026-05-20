@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WiseWorkout · S-21 Live Outdoor GPS Cardio</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #edeef5;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+      }
+      .stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+      }
+      .label {
+        font-size: 12px;
+        color: #6b6b80;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .phone-shell {
+        width: 390px;
+        height: 844px;
+        border-radius: 52px;
+        background: #0a0a12;
+        padding: 5px;
+        box-shadow:
+          0 30px 70px rgba(20, 25, 60, 0.2),
+          0 0 0 1px rgba(0, 0, 0, 0.12);
+        position: relative;
+        box-sizing: content-box;
+      }
+      .phone-inner {
+        width: 390px;
+        height: 844px;
+        border-radius: 47px;
+        overflow: hidden;
+        background: #e8edf0;
+        position: relative;
+      }
+      .island {
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 118px;
+        height: 33px;
+        border-radius: 20px;
+        background: #000;
+        z-index: 60;
+        pointer-events: none;
+      }
+      .tweaks-panel {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 240px;
+        background: #fff;
+        border-radius: 14px;
+        padding: 14px 16px 16px;
+        box-shadow:
+          0 10px 40px rgba(20, 25, 60, 0.18),
+          0 0 0 0.5px rgba(0, 0, 0, 0.08);
+        color: #3d3d5c;
+        display: none;
+        z-index: 100;
+      }
+      .tweaks-panel.open {
+        display: block;
+      }
+      .tweaks-panel h3 {
+        margin: 0 0 10px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: #8a8a9e;
+      }
+      .tweak-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
+        gap: 10px;
+      }
+      .tweak-row label {
+        font-size: 13px;
+        color: #3d3d5c;
+        flex: 1;
+      }
+      .tweak-row input[type="checkbox"] {
+        accent-color: #6c7ee8;
+      }
+      @keyframes locPulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.5);
+          opacity: 0.3;
+        }
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="label">S-21 · Live Outdoor GPS Cardio</div>
+      <div class="phone-shell">
+        <div class="island"></div>
+        <div class="phone-inner" id="app"></div>
+      </div>
+    </div>
+    <div class="tweaks-panel" id="tweaks">
+      <h3>State</h3>
+      <div class="tweak-row">
+        <label>GPS lost</label><input type="checkbox" id="tw-gps-lost" />
+      </div>
+      <div class="tweak-row">
+        <label>Paused</label><input type="checkbox" id="tw-paused" />
+      </div>
+      <div class="tweak-row">
+        <label>Stop modal</label><input type="checkbox" id="tw-stop" />
+      </div>
+    </div>
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/babel">
+      const WW = {
+        card: "#FFFFFF",
+        primary: "#6C7EE8",
+        primaryDark: "#2D3A8C",
+        teal: "#4BB8CC",
+        text: "#3D3D5C",
+        textSec: "#8A8A9E",
+        border: "#C8C8D8",
+        chipBg: "#E6EAFE",
+      };
+
+      const ROUTE_POINTS = [
+        [80, 260],
+        [100, 240],
+        [130, 225],
+        [155, 230],
+        [175, 215],
+        [195, 225],
+        [215, 210],
+        [235, 220],
+        [250, 205],
+        [265, 215],
+        [280, 200],
+        [295, 210],
+      ];
+
+      function App() {
+        const [elapsed, setElapsed] = React.useState(1245);
+        const [gpsLost, setGpsLost] = React.useState(false);
+        const [paused, setPaused] = React.useState(false);
+        const [showStop, setShowStop] = React.useState(false);
+        const [locked, setLocked] = React.useState(false);
+
+        React.useEffect(() => {
+          if (paused) return;
+          const t = setInterval(() => setElapsed((s) => s + 1), 1000);
+          return () => clearInterval(t);
+        }, [paused]);
+
+        React.useEffect(() => {
+          ["tw-gps-lost", "tw-paused", "tw-stop"].forEach((id) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (id === "tw-gps-lost")
+              el.addEventListener("change", (e) =>
+                setGpsLost(e.target.checked),
+              );
+            if (id === "tw-paused")
+              el.addEventListener("change", (e) => setPaused(e.target.checked));
+            if (id === "tw-stop")
+              el.addEventListener("change", (e) =>
+                setShowStop(e.target.checked),
+              );
+          });
+          const panel = document.getElementById("tweaks");
+          if (panel) panel.style.display = "none";
+          const btn = document.createElement("button");
+          btn.textContent = "⚙";
+          btn.style.cssText =
+            "position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:22px;background:#6C7EE8;color:#fff;border:none;font-size:20px;cursor:pointer;z-index:200;box-shadow:0 4px 12px rgba(108,126,232,.4)";
+          btn.onclick = () => panel?.classList.toggle("open");
+          document.body.appendChild(btn);
+        }, []);
+
+        const fmt = (s) => {
+          const h = Math.floor(s / 3600),
+            m = Math.floor((s % 3600) / 60),
+            sec = s % 60;
+          return `${h > 0 ? String(h).padStart(2, "0") + ":" : ""}${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+        };
+
+        const routePath = ROUTE_POINTS.map(
+          (p, i) => `${i === 0 ? "M" : "L"}${p[0]} ${p[1]}`,
+        ).join(" ");
+        const lastPt = ROUTE_POINTS[ROUTE_POINTS.length - 1];
+
+        const distKm = 2.34;
+        const pace = "5:19";
+        const hr = 152;
+        const hrZone = 3;
+        const hrColor = ["#4BB8CC", "#6C7EE8", "#F59E0B", "#EF4444"][
+          hrZone - 1
+        ];
+
+        return (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            {/* Map — top 55% */}
+            <div
+              style={{
+                height: "55%",
+                position: "relative",
+                background: "#E8EDF0",
+                flexShrink: 0,
+              }}
+            >
+              {/* Map grid */}
+              <svg
+                width="390"
+                height="100%"
+                viewBox="0 0 390 465"
+                style={{ position: "absolute", inset: 0, display: "block" }}
+              >
+                <rect width="390" height="465" fill="#E8EDF0" />
+                {[60, 120, 180, 240, 300, 360, 420].map((y) => (
+                  <line
+                    key={y}
+                    x1="0"
+                    y1={y}
+                    x2="390"
+                    y2={y}
+                    stroke="#D4DAE0"
+                    strokeWidth=".5"
+                  />
+                ))}
+                {[65, 130, 195, 260, 325].map((x) => (
+                  <line
+                    key={x}
+                    x1={x}
+                    y1="0"
+                    x2={x}
+                    y2="465"
+                    stroke="#D4DAE0"
+                    strokeWidth=".5"
+                  />
+                ))}
+                {/* Roads */}
+                <path
+                  d="M0 200 Q150 180 390 220"
+                  fill="none"
+                  stroke="#D0D6DA"
+                  strokeWidth="10"
+                />
+                <path
+                  d="M195 0 Q200 200 195 465"
+                  fill="none"
+                  stroke="#D0D6DA"
+                  strokeWidth="8"
+                />
+                <path
+                  d="M0 350 Q200 340 390 360"
+                  fill="none"
+                  stroke="#D0D6DA"
+                  strokeWidth="7"
+                />
+                {/* Route trace */}
+                <path
+                  d={routePath}
+                  fill="none"
+                  stroke={WW.primary}
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity={gpsLost ? 0.6 : 1}
+                />
+                {/* Start dot */}
+                <circle
+                  cx={ROUTE_POINTS[0][0]}
+                  cy={ROUTE_POINTS[0][1]}
+                  r="5"
+                  fill="#10B981"
+                />
+                {/* Current location */}
+                {!gpsLost && (
+                  <>
+                    <circle
+                      cx={lastPt[0]}
+                      cy={lastPt[1]}
+                      r="12"
+                      fill={WW.primary}
+                      opacity=".2"
+                      style={{ animation: "locPulse 2s infinite" }}
+                    />
+                    <circle
+                      cx={lastPt[0]}
+                      cy={lastPt[1]}
+                      r="7"
+                      fill={WW.primary}
+                      stroke="#fff"
+                      strokeWidth="2"
+                    />
+                  </>
+                )}
+              </svg>
+
+              {/* Status bar overlay */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 47,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "0 28px",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: WW.text,
+                }}
+              >
+                <div style={{ paddingTop: 10 }}>9:41</div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 6,
+                    alignItems: "center",
+                    paddingTop: 10,
+                  }}
+                >
+                  <svg width="17" height="11" viewBox="0 0 17 11">
+                    <rect
+                      x="0"
+                      y="7"
+                      width="3"
+                      height="4"
+                      rx=".6"
+                      fill={WW.text}
+                    />
+                    <rect
+                      x="4.5"
+                      y="5"
+                      width="3"
+                      height="6"
+                      rx=".6"
+                      fill={WW.text}
+                    />
+                    <rect
+                      x="9"
+                      y="2.5"
+                      width="3"
+                      height="8.5"
+                      rx=".6"
+                      fill={WW.text}
+                    />
+                    <rect
+                      x="13.5"
+                      y="0"
+                      width="3"
+                      height="11"
+                      rx=".6"
+                      fill={WW.text}
+                    />
+                  </svg>
+                  <svg width="24" height="11" viewBox="0 0 24 11">
+                    <rect
+                      x=".5"
+                      y=".5"
+                      width="20"
+                      height="10"
+                      rx="3"
+                      stroke={WW.text}
+                      strokeOpacity=".4"
+                      fill="none"
+                    />
+                    <rect
+                      x="2"
+                      y="2"
+                      width="17"
+                      height="7"
+                      rx="1.5"
+                      fill={WW.text}
+                    />
+                    <rect
+                      x="21"
+                      y="3.5"
+                      width="1.5"
+                      height="4"
+                      rx=".5"
+                      fill={WW.text}
+                      opacity=".4"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              {/* GPS pill */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 56,
+                  left: 14,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  background: "rgba(255,255,255,.9)",
+                  backdropFilter: "blur(8px)",
+                  borderRadius: 20,
+                  padding: "5px 10px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,.12)",
+                }}
+              >
+                <div
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: 4,
+                    background: gpsLost ? "#F59E0B" : "#10B981",
+                  }}
+                />
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: gpsLost ? "#D97706" : "#059669",
+                  }}
+                >
+                  {gpsLost ? "GPS lost" : "GPS ready"}
+                </div>
+              </div>
+
+              {/* Lock button */}
+              <button
+                onClick={() => setLocked((l) => !l)}
+                style={{
+                  position: "absolute",
+                  top: 56,
+                  right: 14,
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  background: "rgba(255,255,255,.9)",
+                  border: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  boxShadow: "0 2px 8px rgba(0,0,0,.12)",
+                }}
+              >
+                {locked ? (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <rect
+                      x="5"
+                      y="11"
+                      width="14"
+                      height="10"
+                      rx="2"
+                      stroke={WW.primary}
+                      strokeWidth="1.8"
+                    />
+                    <path
+                      d="M8 11V7a4 4 0 018 0v4"
+                      stroke={WW.primary}
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                ) : (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <rect
+                      x="5"
+                      y="11"
+                      width="14"
+                      height="10"
+                      rx="2"
+                      stroke={WW.textSec}
+                      strokeWidth="1.8"
+                    />
+                    <path
+                      d="M8 11V7a4 4 0 018 0"
+                      stroke={WW.textSec}
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                )}
+              </button>
+
+              {/* GPS lost banner */}
+              {gpsLost && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    background: "rgba(245,158,11,.92)",
+                    padding: "8px 16px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    animation: "fadeUp .3s ease",
+                  }}
+                >
+                  <span style={{ fontSize: 16 }}>⚠️</span>
+                  <div
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: "#fff",
+                      flex: 1,
+                    }}
+                  >
+                    GPS signal lost — timer continues, distance paused.
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Stats panel — bottom 45% */}
+            <div
+              style={{
+                flex: 1,
+                background: WW.card,
+                boxShadow: "0 -4px 20px rgba(0,0,0,.12)",
+                display: "flex",
+                flexDirection: "column",
+                padding: "0 0 24px",
+              }}
+            >
+              {/* Elapsed time */}
+              <div style={{ textAlign: "center", padding: "16px 16px 8px" }}>
+                <div
+                  style={{
+                    fontSize: 46,
+                    fontWeight: 800,
+                    color: WW.text,
+                    letterSpacing: "-2px",
+                    fontVariantNumeric: "tabular-nums",
+                    lineHeight: 1,
+                  }}
+                >
+                  {fmt(elapsed)}
+                </div>
+                {paused && (
+                  <div
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: "#F59E0B",
+                      marginTop: 4,
+                    }}
+                  >
+                    PAUSED
+                  </div>
+                )}
+              </div>
+
+              {/* Stats row */}
+              <div
+                style={{
+                  display: "flex",
+                  padding: "8px 16px 12px",
+                  borderBottom: `0.5px solid #E8EAF8`,
+                }}
+              >
+                {[
+                  { label: "Distance", val: `${distKm} km` },
+                  { label: "Pace", val: `${pace}/km` },
+                  {
+                    label: "Heart Rate",
+                    val: `${hr} bpm`,
+                    extra: (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 3,
+                          marginTop: 2,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 7,
+                            height: 7,
+                            borderRadius: 4,
+                            background: hrColor,
+                          }}
+                        />
+                        <div
+                          style={{
+                            fontSize: 10,
+                            color: hrColor,
+                            fontWeight: 700,
+                          }}
+                        >
+                          Zone {hrZone}
+                        </div>
+                      </div>
+                    ),
+                  },
+                ].map((s) => (
+                  <div key={s.label} style={{ flex: 1, textAlign: "center" }}>
+                    <div
+                      style={{
+                        fontSize: 20,
+                        fontWeight: 800,
+                        color: WW.text,
+                        letterSpacing: "-.5px",
+                      }}
+                    >
+                      {s.val}
+                    </div>
+                    {s.extra}
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: WW.textSec,
+                        fontWeight: 600,
+                        marginTop: 2,
+                      }}
+                    >
+                      {s.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Controls */}
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 28,
+                  padding: "0 16px",
+                }}
+              >
+                {/* Pause */}
+                <button
+                  onClick={() => setPaused((p) => !p)}
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    background: "rgba(108,126,232,.1)",
+                    border: `2px solid ${WW.primary}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  {paused ? (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M8 5l11 7-11 7V5z" fill={WW.primary} />
+                    </svg>
+                  ) : (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <rect
+                        x="6"
+                        y="4"
+                        width="4"
+                        height="16"
+                        rx="2"
+                        fill={WW.primary}
+                      />
+                      <rect
+                        x="14"
+                        y="4"
+                        width="4"
+                        height="16"
+                        rx="2"
+                        fill={WW.primary}
+                      />
+                    </svg>
+                  )}
+                </button>
+
+                {/* Stop */}
+                <button
+                  onClick={() => setShowStop(true)}
+                  style={{
+                    width: 72,
+                    height: 72,
+                    borderRadius: 36,
+                    background: "#EF4444",
+                    border: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 16px rgba(239,68,68,.4)",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 22,
+                      height: 22,
+                      borderRadius: 4,
+                      background: "#fff",
+                    }}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Stop confirmation modal */}
+            {showStop && (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "rgba(10,10,18,.55)",
+                  display: "flex",
+                  alignItems: "flex-end",
+                  zIndex: 50,
+                }}
+                onClick={() => setShowStop(false)}
+              >
+                <div
+                  style={{
+                    width: "100%",
+                    background: WW.card,
+                    borderRadius: "20px 20px 0 0",
+                    padding: "20px 20px 40px",
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div
+                    style={{
+                      width: 36,
+                      height: 4,
+                      borderRadius: 2,
+                      background: "#E8EAF8",
+                      margin: "0 auto 16px",
+                    }}
+                  />
+                  <div
+                    style={{
+                      fontSize: 17,
+                      fontWeight: 800,
+                      color: WW.text,
+                      marginBottom: 6,
+                    }}
+                  >
+                    End session?
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: WW.textSec,
+                      lineHeight: 1.5,
+                      marginBottom: 16,
+                    }}
+                  >
+                    You've run {distKm} km in {fmt(elapsed)}. Your progress will
+                    be saved.
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      onClick={() => setShowStop(false)}
+                      style={{
+                        flex: 1,
+                        height: 46,
+                        borderRadius: 12,
+                        border: `1.5px solid #E8EAF8`,
+                        background: "transparent",
+                        color: WW.text,
+                        fontSize: 14,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Keep Going
+                    </button>
+                    <a
+                      href="S-23b-Save-Activity.html"
+                      style={{
+                        flex: 1,
+                        height: 46,
+                        borderRadius: 12,
+                        background: "#EF4444",
+                        border: "none",
+                        color: "#fff",
+                        fontSize: 14,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textDecoration: "none",
+                      }}
+                    >
+                      End Run
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+    </script>
+  </body>
+</html>

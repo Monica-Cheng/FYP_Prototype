@@ -1,0 +1,314 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-20 Cardio Setup</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  .tweaks-panel{position:fixed;bottom:20px;right:20px;width:240px;background:#fff;border-radius:14px;padding:14px 16px 16px;box-shadow:0 10px 40px rgba(20,25,60,.18),0 0 0 .5px rgba(0,0,0,.08);color:#3D3D5C;display:none;z-index:100}
+  .tweaks-panel.open{display:block}.tweaks-panel h3{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:#8A8A9E}
+  .tweak-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:10px}
+  .tweak-row label{font-size:13px;color:#3D3D5C;flex:1}.tweak-row input[type="checkbox"]{accent-color:#6C7EE8}
+  @keyframes gpsPulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @keyframes countPop{0%{transform:scale(1.4);opacity:0}40%{opacity:1}80%{transform:scale(1);opacity:1}100%{transform:scale(0.8);opacity:0}}
+  @keyframes goAnim{0%{transform:scale(0.6);opacity:0}50%{transform:scale(1.1);opacity:1}100%{transform:scale(1);opacity:1}}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-20 · Cardio Setup (Bottom Sheet)</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<div class="tweaks-panel" id="tweaks">
+  <h3>State</h3>
+  <div class="tweak-row"><label>GPS ready</label><input type="checkbox" id="tw-gps" checked/></div>
+  <div class="tweak-row"><label>Wearable connected</label><input type="checkbox" id="tw-hr"/></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+const ACTIVITIES=[
+  {id:'run',label:'Run',lastUsed:true,
+    icon:c=><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="4" r="2" fill={c}/><path d="M9 9.5l1.5-3.5 3.5 2 2 4H9zM7.5 14l1.5-4.5m4.5.5l1.5 5.5-3.5 2L9.5 21" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    grad:'linear-gradient(145deg,#1A6B7C 0%,#4BB8CC 100%)',destOutdoor:'S-21-Live-Outdoor-GPS-Cardio.html',destIndoor:'S-22-Indoor-Cardio-Logging.html'},
+  {id:'walk',label:'Walk',lastUsed:false,
+    icon:c=><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="4" r="2" fill={c}/><path d="M8 12l1.5-4 4 2 2 5M9.5 20l1-4m4-3.5l1.5 5-3 1" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    grad:'linear-gradient(145deg,#166534 0%,#22C55E 100%)',destOutdoor:'S-21-Live-Outdoor-GPS-Cardio.html',destIndoor:'S-22-Indoor-Cardio-Logging.html'},
+  {id:'cycle',label:'Cycle',lastUsed:false,
+    icon:c=><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="15" r="4" stroke={c} strokeWidth="1.6"/><circle cx="18" cy="15" r="4" stroke={c} strokeWidth="1.6"/><path d="M6 15l5-8h3l2 8M14 7l1.5 4" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    grad:'linear-gradient(145deg,#5B3F9E 0%,#9B84E8 100%)',destOutdoor:'S-21-Live-Outdoor-GPS-Cardio.html',destIndoor:'S-22-Indoor-Cardio-Logging.html'},
+];
+
+function StatusBar(){
+  return(
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:'rgba(255,255,255,0.8)',flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="rgba(255,255,255,0.8)"/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="rgba(255,255,255,0.4)" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="rgba(255,255,255,0.8)"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="rgba(255,255,255,0.4)"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function MapPreview({gpsReady}){
+  const pts=[[20,55],[45,42],[72,47],[100,35],[128,44],[155,38],[182,48],[210,35],[238,42]];
+  const path=pts.map((p,i)=>`${i===0?'M':'L'}${p[0]} ${p[1]}`).join(' ');
+  const last=pts[pts.length-1];
+  return(
+    <div style={{borderRadius:12,overflow:'hidden',height:80,background:'#E8EDF0',position:'relative',border:`0.5px solid ${WW.border}`}}>
+      <svg width="100%" height="80" viewBox="0 0 260 80" style={{display:'block'}}>
+        <rect width="260" height="80" fill="#E8EDF0"/>
+        {[25,50].map(y=><line key={y} x1="0" y1={y} x2="260" y2={y} stroke="#D4DAE0" strokeWidth=".5"/>)}
+        {[65,130,195].map(x=><line key={x} x1={x} y1="0" x2={x} y2="80" stroke="#D4DAE0" strokeWidth=".5"/>)}
+        <path d="M0 50 Q130 40 260 55" fill="none" stroke="#D0D6DA" strokeWidth="8"/>
+        <path d="M130 0 L130 80" fill="none" stroke="#D0D6DA" strokeWidth="6"/>
+        <path d={path} fill="none" stroke={WW.teal} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <circle cx={pts[0][0]} cy={pts[0][1]} r="4" fill="#10B981" stroke="#fff" strokeWidth="1.5"/>
+        {gpsReady&&<>
+          <circle cx={last[0]} cy={last[1]} r="9" fill={WW.teal} opacity=".25" style={{animation:'gpsPulse 1.8s ease-in-out infinite'}}/>
+          <circle cx={last[0]} cy={last[1]} r="5" fill={WW.teal} stroke="#fff" strokeWidth="1.5"/>
+        </>}
+      </svg>
+      <div style={{position:'absolute',bottom:5,right:8,fontSize:9,color:WW.textSec,fontWeight:600,background:'rgba(255,255,255,0.85)',borderRadius:6,padding:'1px 5px'}}>📍 Current location</div>
+    </div>
+  );
+}
+
+function App(){
+  const [activity,setActivity]=React.useState('run');
+  const [mode,setMode]=React.useState('outdoor');
+  const [goalOpen,setGoalOpen]=React.useState(false);
+  const [goalType,setGoalType]=React.useState('distance');
+  const [goalVal,setGoalVal]=React.useState('');
+  const [gpsReady,setGpsReady]=React.useState(true);
+  const [hasHR,setHasHR]=React.useState(false);
+  const [audioCues,setAudioCues]=React.useState(true);
+  const [autoPause,setAutoPause]=React.useState(false);
+  const [countdown,setCountdown]=React.useState(null);
+  const timerRef=React.useRef(null);
+
+  React.useEffect(()=>{
+    const gEl=document.getElementById('tw-gps');
+    const hEl=document.getElementById('tw-hr');
+    if(gEl){gEl.checked=true;gEl.addEventListener('change',e=>setGpsReady(e.target.checked));}
+    if(hEl)hEl.addEventListener('change',e=>setHasHR(e.target.checked));
+    const panel=document.getElementById('tweaks');
+    if(panel)panel.style.display='none';
+    const btn=document.createElement('button');
+    btn.textContent='⚙';btn.style.cssText='position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:22px;background:#6C7EE8;color:#fff;border:none;font-size:20px;cursor:pointer;z-index:200;box-shadow:0 4px 12px rgba(108,126,232,.4)';
+    btn.onclick=()=>panel?.classList.toggle('open');document.body.appendChild(btn);
+    return()=>{if(timerRef.current)clearInterval(timerRef.current);};
+  },[]);
+
+  const act=ACTIVITIES.find(a=>a.id===activity)||ACTIVITIES[0];
+  const dest=mode==='outdoor'?act.destOutdoor:act.destIndoor;
+
+  const handleStart=()=>{
+    setCountdown(3);
+    let c=3;
+    timerRef.current=setInterval(()=>{
+      c--;
+      if(c===0){
+        clearInterval(timerRef.current);
+        setCountdown('Go!');
+        setTimeout(()=>{window.location.href=dest;},500);
+      } else {
+        setCountdown(c);
+      }
+    },1000);
+  };
+
+  function Toggle({on,onToggle}){
+    return(
+      <button onClick={onToggle}
+        style={{width:42,height:24,borderRadius:12,background:on?WW.teal:WW.border,border:'none',cursor:'pointer',position:'relative',transition:'background .2s',flexShrink:0}}>
+        <div style={{position:'absolute',top:2,left:on?20:2,width:20,height:20,borderRadius:10,background:'#fff',transition:'left .2s',boxShadow:'0 1px 3px rgba(0,0,0,.18)'}}/>
+      </button>
+    );
+  }
+
+  return(
+    <div style={{width:'100%',height:'100%',position:'relative',overflow:'hidden'}}>
+      {/* Background — dimmed previous screen */}
+      <div style={{position:'absolute',inset:0,background:'linear-gradient(160deg,#2D3A8C 0%,#1a2266 100%)'}}>
+        <StatusBar/>
+        <div style={{padding:'20px 24px',opacity:.4}}>
+          <div style={{fontSize:22,fontWeight:800,color:'#fff',marginBottom:8}}>Plans</div>
+          <div style={{height:60,borderRadius:14,background:'rgba(255,255,255,.1)',marginBottom:8}}/>
+          <div style={{height:40,borderRadius:14,background:'rgba(255,255,255,.07)'}}/>
+        </div>
+      </div>
+
+      {/* Bottom sheet */}
+      <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,borderRadius:'22px 22px 0 0',zIndex:10,maxHeight:'88%',display:'flex',flexDirection:'column',boxShadow:'0 -10px 40px rgba(10,10,18,.28)'}}>
+        <div style={{width:36,height:4,borderRadius:2,background:WW.border,margin:'10px auto 0',flexShrink:0}}/>
+
+        {/* Header */}
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 20px 6px',flexShrink:0}}>
+          <div style={{fontSize:18,fontWeight:800,color:WW.primaryDark,letterSpacing:'-.3px'}}>Start Activity</div>
+          <a href="S-10-Plans-Hub.html" style={{width:32,height:32,borderRadius:16,background:WW.elevated,display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none'}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke={WW.text} strokeWidth="2" strokeLinecap="round"/></svg>
+          </a>
+        </div>
+
+        <div style={{flex:1,overflowY:'auto',padding:'0 16px',paddingBottom:90}}>
+
+          {/* ── 3 Large icon activity cards ─── */}
+          <div style={{fontSize:11,fontWeight:700,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',marginBottom:8,marginTop:4}}>Activity</div>
+          <div style={{display:'flex',gap:8,marginBottom:14}}>
+            {ACTIVITIES.map(a=>{
+              const sel=activity===a.id;
+              return(
+                <button key={a.id} onClick={()=>setActivity(a.id)}
+                  style={{flex:1,padding:'0',borderRadius:16,border:`2.5px solid ${sel?WW.teal:WW.border}`,background:sel?WW.tealBg:WW.card,cursor:'pointer',boxShadow:sel?`0 4px 14px rgba(75,184,204,.25)`:WW.shadow,transition:'all .18s',overflow:'hidden',display:'flex',flexDirection:'column',alignItems:'center'}}>
+                  {/* Gradient top */}
+                  <div style={{width:'100%',padding:'16px 0 12px',background:sel?a.grad:'linear-gradient(145deg,#EEF0FB,#F7F8FF)',display:'flex',alignItems:'center',justifyContent:'center',transition:'background .2s'}}>
+                    {a.icon(sel?'#fff':WW.textSec)}
+                  </div>
+                  {/* Label + last used */}
+                  <div style={{padding:'6px 8px 10px',width:'100%',textAlign:'center'}}>
+                    <div style={{fontSize:13,fontWeight:800,color:sel?'#1A7A8C':WW.text}}>{a.label}</div>
+                    {a.lastUsed&&<div style={{fontSize:9,fontWeight:700,color:sel?WW.teal:WW.textSec,marginTop:3,opacity:.8}}>Last used</div>}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* ── Mode toggle ─── */}
+          <div style={{fontSize:11,fontWeight:700,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',marginBottom:8}}>Mode</div>
+          <div style={{display:'flex',background:WW.elevated,borderRadius:12,padding:3,marginBottom:14}}>
+            {['outdoor','indoor'].map(m=>(
+              <button key={m} onClick={()=>setMode(m)}
+                style={{flex:1,height:36,borderRadius:10,background:mode===m?WW.card:'transparent',border:`${mode===m?'0.5px':'0px'} solid ${WW.border}`,color:mode===m?WW.primaryDark:WW.textSec,fontSize:13,fontWeight:700,cursor:'pointer',boxShadow:mode===m?WW.shadow:'none',transition:'all .15s',textTransform:'capitalize',display:'flex',alignItems:'center',justifyContent:'center',gap:5}}>
+                {m==='outdoor'?<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 100 14A7 7 0 0012 2z" stroke="currentColor" strokeWidth="1.5"/><path d="M12 16v5M8 20h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>:<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.5"/><path d="M3 9h18M9 9v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
+                {m.charAt(0).toUpperCase()+m.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {/* Outdoor: GPS + map */}
+          {mode==='outdoor'&&(
+            <div style={{marginBottom:14}}>
+              <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:7}}>
+                <div style={{width:7,height:7,borderRadius:4,background:gpsReady?'#10B981':'#F59E0B',animation:gpsReady?'none':'gpsPulse 1.4s infinite'}}/>
+                <div style={{fontSize:12,fontWeight:700,color:gpsReady?'#059669':'#D97706'}}>{gpsReady?'GPS ready · Accurate to 4m':'Searching for GPS...'}</div>
+              </div>
+              <MapPreview gpsReady={gpsReady}/>
+            </div>
+          )}
+          {mode==='indoor'&&(
+            <div style={{background:WW.elevated,borderRadius:12,padding:'10px 12px',marginBottom:14,display:'flex',gap:8,alignItems:'flex-start'}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{flexShrink:0,marginTop:1}}><circle cx="12" cy="12" r="9" stroke={WW.textSec} strokeWidth="1.5"/><path d="M12 8v5M12 16v.5" stroke={WW.textSec} strokeWidth="1.8" strokeLinecap="round"/></svg>
+              <div style={{fontSize:12,color:WW.textSec,lineHeight:1.5}}>No GPS tracking. You'll log distance and notes manually when you stop.</div>
+            </div>
+          )}
+
+          {/* ── Optional goal ─── */}
+          <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,overflow:'hidden',marginBottom:14}}>
+            <button onClick={()=>setGoalOpen(o=>!o)}
+              style={{width:'100%',padding:'12px 14px',display:'flex',alignItems:'center',justifyContent:'space-between',background:'none',border:'none',cursor:'pointer'}}>
+              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={WW.primary} strokeWidth="1.5"/><circle cx="12" cy="12" r="5" stroke={WW.primary} strokeWidth="1.5"/><circle cx="12" cy="12" r="1.5" fill={WW.primary}/></svg>
+                <div style={{fontSize:13,fontWeight:700,color:WW.text}}>Set a goal <span style={{fontSize:11,fontWeight:500,color:WW.textSec}}>(optional)</span></div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{transform:goalOpen?'rotate(180deg)':'',transition:'transform .2s'}}><path d="M6 9l6 6 6-6" stroke={WW.textSec} strokeWidth="2" strokeLinecap="round"/></svg>
+            </button>
+            {goalOpen&&(
+              <div style={{padding:'0 14px 14px',borderTop:`0.5px solid ${WW.border}`}}>
+                <div style={{display:'flex',background:WW.elevated,borderRadius:10,padding:3,marginBottom:10,marginTop:10}}>
+                  {['distance','time'].map(t=>(
+                    <button key={t} onClick={()=>setGoalType(t)}
+                      style={{flex:1,height:32,borderRadius:8,background:goalType===t?WW.card:'transparent',border:'none',color:goalType===t?WW.primaryDark:WW.textSec,fontSize:12,fontWeight:700,cursor:'pointer'}}>
+                      {t==='distance'?'Distance (km)':'Time (min)'}
+                    </button>
+                  ))}
+                </div>
+                <input type="number" placeholder={goalType==='distance'?'e.g. 5.0':'e.g. 30'} value={goalVal} onChange={e=>setGoalVal(e.target.value)}
+                  style={{width:'100%',height:44,borderRadius:11,border:`1.5px solid ${goalVal?WW.teal:WW.border}`,padding:'0 12px',fontSize:16,fontWeight:700,color:WW.text,background:'#fff',outline:'none',boxSizing:'border-box'}}/>
+                {goalVal&&<div style={{fontSize:11,color:WW.teal,fontWeight:700,marginTop:6}}>Goal: {goalVal} {goalType==='distance'?'km':'min'}</div>}
+              </div>
+            )}
+          </div>
+
+          {/* ── Settings row ─── */}
+          <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,overflow:'hidden',marginBottom:14}}>
+            <div style={{padding:'11px 14px',borderBottom:`0.5px solid ${WW.border}`,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <div>
+                <div style={{fontSize:13,fontWeight:700,color:WW.text}}>Audio cues</div>
+                <div style={{fontSize:11,color:WW.textSec,marginTop:1}}>Km distance &amp; pace announcements</div>
+              </div>
+              <Toggle on={audioCues} onToggle={()=>setAudioCues(a=>!a)}/>
+            </div>
+            <div style={{padding:'11px 14px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <div>
+                <div style={{fontSize:13,fontWeight:700,color:WW.text}}>Auto-pause</div>
+                <div style={{fontSize:11,color:WW.textSec,marginTop:1}}>Pause timer when stationary</div>
+              </div>
+              <Toggle on={autoPause} onToggle={()=>setAutoPause(a=>!a)}/>
+            </div>
+          </div>
+
+          {/* HR zones (wearable) */}
+          {hasHR&&(
+            <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'12px 14px',marginBottom:14}}>
+              <div style={{fontSize:12,fontWeight:700,color:WW.text,marginBottom:8}}>Heart Rate Zones</div>
+              {[{z:1,c:'#4BB8CC',r:'< 115 bpm',l:'Easy'},{z:2,c:WW.primary,r:'115–135',l:'Fat Burn'},{z:3,c:'#F59E0B',r:'135–155',l:'Cardio'},{z:4,c:'#EF4444',r:'> 155 bpm',l:'Peak'}].map(z=>(
+                <div key={z.z} style={{display:'flex',alignItems:'center',gap:8,marginBottom:5}}>
+                  <div style={{width:9,height:9,borderRadius:3,background:z.c,flexShrink:0}}/>
+                  <div style={{fontSize:12,fontWeight:600,color:WW.text,flex:1}}>Z{z.z} — {z.l}</div>
+                  <div style={{fontSize:11,color:WW.textSec}}>{z.r}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Start button */}
+        <div style={{position:'absolute',bottom:0,left:0,right:0,padding:'10px 16px 28px',background:WW.card,borderTop:`0.5px solid ${WW.border}`,zIndex:20}}>
+          <button onClick={handleStart}
+            style={{width:'100%',height:54,borderRadius:14,background:WW.teal,color:'#fff',fontSize:16,fontWeight:800,border:'none',cursor:'pointer',boxShadow:'0 4px 16px rgba(75,184,204,.4)',letterSpacing:'-.1px',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>
+            Start {act.label} · {mode.charAt(0).toUpperCase()+mode.slice(1)}
+          </button>
+        </div>
+      </div>{/* end sheet */}
+
+      {/* Countdown overlay */}
+      {countdown!==null&&(
+        <div style={{position:'absolute',inset:0,background:'rgba(10,10,18,.85)',zIndex:30,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:20}}>
+          {/* Activity indicator */}
+          <div style={{width:64,height:64,borderRadius:20,background:act.grad,display:'flex',alignItems:'center',justifyContent:'center',opacity:.9}}>
+            {act.icon('#fff')}
+          </div>
+          <div style={{fontSize:13,fontWeight:700,color:'rgba(255,255,255,.6)',letterSpacing:.6,textTransform:'uppercase'}}>
+            {countdown==='Go!'?'Starting now':'Get ready'}
+          </div>
+          {countdown==='Go!'?(
+            <div key="go" style={{fontSize:72,fontWeight:900,color:WW.teal,letterSpacing:'-3px',animation:'goAnim .35s cubic-bezier(.2,.8,.2,1) both'}}>
+              Go!
+            </div>
+          ):(
+            <div key={countdown} style={{fontSize:110,fontWeight:900,color:'#fff',letterSpacing:'-4px',fontVariantNumeric:'tabular-nums',lineHeight:1,animation:'countPop .9s ease both'}}>
+              {countdown}
+            </div>
+          )}
+          {countdown!=='Go!'&&<div style={{display:'flex',gap:8,marginTop:10}}>
+            {[3,2,1].map(n=>(
+              <div key={n} style={{width:8,height:8,borderRadius:4,background:n>=countdown?WW.teal:'rgba(255,255,255,.25)',transition:'background .3s'}}/>
+            ))}
+          </div>}
+        </div>
+      )}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

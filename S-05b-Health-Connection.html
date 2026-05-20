@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-05b Health Connection</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell { width: 390px; height: 844px; border-radius: 52px; background: #0A0A12; padding: 5px; box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12); position: relative; box-sizing: content-box; }
+  .phone-inner { width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #F7F8FF; position: relative; }
+  .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="label">S-05b · Health Connection — Step 2 of 3</div>
+  <div class="phone-shell">
+    <div class="island"></div>
+    <div class="phone-inner" id="app"></div>
+  </div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW = {
+  bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',
+  primary:'#6C7EE8',primaryDark:'#2D3A8C',
+  lavender:'#9B84E8',lavenderBg:'#F0EEFE',
+  teal:'#4BB8CC',tealBg:'#E0F4F8',
+  text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',
+  chipBg:'#E6EAFE',shadow:'0 2px 8px rgba(45,58,140,0.06)',
+};
+
+function StatusBar() {
+  return (
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={WW.text} opacity="0.4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+const SOURCES = [
+  {
+    id: 'apple',
+    icon: () => (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <path d="M12 21.6C6.1 17.8 2 14 2 9.5A5.5 5.5 0 0112 6.3a5.5 5.5 0 0110 3.2c0 4.5-4.1 8.3-10 12.1z" fill="#FF3B30"/>
+      </svg>
+    ),
+    name: 'Apple Health',
+    desc: 'Heart rate, calories, steps, workouts',
+    iconBg: '#FFF0F0',
+  },
+  {
+    id: 'wearable',
+    icon: () => (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <rect x="7" y="3" width="10" height="18" rx="4" stroke={WW.primary} strokeWidth="1.7"/>
+        <path d="M7 8h10M7 16h10" stroke={WW.primary} strokeWidth="1.2"/>
+        <circle cx="12" cy="12" r="2" fill={WW.primary}/>
+        <path d="M5 7l-1.5-1.5M19 7l1.5-1.5M5 17l-1.5 1.5M19 17l1.5 1.5" stroke={WW.primary} strokeWidth="1.2" strokeLinecap="round"/>
+      </svg>
+    ),
+    name: 'Wearable Device',
+    desc: 'Real-time heart rate during sessions',
+    iconBg: WW.chipBg,
+  },
+  {
+    id: 'google',
+    icon: () => (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="#4285F4" strokeWidth="1.5"/>
+        <path d="M12 7v10M7 12h10" stroke="#34A853" strokeWidth="1.8" strokeLinecap="round"/>
+        <circle cx="12" cy="12" r="2.5" fill="#EA4335"/>
+      </svg>
+    ),
+    name: 'Google Health Connect',
+    desc: 'Android health data & activity tracking',
+    iconBg: '#F0F7FF',
+  },
+];
+
+function App() {
+  const [connected, setConnected] = React.useState({});
+
+  const toggle = (id) => setConnected(c => ({...c, [id]: !c[id]}));
+  const connectAll = () => setConnected({apple:true, wearable:true, google:true});
+
+  return (
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column'}}>
+      <StatusBar/>
+
+      {/* Step indicator */}
+      <div style={{padding:'0 24px 14px',flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+          <div style={{fontSize:12,fontWeight:700,color:WW.textSec,letterSpacing:'.3px'}}>Step 2 of 3</div>
+          <div style={{fontSize:12,fontWeight:600,color:WW.textSec}}>Health Data</div>
+        </div>
+        <div style={{height:6,borderRadius:3,background:WW.elevated,overflow:'hidden'}}>
+          <div style={{height:'100%',width:'66.6%',borderRadius:3,background:WW.primary,transition:'width 0.4s'}}/>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{flex:1,overflowY:'auto',padding:'0 24px'}}>
+
+        <div style={{fontSize:24,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.5px',marginBottom:6}}>
+          Connect your health data
+        </div>
+        <div style={{fontSize:14,color:WW.textSec,lineHeight:1.6,marginBottom:24}}>
+          WiseWorkout reads data from your health apps and devices to give you more accurate coaching and calorie estimates.
+        </div>
+
+        {/* Source cards */}
+        {SOURCES.map(src => (
+          <div key={src.id} style={{
+            background:WW.card,borderRadius:16,border:`0.5px solid ${connected[src.id]?WW.primary:WW.border}`,
+            boxShadow:connected[src.id]?`0 0 0 1px ${WW.primary}22, ${WW.shadow}`:WW.shadow,
+            padding:'14px 16px',marginBottom:12,transition:'border-color 0.2s',
+          }}>
+            <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:12}}>
+              <div style={{width:44,height:44,borderRadius:12,background:src.iconBg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                {src.icon()}
+              </div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:15,fontWeight:700,color:WW.text,marginBottom:2}}>{src.name}</div>
+                <div style={{fontSize:12,color:WW.textSec,lineHeight:1.4}}>{src.desc}</div>
+              </div>
+              {connected[src.id] && (
+                <div style={{width:20,height:20,borderRadius:10,background:WW.teal,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+              )}
+            </div>
+            <button onClick={()=>toggle(src.id)} style={{
+              width:'100%',height:38,borderRadius:10,cursor:'pointer',fontSize:13,fontWeight:700,
+              background:connected[src.id]?WW.tealBg:'transparent',
+              color:connected[src.id]?WW.teal:WW.primary,
+              border:`1.5px solid ${connected[src.id]?WW.teal:WW.primary}`,
+              transition:'all 0.2s',
+            }}>
+              {connected[src.id] ? '✓ Connected' : 'Connect'}
+            </button>
+          </div>
+        ))}
+
+        {/* Privacy note */}
+        <div style={{display:'flex',alignItems:'flex-start',gap:10,padding:'12px 14px',background:'#F0EEFE',borderRadius:12,marginBottom:28,border:'0.5px solid rgba(155,132,232,0.25)'}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{flexShrink:0,marginTop:1}}>
+            <path d="M12 2l9 4v6c0 5-3.6 9.3-9 10.5C6.6 21.3 3 17 3 12V6l9-4z" stroke="#9B84E8" strokeWidth="1.7" strokeLinejoin="round"/>
+            <path d="M9 12l2 2 4-4" stroke="#9B84E8" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <div style={{fontSize:12,color:'#7B5CB8',lineHeight:1.5,fontWeight:500}}>
+            Your health data stays private and encrypted. We never sell it.
+          </div>
+        </div>
+
+        {/* CTA buttons */}
+        <button onClick={connectAll} style={{
+          width:'100%',height:52,borderRadius:14,background:WW.primary,color:'#fff',
+          fontSize:16,fontWeight:700,border:'none',cursor:'pointer',
+          boxShadow:'0 4px 14px rgba(108,126,232,0.35)',marginBottom:12,
+        }}>
+          {Object.values(connected).filter(Boolean).length === 3 ? '✓ All connected — Continue' : 'Connect all and continue'}
+        </button>
+        <div style={{textAlign:'center',marginBottom:36}}>
+          <a href="S-06-Onboarding-Goals.html" style={{fontSize:14,color:WW.textSec,textDecoration:'none',fontWeight:600}}>Skip for now</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

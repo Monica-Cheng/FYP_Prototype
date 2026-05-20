@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-41 Manage Apps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0;padding:0;background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .lbl{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+</style>
+</head><body>
+<div class="stage">
+  <div class="lbl">S-41 · Manage Apps</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+const PATHS={
+  'chevron-left':"M15 18l-6-6 6-6",
+  'chevron-right':"M9 18l6-6-6-6",
+  check:"M20 6L9 17l-5-5",
+  plus:"M12 5v14M5 12h14",
+  watch:"M12 12m-3 0a3 3 0 1 0 6 0 3 3 0 1 0-6 0M12 5V3M12 21v-2M4.22 10.22l-1.42-1.42M21.2 15.2l-1.42-1.42M4.22 13.78l-1.42 1.42M21.2 8.8l-1.42 1.42",
+  smartphone:"M17 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM12 18h.01",
+  heart:"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z",
+  'x-circle':"M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0zM15 9l-6 6M9 9l6 6",
+  info:"M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zM12 16v-4M12 8h.01",
+};
+function Icon({name,size=16,color='currentColor',style:s}){
+  const p=PATHS[name];if(!p)return null;
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-flex',flexShrink:0,...s}}><path d={p}/></svg>;
+}
+function StatusBar(){
+  return <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0,background:WW.card}}>
+    <span style={{paddingTop:10}}>9:41</span>
+    <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+      <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+      <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+    </div>
+  </div>;
+}
+
+const DEVICES=[
+  {id:'apple-watch',label:'Apple Watch',subtitle:'Series 9 · Paired',icon:'watch',connected:true,color:'#1C1C1E'},
+  {id:'samsung',label:'Samsung Galaxy Watch',subtitle:'Not connected',icon:'watch',connected:false,color:'#1A5BB8'},
+  {id:'garmin',label:'Garmin',subtitle:'Not connected',icon:'watch',connected:false,color:'#007DC5'},
+];
+const SERVICES=[
+  {id:'apple-health',label:'Apple Health',subtitle:'Connected · Syncing steps, HR & workouts',icon:'heart',connected:true,color:'#FF3B30',androidOnly:false},
+  {id:'google-health',label:'Google Health Connect',subtitle:'Android only',icon:'heart',connected:false,color:'#4285F4',androidOnly:true},
+];
+
+function App(){
+  const [devices,setDevices]=React.useState(DEVICES.map(d=>({...d})));
+  const [services,setServices]=React.useState(SERVICES.map(s=>({...s})));
+
+  function toggleDevice(id){
+    setDevices(prev=>prev.map(d=>{
+      if(d.id!==id)return d;
+      const next=!d.connected;
+      return {...d,connected:next,subtitle:next?'Connecting...':d.id==='apple-watch'?'Series 9 · Paired':'Not connected'};
+    }));
+  }
+  function toggleService(id){
+    setServices(prev=>prev.map(s=>{
+      if(s.id!==id)return s;
+      const next=!s.connected;
+      return {...s,connected:next,subtitle:next?'Connected · Syncing steps, HR & workouts':'Not connected'};
+    }));
+  }
+
+  const sectionLabel=(txt)=>(
+    <div style={{fontSize:12,fontWeight:600,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',padding:'0 4px',marginBottom:8,marginTop:4}}>{txt}</div>
+  );
+
+  const deviceCard=(d,onTap)=>(
+    <div key={d.id} style={{display:'flex',alignItems:'center',gap:12,padding:'14px 16px',background:WW.card,borderRadius:12,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,marginBottom:8}}>
+      <div style={{width:42,height:42,borderRadius:12,background:d.color,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+        <Icon name={d.icon} size={20} color="#fff"/>
+      </div>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontSize:15,fontWeight:500,color:WW.text,marginBottom:2}}>{d.label}</div>
+        <div style={{fontSize:12,color:d.connected?'#16A34A':WW.textSec}}>{d.subtitle}</div>
+      </div>
+      {d.connected?(
+        <button onClick={()=>onTap(d.id)} style={{padding:'6px 12px',borderRadius:20,border:`1px solid #EF4444`,background:'#FEF2F2',color:'#EF4444',fontSize:12,fontWeight:500,cursor:'pointer',fontFamily:'inherit',flexShrink:0}}>Disconnect</button>
+      ):(
+        <button onClick={()=>!d.androidOnly&&onTap(d.id)} disabled={d.androidOnly} style={{padding:'6px 12px',borderRadius:20,border:`1px solid ${d.androidOnly?WW.border:WW.primary}`,background:d.androidOnly?WW.elevated:'#E6EAFE',color:d.androidOnly?WW.textSec:WW.primary,fontSize:12,fontWeight:500,cursor:d.androidOnly?'not-allowed':'pointer',fontFamily:'inherit',flexShrink:0,opacity:d.androidOnly?.5:1}}>Connect</button>
+      )}
+    </div>
+  );
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,fontFamily:"'Inter',system-ui,sans-serif"}}>
+      <StatusBar/>
+      <div style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',flexShrink:0,position:'relative'}}>
+        <a href="S-35-Settings.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,textDecoration:'none',flexShrink:0}}>
+          <Icon name="chevron-left" size={18} color={WW.textSec}/>
+        </a>
+        <span style={{position:'absolute',left:'50%',transform:'translateX(-50%)',fontSize:18,fontWeight:600,color:WW.primaryDark}}>Manage Apps</span>
+      </div>
+
+      <div style={{flex:1,overflowY:'auto',padding:'16px 16px 40px'}}>
+        {/* Devices */}
+        {sectionLabel('Wearable Devices')}
+        {devices.map(d=>deviceCard(d,toggleDevice))}
+
+        {/* Add device row */}
+        <button onClick={()=>alert('Device pairing flow would open here.')} style={{display:'flex',alignItems:'center',gap:12,padding:'14px 16px',background:WW.card,borderRadius:12,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,marginBottom:20,width:'100%',boxSizing:'border-box',cursor:'pointer',fontFamily:'inherit'}}>
+          <div style={{width:42,height:42,borderRadius:12,background:WW.elevated,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <Icon name="plus" size={20} color={WW.primary}/>
+          </div>
+          <div style={{flex:1,textAlign:'left'}}>
+            <div style={{fontSize:15,fontWeight:500,color:WW.primary}}>Connect new device</div>
+            <div style={{fontSize:12,color:WW.textSec}}>Pair a Bluetooth fitness tracker</div>
+          </div>
+          <Icon name="chevron-right" size={16} color={WW.textSec}/>
+        </button>
+
+        {/* Health services */}
+        {sectionLabel('Health Services')}
+        {services.map(s=>deviceCard(s,toggleService))}
+
+        {/* Info card */}
+        <div style={{background:'#F0EEFE',borderRadius:12,padding:'12px 14px',border:'0.5px solid #D8D0F4',display:'flex',gap:10,marginTop:8}}>
+          <Icon name="info" size={16} color="#7B5CB8" style={{marginTop:1,flexShrink:0}}/>
+          <div style={{fontSize:13,color:'#5B3F9E',lineHeight:1.5}}>Data from connected apps and devices syncs automatically. Disconnect at any time to stop sharing data with WiseWorkout.</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

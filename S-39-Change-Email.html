@@ -1,0 +1,177 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-39 Change Email</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0;padding:0;background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .lbl{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  .spin{animation:spin .8s linear infinite;display:inline-flex}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .fade-in{animation:fadeIn .35s ease forwards}
+</style>
+</head><body>
+<div class="stage">
+  <div class="lbl">S-39 · Change Email</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+const PATHS={
+  'chevron-left':"M15 18l-6-6 6-6",
+  mail:"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6",
+  check:"M20 6L9 17l-5-5",
+  'alert-circle':"M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zM12 8v4M12 16h.01",
+  'loader-circle':"M21 12a9 9 0 1 1-6.22-8.56",
+  'check-circle':"M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3",
+};
+function Icon({name,size=16,color='currentColor',style:s,className:cn}){
+  const p=PATHS[name];if(!p)return null;
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-flex',flexShrink:0,...s}} className={cn}><path d={p}/></svg>;
+}
+function StatusBar(){
+  return <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0,background:WW.card}}>
+    <span style={{paddingTop:10}}>9:41</span>
+    <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+      <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+      <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+    </div>
+  </div>;
+}
+
+const CURRENT_EMAIL='marcus@email.com';
+
+function App(){
+  const [newEmail,setNewEmail]=React.useState('');
+  const [confirmEmail,setConfirmEmail]=React.useState('');
+  const [saveS,setSaveS]=React.useState('idle');
+  const [focusedField,setFocusedField]=React.useState(null);
+
+  const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const newValid=emailRegex.test(newEmail);
+  const match=newEmail===confirmEmail&&newEmail.length>0;
+  const mismatch=confirmEmail.length>0&&newEmail!==confirmEmail;
+  const canSave=newValid&&match&&saveS==='idle';
+
+  function handleSave(){
+    if(!canSave)return;
+    setSaveS('loading');
+    setTimeout(()=>{
+      setSaveS('sent');
+    },900);
+  }
+
+  const fieldStyle=(focused)=>({
+    width:'100%',border:'none',outline:'none',fontSize:15,color:WW.text,
+    background:'transparent',fontFamily:'inherit',boxSizing:'border-box',
+  });
+
+  const fieldWrap=(focused,hasError)=>({
+    padding:'12px 16px',
+    borderRadius:12,
+    border:`1px solid ${hasError?'#EF4444':focused?WW.primary:WW.border}`,
+    background:WW.card,
+    boxShadow:focused?`0 0 0 3px ${hasError?'rgba(239,68,68,.08)':'rgba(108,126,232,.12)'}`:WW.shadow,
+    transition:'border-color .15s,box-shadow .15s',
+    display:'flex',alignItems:'center',gap:10,
+  });
+
+  if(saveS==='sent'){
+    return(
+      <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,fontFamily:"'Inter',system-ui,sans-serif"}}>
+        <StatusBar/>
+        <div style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',flexShrink:0,position:'relative'}}>
+          <a href="S-35-Settings.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,textDecoration:'none',flexShrink:0}}>
+            <Icon name="chevron-left" size={18} color={WW.textSec}/>
+          </a>
+          <span style={{position:'absolute',left:'50%',transform:'translateX(-50%)',fontSize:18,fontWeight:600,color:WW.primaryDark}}>Change Email</span>
+        </div>
+        <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'0 24px',gap:16}} className="fade-in">
+          <div style={{width:72,height:72,borderRadius:36,background:'#DCFCE7',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <Icon name="check-circle" size={36} color="#16A34A"/>
+          </div>
+          <div style={{textAlign:'center'}}>
+            <div style={{fontSize:20,fontWeight:700,color:WW.primaryDark,marginBottom:8}}>Verification Sent</div>
+            <div style={{fontSize:14,color:WW.textSec,lineHeight:1.6}}>We've sent a verification link to<br/><span style={{fontWeight:600,color:WW.text}}>{newEmail}</span>.<br/>Click the link to confirm your new email.</div>
+          </div>
+          <div style={{background:'#EFF6FF',borderRadius:12,padding:'12px 16px',border:'1px solid #BFDBFE',width:'100%',boxSizing:'border-box'}}>
+            <div style={{fontSize:13,color:'#1E40AF',lineHeight:1.5}}>Your email will not change until you click the verification link.</div>
+          </div>
+          <a href="S-35-Settings.html" style={{width:'100%',height:52,borderRadius:16,background:WW.primary,color:'#fff',fontSize:16,fontWeight:500,display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none',marginTop:8}}>Back to Settings</a>
+        </div>
+      </div>
+    );
+  }
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,fontFamily:"'Inter',system-ui,sans-serif"}}>
+      <StatusBar/>
+      <div style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',flexShrink:0,position:'relative'}}>
+        <a href="S-35-Settings.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,textDecoration:'none',flexShrink:0}}>
+          <Icon name="chevron-left" size={18} color={WW.textSec}/>
+        </a>
+        <span style={{position:'absolute',left:'50%',transform:'translateX(-50%)',fontSize:18,fontWeight:600,color:WW.primaryDark}}>Change Email</span>
+      </div>
+
+      <div style={{flex:1,overflowY:'auto',padding:'20px 16px 120px'}}>
+        {/* Current email */}
+        <div style={{fontSize:12,fontWeight:600,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',marginBottom:8}}>Current Email</div>
+        <div style={{background:WW.card,borderRadius:12,padding:'14px 16px',border:`0.5px solid ${WW.border}`,display:'flex',alignItems:'center',gap:10,marginBottom:20,boxShadow:WW.shadow}}>
+          <Icon name="mail" size={16} color={WW.textSec}/>
+          <span style={{fontSize:15,color:WW.textSec}}>{CURRENT_EMAIL}</span>
+        </div>
+
+        {/* New email */}
+        <div style={{fontSize:12,fontWeight:600,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',marginBottom:8}}>New Email</div>
+        <div style={fieldWrap(focusedField==='new',false)} onClick={()=>document.getElementById('newEmail').focus()}>
+          <Icon name="mail" size={16} color={focusedField==='new'?WW.primary:WW.textSec}/>
+          <input id="newEmail" type="email" value={newEmail} onChange={e=>setNewEmail(e.target.value)}
+            onFocus={()=>setFocusedField('new')} onBlur={()=>setFocusedField(null)}
+            placeholder="Enter new email address" style={fieldStyle(focusedField==='new')}/>
+          {newValid&&<Icon name="check" size={16} color="#16A34A"/>}
+        </div>
+
+        <div style={{height:12}}/>
+
+        {/* Confirm email */}
+        <div style={{fontSize:12,fontWeight:600,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',marginBottom:8}}>Confirm New Email</div>
+        <div style={fieldWrap(focusedField==='confirm',mismatch)} onClick={()=>document.getElementById('confirmEmail').focus()}>
+          <Icon name="mail" size={16} color={mismatch?'#EF4444':focusedField==='confirm'?WW.primary:WW.textSec}/>
+          <input id="confirmEmail" type="email" value={confirmEmail} onChange={e=>setConfirmEmail(e.target.value)}
+            onFocus={()=>setFocusedField('confirm')} onBlur={()=>setFocusedField(null)}
+            placeholder="Re-enter new email address" style={fieldStyle(focusedField==='confirm')}/>
+          {match&&<Icon name="check" size={16} color="#16A34A"/>}
+        </div>
+        {mismatch&&<div style={{fontSize:12,color:'#EF4444',marginTop:6,display:'flex',alignItems:'center',gap:4}}>
+          <Icon name="alert-circle" size={12} color="#EF4444"/>Emails do not match
+        </div>}
+
+        <div style={{height:16}}/>
+        <div style={{background:'#EFF6FF',borderRadius:12,padding:'12px 14px',border:'1px solid #BFDBFE'}}>
+          <div style={{fontSize:13,color:'#1E40AF',lineHeight:1.5}}>A verification link will be sent to your new email. Your email won't change until you confirm it.</div>
+        </div>
+      </div>
+
+      {/* Sticky button */}
+      <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,padding:'12px 16px',paddingBottom:'calc(12px + env(safe-area-inset-bottom,0px))',borderTop:'0.5px solid #E8EAF8',zIndex:20}}>
+        <button onClick={handleSave} style={{width:'100%',height:52,borderRadius:16,border:'none',background:canSave?WW.primary:'#E8EAF8',color:canSave?'#fff':'#8A8A9E',fontSize:16,fontWeight:500,cursor:canSave?'pointer':'not-allowed',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+          {saveS==='loading'&&<Icon name="loader-circle" size={16} color="#fff" className="spin"/>}
+          {saveS==='loading'?'Sending...':'Update Email'}
+        </button>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

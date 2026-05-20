@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-34 Profile Overlay</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  @keyframes slideUp{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-34 · Profile Overlay</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+const Ico={
+  home:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill={c}/></svg>,
+  plans:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="20" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill={c}/></svg>,
+  coach:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke={c} strokeWidth="1.5" strokeLinejoin="round"/></svg>,
+  club:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke={c} strokeWidth="1.5"/><circle cx="17" cy="10" r="2.2" stroke={c} strokeWidth="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke={c} strokeWidth="1.5" strokeLinecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  progress:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+};
+const NAV=[{id:'home',label:'Home',icon:Ico.home,href:'S-09-Home.html'},{id:'plans',label:'Plans',icon:Ico.plans,href:'S-10-Plans-Hub.html'},{id:'coach',label:'Coach',icon:Ico.coach,href:'S-25-Coach-Chat.html'},{id:'club',label:'Club',icon:Ico.club,href:'S-28-Club-Tab.html'},{id:'progress',label:'Progress',icon:Ico.progress,href:'S-32-Progress-Tab.html'}];
+function StatusBar(){return(<div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}><div style={{paddingTop:10}}>9:41</div><div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg></div></div>);}
+function BottomNav(){return(<div style={{position:'absolute',bottom:0,left:0,right:0,height:84,background:WW.card,borderTop:'0.5px solid #E8EAF8',display:'flex',zIndex:30}}>{NAV.map(n=>{const c=WW.textSec;return(<a key={n.id} href={n.href} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,textDecoration:'none',paddingBottom:8}}>{n.icon(c)}<span style={{fontSize:10,fontWeight:600,color:c}}>{n.label}</span></a>);})}</div>);}
+
+const BADGES=[
+  {emoji:'🏆',label:'First Run'},
+  {emoji:'🔥',label:'7-Day Streak'},
+  {emoji:'🥇',label:'PB Bench'},
+  {emoji:'⚡',label:'Speed Demon'},
+  {emoji:'🌟',label:'Level 8'},
+  {emoji:'🚴',label:'50k Ride'},
+];
+
+const MENU=[
+  {icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.7"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>,label:'Edit Profile',href:null},
+  {icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.7"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" strokeWidth="1.7"/></svg>,label:'Settings',href:'S-35-Settings.html'},
+  {icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/></svg>,label:'Achievements & XP',href:null},
+];
+
+function App(){
+  const [badgeDetail,setBadgeDetail]=React.useState(null);
+  const [logoutModal,setLogoutModal]=React.useState(false);
+  const [open,setOpen]=React.useState(true);
+
+  const xpCurrent=2620,xpNext=3000;
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,position:'relative'}}>
+      <StatusBar/>
+
+      {/* Background home hint */}
+      <div style={{flex:1,padding:'0 18px',opacity:.5,pointerEvents:'none'}}>
+        <div style={{fontSize:22,fontWeight:800,color:WW.primaryDark,marginTop:10}}>Home</div>
+        <div style={{height:60,marginTop:12,background:WW.card,borderRadius:16}}/>
+        <div style={{height:80,marginTop:10,background:WW.card,borderRadius:16}}/>
+      </div>
+      <BottomNav/>
+
+      {/* Dim backdrop */}
+      {open&&(
+        <div onClick={()=>setOpen(false)} style={{position:'absolute',inset:0,background:'rgba(10,10,18,.5)',zIndex:40}}/>
+      )}
+
+      {/* Profile sheet */}
+      {open&&(
+        <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,borderRadius:'24px 24px 0 0',zIndex:50,animation:'slideUp .3s cubic-bezier(.2,.8,.2,1)',maxHeight:'92%',display:'flex',flexDirection:'column'}}>
+          {/* Handle */}
+          <div style={{display:'flex',justifyContent:'center',padding:'12px 0 6px',flexShrink:0}}>
+            <div style={{width:36,height:4,borderRadius:2,background:WW.border}}/>
+          </div>
+
+          <div style={{overflowY:'auto',flex:1,paddingBottom:32}}>
+            {/* Header */}
+            <div style={{padding:'8px 20px 20px',textAlign:'center',borderBottom:`0.5px solid ${WW.border}`}}>
+              {/* Avatar */}
+              <div style={{width:80,height:80,borderRadius:40,background:`linear-gradient(135deg,${WW.primary},${WW.lavender})`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px',boxShadow:`0 0 0 4px ${WW.chipBg},0 0 0 6px ${WW.primary}30`}}>
+                <span style={{fontSize:32,fontWeight:800,color:'#fff'}}>M</span>
+              </div>
+              <div style={{fontSize:20,fontWeight:800,color:WW.primaryDark,marginBottom:2}}>Marcus Tan</div>
+              <div style={{fontSize:13,color:WW.textSec,marginBottom:12}}>@marcus_tan_sg</div>
+              {/* Level pill */}
+              <div style={{display:'inline-flex',alignItems:'center',gap:6,background:WW.chipBg,border:`1px solid ${WW.primary}40`,borderRadius:20,padding:'5px 14px',marginBottom:10}}>
+                <span style={{fontSize:14}}>⭐</span>
+                <span style={{fontSize:13,fontWeight:800,color:WW.primary}}>Level 8</span>
+                <span style={{fontSize:11,color:WW.textSec}}>· 2,620 XP</span>
+              </div>
+              {/* XP progress bar */}
+              <div style={{height:6,borderRadius:3,background:WW.elevated,overflow:'hidden',marginBottom:4}}>
+                <div style={{height:'100%',width:`${xpCurrent/xpNext*100}%`,borderRadius:3,background:`linear-gradient(90deg,${WW.primary},${WW.lavender})`}}/>
+              </div>
+              <div style={{fontSize:10,color:WW.textSec}}>{xpCurrent} / {xpNext} XP to Level 9</div>
+            </div>
+
+            {/* Badges row */}
+            <div style={{padding:'16px 20px',borderBottom:`0.5px solid ${WW.border}`}}>
+              <div style={{fontSize:12,fontWeight:700,color:WW.textSec,letterSpacing:.4,textTransform:'uppercase',marginBottom:10}}>Badges</div>
+              <div style={{display:'flex',gap:12,overflowX:'auto',paddingBottom:4}}>
+                {BADGES.map((b,i)=>(
+                  <button key={i} onClick={()=>setBadgeDetail(b)} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:4,border:'none',background:'none',cursor:'pointer',flexShrink:0}}>
+                    <div style={{width:48,height:48,borderRadius:24,background:WW.chipBg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,border:`1.5px solid ${WW.border}`}}>{b.emoji}</div>
+                    <span style={{fontSize:9,color:WW.textSec,whiteSpace:'nowrap'}}>{b.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Friends shortcut */}
+            <div style={{padding:'14px 20px',borderBottom:`0.5px solid ${WW.border}`,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <div style={{display:'flex'}}>
+                  {['#6C7EE8','#4BB8CC','#9B84E8'].map((c,i)=>(
+                    <div key={i} style={{width:28,height:28,borderRadius:14,background:c,border:'2px solid #fff',marginLeft:i>0?-8:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                      <span style={{fontSize:10,fontWeight:800,color:'#fff'}}>{['AK','JT','SL'][i]}</span>
+                    </div>
+                  ))}
+                </div>
+                <span style={{fontSize:14,fontWeight:700,color:WW.text}}>5 friends</span>
+              </div>
+              <a href="S-29-Add-Friends.html" style={{fontSize:13,fontWeight:700,color:WW.primary,textDecoration:'none',background:WW.chipBg,padding:'6px 12px',borderRadius:10}}>Add Friends</a>
+            </div>
+
+            {/* Menu rows */}
+            <div style={{padding:'8px 20px'}}>
+              {MENU.map((m,i)=>(
+                <a key={i} href={m.href||undefined} onClick={m.href?undefined:(e)=>{e.preventDefault();}} style={{display:'flex',alignItems:'center',gap:14,padding:'14px 0',borderBottom:`0.5px solid ${WW.border}`,textDecoration:'none',cursor:'pointer'}}>
+                  <div style={{color:WW.textSec}}>{m.icon}</div>
+                  <span style={{flex:1,fontSize:15,fontWeight:600,color:WW.text}}>{m.label}</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke={WW.textSec} strokeWidth="1.8" strokeLinecap="round"/></svg>
+                </a>
+              ))}
+              {/* Log out */}
+              <button onClick={()=>setLogoutModal(true)} style={{width:'100%',display:'flex',alignItems:'center',gap:14,padding:'14px 0',background:'none',border:'none',cursor:'pointer',textAlign:'left'}}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 16l4-4m0 0l-4-4m4 4H7" stroke="#EF4444" strokeWidth="1.7" strokeLinecap="round"/><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="#EF4444" strokeWidth="1.7" strokeLinecap="round"/></svg>
+                <span style={{flex:1,fontSize:15,fontWeight:600,color:'#EF4444'}}>Log out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Badge detail modal */}
+      {badgeDetail&&(
+        <div onClick={()=>setBadgeDetail(null)} style={{position:'absolute',inset:0,background:'rgba(10,10,18,.6)',zIndex:60,display:'flex',alignItems:'center',justifyContent:'center',padding:'0 32px'}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:WW.card,borderRadius:20,padding:'28px 24px',textAlign:'center',width:'100%',boxShadow:'0 20px 60px rgba(20,25,60,.25)'}}>
+            <div style={{fontSize:52,marginBottom:10}}>{badgeDetail.emoji}</div>
+            <div style={{fontSize:18,fontWeight:800,color:WW.primaryDark,marginBottom:6}}>{badgeDetail.label}</div>
+            <div style={{fontSize:13,color:WW.textSec,lineHeight:1.6,marginBottom:20}}>Awarded for completing a milestone in your fitness journey. Keep it up!</div>
+            <button onClick={()=>setBadgeDetail(null)} style={{width:'100%',height:46,borderRadius:12,background:WW.primary,color:'#fff',border:'none',fontSize:15,fontWeight:700,cursor:'pointer'}}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* Logout confirmation */}
+      {logoutModal&&(
+        <div style={{position:'absolute',inset:0,background:'rgba(10,10,18,.6)',zIndex:60,display:'flex',alignItems:'flex-end'}}>
+          <div style={{width:'100%',background:WW.card,borderRadius:'22px 22px 0 0',padding:'20px 20px 44px',boxShadow:'0 -8px 40px rgba(20,25,60,.2)',textAlign:'center'}}>
+            <div style={{width:36,height:4,borderRadius:2,background:WW.border,margin:'0 auto 20px'}}/>
+            <div style={{fontSize:18,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>Log out?</div>
+            <div style={{fontSize:14,color:WW.textSec,lineHeight:1.5,marginBottom:20}}>Are you sure you want to log out of WiseWorkout?</div>
+            <a href="S-02-Login.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:50,borderRadius:14,background:'#FEE2E2',color:'#DC2626',fontSize:15,fontWeight:700,textDecoration:'none',marginBottom:10}}>Yes, log out</a>
+            <button onClick={()=>setLogoutModal(false)} style={{width:'100%',height:50,borderRadius:14,background:WW.elevated,color:WW.text,border:`1.5px solid ${WW.border}`,fontSize:15,fontWeight:700,cursor:'pointer'}}>Cancel</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

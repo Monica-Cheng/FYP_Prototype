@@ -1,0 +1,310 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-17 Gym Session Active</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  .tweaks-panel{position:fixed;bottom:20px;right:20px;width:240px;background:#fff;border-radius:14px;padding:14px 16px 16px;box-shadow:0 10px 40px rgba(20,25,60,.18),0 0 0 .5px rgba(0,0,0,.08);color:#3D3D5C;display:none;z-index:100}
+  .tweaks-panel.open{display:block}.tweaks-panel h3{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:#8A8A9E}
+  .tweak-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:10px}
+  .tweak-row label{font-size:13px;color:#3D3D5C;flex:1}.tweak-row input[type="checkbox"]{accent-color:#6C7EE8}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-17 · Gym Session Active</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<div class="tweaks-panel" id="tweaks">
+  <h3>State</h3>
+  <div class="tweak-row"><label>Show PB banner</label><input type="checkbox" id="tw-pb"/></div>
+  <div class="tweak-row"><label>Show rest timer</label><input type="checkbox" id="tw-rest"/></div>
+  <div class="tweak-row"><label>Show finish modal</label><input type="checkbox" id="tw-finish"/></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',lavenderDark:'#7B5CB8',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+const SET_TYPES=[
+  {id:'W',label:'W',color:'#8A8A9E',bg:'#F2F2F7',title:'Warmup'},
+  {id:'N',label:'N',color:WW.primary,bg:WW.chipBg,title:'Normal'},
+  {id:'D',label:'D',color:'#F59E0B',bg:'#FEF3C7',title:'Drop Set'},
+];
+const nextType=t=>{const i=SET_TYPES.findIndex(s=>s.id===t);return SET_TYPES[(i+1)%SET_TYPES.length].id;};
+
+const EXERCISES=[
+  {id:1,name:'Bench Press',muscle:'Chest',note:'',sets:[{prev:'80kg×8',kg:'82.5',reps:'8',type:'W',done:true},{prev:'80kg×8',kg:'82.5',reps:'8',type:'N',done:true},{prev:'80kg×8',kg:'',reps:'',type:'N',done:false},{prev:'80kg×8',kg:'',reps:'',type:'N',done:false}]},
+  {id:2,name:'Overhead Press',muscle:'Shoulders',note:'',sets:[{prev:'50kg×10',kg:'',reps:'',type:'N',done:false},{prev:'50kg×10',kg:'',reps:'',type:'N',done:false},{prev:'50kg×10',kg:'',reps:'',type:'N',done:false}]},
+  {id:3,name:'Tricep Pushdown',muscle:'Triceps',note:'',sets:[{prev:'25kg×12',kg:'',reps:'',type:'N',done:false},{prev:'25kg×12',kg:'',reps:'',type:'N',done:false},{prev:'25kg×12',kg:'',reps:'',type:'D',done:false}]},
+  {id:4,name:'Lateral Raise',muscle:'Shoulders',note:'',sets:[{prev:'10kg×15',kg:'',reps:'',type:'N',done:false},{prev:'10kg×15',kg:'',reps:'',type:'N',done:false},{prev:'10kg×15',kg:'',reps:'',type:'N',done:false}]},
+  {id:5,name:'Cable Fly',muscle:'Chest',note:'',sets:[{prev:'15kg×12',kg:'',reps:'',type:'N',done:false},{prev:'15kg×12',kg:'',reps:'',type:'N',done:false},{prev:'15kg×12',kg:'',reps:'',type:'N',done:false}]},
+];
+
+function StatusBar(){
+  return(
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [exIdx,setExIdx]=React.useState(0);
+  const [exercises,setExercises]=React.useState(EXERCISES.map(e=>({...e,sets:e.sets.map(s=>({...s}))})));
+  const [elapsed,setElapsed]=React.useState(0);
+  const [showPB,setShowPB]=React.useState(false);
+  const [showRest,setShowRest]=React.useState(false);
+  const [restSecs,setRestSecs]=React.useState(90);
+  const [showFinish,setShowFinish]=React.useState(false);
+  const [paused,setPaused]=React.useState(false);
+
+  React.useEffect(()=>{
+    if(paused)return;
+    const t=setInterval(()=>setElapsed(s=>s+1),1000);
+    return()=>clearInterval(t);
+  },[paused]);
+
+  React.useEffect(()=>{
+    if(!showRest)return;
+    const t=setInterval(()=>setRestSecs(s=>{if(s<=1){setShowRest(false);return 90;}return s-1;}),1000);
+    return()=>clearInterval(t);
+  },[showRest]);
+
+  React.useEffect(()=>{
+    ['tw-pb','tw-rest','tw-finish'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el)return;
+      if(id==='tw-pb')el.addEventListener('change',e=>setShowPB(e.target.checked));
+      if(id==='tw-rest')el.addEventListener('change',e=>{setShowRest(e.target.checked);setRestSecs(90);});
+      if(id==='tw-finish')el.addEventListener('change',e=>setShowFinish(e.target.checked));
+    });
+    const panel=document.getElementById('tweaks');
+    if(panel)panel.style.display='none';
+    const btn=document.createElement('button');
+    btn.textContent='⚙';btn.style.cssText='position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:22px;background:#6C7EE8;color:#fff;border:none;font-size:20px;cursor:pointer;z-index:200;box-shadow:0 4px 12px rgba(108,126,232,.4)';
+    btn.onclick=()=>panel?.classList.toggle('open');document.body.appendChild(btn);
+  },[]);
+
+  const fmt=s=>{const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;};
+
+  const ex=exercises[exIdx];
+  const completedSets=ex.sets.filter(s=>s.done).length;
+  const totalSets=ex.sets.length;
+
+  const updateSet=(si,field,val)=>{
+    setExercises(prev=>prev.map((e,ei)=>ei===exIdx?{...e,sets:e.sets.map((s,i)=>i===si?{...s,[field]:val}:s)}:e));
+  };
+
+  const toggleDone=si=>{
+    const set=ex.sets[si];
+    if(!set.done&&set.kg&&set.reps){
+      updateSet(si,'done',true);
+      setShowRest(true);setRestSecs(90);
+      if(parseFloat(set.kg)>80&&set.reps==='8')setShowPB(true);
+    }else if(set.done){
+      updateSet(si,'done',false);
+    }
+  };
+
+  const addSet=()=>{
+    const last=ex.sets[ex.sets.length-1];
+    setExercises(prev=>prev.map((e,ei)=>ei===exIdx?{...e,sets:[...e.sets,{prev:last?.prev||'—',kg:'',reps:'',done:false}]}:e));
+  };
+
+  const incompleteCount=exercises.reduce((acc,e)=>acc+e.sets.filter(s=>!s.done).length,0);
+
+  return(
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',position:'relative'}}>
+      <StatusBar/>
+
+      {/* PB Banner */}
+      {showPB&&(
+        <div style={{background:WW.tealBg,borderTop:`2px solid ${WW.teal}`,padding:'8px 16px',display:'flex',alignItems:'center',gap:8,animation:'slideDown .3s ease',flexShrink:0}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.2L12 16.5l-6.2 4.4 2.4-7.2L2 9.2h7.6L12 2z" fill={WW.teal}/></svg>
+          <div style={{fontSize:13,fontWeight:700,color:'#1A7A8C',flex:1}}>New Personal Best! Bench Press 82.5 kg × 8</div>
+          <button onClick={()=>setShowPB(false)} style={{background:'none',border:'none',color:WW.teal,fontSize:18,cursor:'pointer',lineHeight:1,padding:0}}>×</button>
+        </div>
+      )}
+
+      {/* Top bar */}
+      <div style={{background:WW.primaryDark,padding:'10px 16px 12px',display:'flex',alignItems:'center',gap:10,flexShrink:0}}>
+        {/* Timer */}
+        <div style={{display:'flex',alignItems:'center',gap:6,flex:1}}>
+          <div style={{width:8,height:8,borderRadius:4,background:paused?WW.textSec:WW.teal,animation:paused?'none':'pulse 2s infinite'}}/>
+          <div style={{fontSize:15,fontWeight:800,color:'#fff',letterSpacing:1,fontVariantNumeric:'tabular-nums'}}>{fmt(elapsed)}</div>
+        </div>
+        {/* Session name */}
+        <div style={{fontSize:14,fontWeight:700,color:'rgba(255,255,255,.85)',flex:1,textAlign:'center'}}>Push A</div>
+        {/* Pause */}
+        <div style={{flex:1,display:'flex',justifyContent:'flex-end',gap:8}}>
+          <button onClick={()=>setPaused(p=>!p)} style={{width:36,height:36,borderRadius:18,background:'rgba(255,255,255,.12)',border:'none',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
+            {paused?(
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 5l11 7-11 7V5z" fill="#fff"/></svg>
+            ):(
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="6" y="4" width="4" height="16" rx="1.5" fill="#fff"/><rect x="14" y="4" width="4" height="16" rx="1.5" fill="#fff"/></svg>
+            )}
+          </button>
+          <a href="S-19-Post-Gym-Summary.html" onClick={e=>{if(incompleteCount>2){e.preventDefault();setShowFinish(true);}}} style={{width:36,height:36,borderRadius:18,background:'rgba(255,255,255,.12)',border:'none',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',textDecoration:'none'}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </a>
+        </div>
+      </div>
+
+      {/* Rest timer overlay */}
+      {showRest&&(
+        <div style={{background:WW.primaryDark,padding:'10px 16px',display:'flex',alignItems:'center',gap:10,flexShrink:0,animation:'fadeUp .3s ease'}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:11,fontWeight:700,color:'rgba(255,255,255,.6)',letterSpacing:.5,textTransform:'uppercase'}}>Rest</div>
+            <div style={{fontSize:22,fontWeight:800,color:'#fff',letterSpacing:1,fontVariantNumeric:'tabular-nums'}}>0:{String(restSecs).padStart(2,'0')}</div>
+          </div>
+          <div style={{display:'flex',gap:6}}>
+            <button onClick={()=>setRestSecs(s=>s+30)} style={{padding:'5px 10px',borderRadius:8,background:'rgba(255,255,255,.15)',border:'none',color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer'}}>+30s</button>
+            <button onClick={()=>{setShowRest(false);setRestSecs(90);}} style={{padding:'5px 10px',borderRadius:8,background:'rgba(255,255,255,.15)',border:'none',color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer'}}>Skip</button>
+          </div>
+        </div>
+      )}
+
+      {/* Exercise progress dots */}
+      <div style={{padding:'8px 16px 0',display:'flex',gap:4,flexShrink:0}}>
+        {exercises.map((e,i)=>{
+          const allDone=e.sets.every(s=>s.done);
+          return(
+            <button key={i} onClick={()=>setExIdx(i)} style={{height:4,flex:1,borderRadius:2,background:allDone?WW.teal:i===exIdx?WW.primary:WW.border,border:'none',cursor:'pointer',padding:0}}/>
+          );
+        })}
+      </div>
+
+      <div style={{flex:1,overflowY:'auto',padding:'12px 16px 16px'}}>
+        {/* Exercise card */}
+        <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,overflow:'hidden',marginBottom:12}}>
+          {/* Card header */}
+          <div style={{padding:'12px 14px 10px',display:'flex',gap:10,alignItems:'flex-start'}}>
+            <div style={{width:28,height:28,borderRadius:8,background:WW.chipBg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <span style={{fontSize:13,fontWeight:800,color:WW.primary}}>{exIdx+1}</span>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:17,fontWeight:800,color:WW.text,letterSpacing:'-.2px'}}>{ex.name}</div>
+              <div style={{display:'flex',gap:6,marginTop:3,alignItems:'center'}}>
+                <span style={{fontSize:11,fontWeight:600,color:WW.textSec}}>{completedSets}/{totalSets} sets</span>
+                <span style={{width:3,height:3,borderRadius:2,background:WW.border,display:'inline-block'}}/>
+                <span style={{fontSize:11,fontWeight:600,color:WW.primary,background:WW.chipBg,padding:'1px 7px',borderRadius:6}}>{ex.muscle}</span>
+              </div>
+            </div>
+            {/* Demo thumbnail */}
+            <a href="S-18-Exercise-Demo.html" style={{width:54,height:40,borderRadius:8,background:WW.primaryDark,display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none',flexShrink:0,position:'relative',overflow:'hidden'}}>
+              <div style={{position:'absolute',inset:0,background:'linear-gradient(135deg,#3a4a9e,#6C7EE8)',opacity:.8}}/>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{position:'relative',zIndex:1}}><path d="M8 5l11 7-11 7V5z" fill="#fff"/></svg>
+            </a>
+          </div>
+
+          {/* Set table */}
+          <div style={{padding:'0 14px 12px'}}>
+            {/* Header row */}
+            <div style={{display:'flex',gap:4,marginBottom:6,alignItems:'center'}}>
+              <div style={{width:24,fontSize:10,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.4}}>Set</div>
+              <div style={{width:28,fontSize:10,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.4,textAlign:'center'}}>Type</div>
+              <div style={{flex:1,fontSize:10,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.4}}>Previous</div>
+              <div style={{width:48,fontSize:10,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.4,textAlign:'center'}}>kg</div>
+              <div style={{width:40,fontSize:10,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.4,textAlign:'center'}}>Reps</div>
+              <div style={{width:28,fontSize:10,fontWeight:700,color:WW.textSec,textTransform:'uppercase',letterSpacing:.4,textAlign:'center'}}>✓</div>
+            </div>
+            {/* Set rows */}
+            {ex.sets.map((s,si)=>{
+              const st=SET_TYPES.find(t=>t.id===(s.type||'N'));
+              return(
+                <div key={si} style={{display:'flex',gap:4,alignItems:'center',padding:'5px 0',borderBottom:`0.5px solid ${WW.border}`,background:s.done?'rgba(75,184,204,.05)':'transparent'}}>
+                  <div style={{width:24,fontSize:13,fontWeight:700,color:s.done?WW.teal:WW.text}}>{si+1}</div>
+                  <button onClick={()=>!s.done&&updateSet(si,'type',nextType(s.type||'N'))} title={st.title} style={{
+                    width:28,height:22,borderRadius:6,background:st.bg,border:'none',
+                    fontSize:11,fontWeight:800,color:st.color,cursor:s.done?'default':'pointer',
+                    flexShrink:0,letterSpacing:.2,
+                  }}>{st.label}</button>
+                  <div style={{flex:1,fontSize:11,color:WW.textSec}}>{s.prev}</div>
+                  <input
+                    type="number" placeholder="—" value={s.kg}
+                    onChange={e=>updateSet(si,'kg',e.target.value)}
+                    disabled={s.done}
+                    style={{width:48,height:28,borderRadius:7,border:`1.5px solid ${s.done?WW.tealBg:WW.border}`,background:s.done?WW.tealBg:'#fff',textAlign:'center',fontSize:13,fontWeight:700,color:s.done?WW.teal:WW.text,outline:'none'}}
+                  />
+                  <input
+                    type="number" placeholder="—" value={s.reps}
+                    onChange={e=>updateSet(si,'reps',e.target.value)}
+                    disabled={s.done}
+                    style={{width:40,height:28,borderRadius:7,border:`1.5px solid ${s.done?WW.tealBg:WW.border}`,background:s.done?WW.tealBg:'#fff',textAlign:'center',fontSize:13,fontWeight:700,color:s.done?WW.teal:WW.text,outline:'none'}}
+                  />
+                  <button onClick={()=>toggleDone(si)} style={{width:28,height:28,borderRadius:8,background:s.done?WW.teal:WW.chipBg,border:`1.5px solid ${s.done?WW.teal:WW.border}`,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',padding:0,flexShrink:0}}>
+                    {s.done?(
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-9" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    ):(
+                      <div style={{width:8,height:8,borderRadius:4,background:WW.border}}/>
+                    )}
+                  </button>
+                </div>
+              );
+            })}
+            {/* Add set */}
+            <button onClick={addSet} style={{marginTop:8,fontSize:12,fontWeight:700,color:WW.primary,background:'none',border:'none',cursor:'pointer',padding:0}}>+ Add Set</button>
+          </div>
+
+          {/* Per-exercise notes */}
+          <div style={{padding:'0 14px 12px',borderTop:`0.5px solid ${WW.border}`}}>
+            <input placeholder="Add note… (e.g. pause at bottom, grip width)" value={ex.note||''}
+              onChange={e=>{
+                setExercises(prev=>prev.map((item,i)=>i===exIdx?{...item,note:e.target.value}:item));
+              }}
+              style={{width:'100%',height:34,borderRadius:8,border:`1px solid ${WW.border}`,background:WW.bg,fontSize:12,color:WW.text,padding:'0 10px',boxSizing:'border-box',outline:'none',fontFamily:'inherit'}}
+            />
+          </div>
+        </div>
+
+        {/* WiseCoach tip */}
+        <div style={{background:WW.lavenderBg,borderRadius:12,borderLeft:`3px solid ${WW.lavender}`,padding:'10px 12px',marginBottom:12,display:'flex',gap:8,alignItems:'flex-start'}}>
+          <div style={{width:22,height:22,borderRadius:11,background:WW.lavender,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"/></svg>
+          </div>
+          <div style={{fontSize:12,color:'#5B3F9E',lineHeight:1.5}}>Last time you hit 80kg×8 on Bench. Push for 82.5 today — your strength trend is up.</div>
+        </div>
+      </div>
+
+      {/* Bottom nav bar — Previous / Next */}
+      <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,borderTop:`0.5px solid ${WW.border}`,padding:'10px 16px 24px',display:'flex',gap:8,zIndex:20}}>
+        <button onClick={()=>setExIdx(i=>Math.max(0,i-1))} disabled={exIdx===0} style={{flex:1,height:46,borderRadius:12,border:`1.5px solid ${exIdx===0?WW.border:WW.primary}`,background:'transparent',color:exIdx===0?WW.textSec:WW.primary,fontSize:14,fontWeight:700,cursor:exIdx===0?'default':'pointer'}}>← Previous</button>
+        {exIdx<exercises.length-1?(
+          <button onClick={()=>setExIdx(i=>i+1)} style={{flex:2,height:46,borderRadius:12,background:WW.primary,border:'none',color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer',boxShadow:'0 3px 10px rgba(108,126,232,.35)'}}>Next Exercise →</button>
+        ):(
+          <a href="S-19-Post-Gym-Summary.html" style={{flex:2,height:46,borderRadius:12,background:WW.teal,border:'none',color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer',boxShadow:'0 3px 10px rgba(75,184,204,.35)',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none'}}>Finish Session ✓</a>
+        )}
+      </div>
+
+      {/* Finish confirmation modal */}
+      {showFinish&&(
+        <div style={{position:'absolute',inset:0,background:'rgba(10,10,18,.55)',display:'flex',alignItems:'flex-end',zIndex:50}} onClick={()=>setShowFinish(false)}>
+          <div style={{width:'100%',background:WW.card,borderRadius:'20px 20px 0 0',padding:'20px 20px 40px'}} onClick={e=>e.stopPropagation()}>
+            <div style={{width:36,height:4,borderRadius:2,background:WW.border,margin:'0 auto 16px'}}/>
+            <div style={{fontSize:17,fontWeight:800,color:WW.text,marginBottom:8}}>End session?</div>
+            <div style={{fontSize:13,color:WW.textSec,lineHeight:1.5,marginBottom:20}}>{incompleteCount} sets remaining. Your completed sets will still be logged.</div>
+            <div style={{display:'flex',gap:8}}>
+              <button onClick={()=>setShowFinish(false)} style={{flex:1,height:46,borderRadius:12,border:`1.5px solid ${WW.border}`,background:'transparent',color:WW.text,fontSize:14,fontWeight:700,cursor:'pointer'}}>Keep Going</button>
+              <a href="S-19-Post-Gym-Summary.html" style={{flex:1,height:46,borderRadius:12,background:'#EF4444',border:'none',color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none'}}>End Session</a>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiseWorkout · S-20 Cardio Setup · For Figma</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F7F8FF;
+      --canvas: #EDEEF5;
+      --card: #FFFFFF;
+      --elevated: #EEF0FB;
+      --primary: #6C7EE8;
+      --primary-dark: #2D3A8C;
+      --teal: #4BB8CC;
+      --teal-bg: #E0F4F8;
+      --text: #3D3D5C;
+      --text-sec: #8A8A9E;
+      --border: #C8C8D8;
+      --chip-bg: #E6EAFE;
+      --shadow: 0 2px 8px rgba(45,58,140,.06);
+      --frame-shadow: 0 30px 70px rgba(20,25,60,.20), 0 0 0 1px rgba(0,0,0,.12);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    }
+    body { min-height: 100vh; padding: 48px 40px 64px; }
+    .page-title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.04em;
+    }
+    .page-subtitle {
+      margin: 0 0 32px;
+      color: var(--text-sec);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 980px;
+    }
+    .storyboard {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .frame-block {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    .frame-label {
+      font-size: 12px;
+      color: #6B6B80;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      font-weight: 700;
+      text-align: center;
+    }
+    .phone-shell {
+      width: 390px;
+      min-height: 844px;
+      border-radius: 52px;
+      background: #0A0A12;
+      padding: 5px;
+      box-shadow: var(--frame-shadow);
+      position: relative;
+    }
+    .phone-inner {
+      width: 100%;
+      min-height: 834px;
+      border-radius: 47px;
+      overflow: hidden;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 33px;
+      border-radius: 20px;
+      background: #000;
+      z-index: 60;
+    }
+    .app {
+      width: 100%;
+      min-height: 834px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(160deg,#2D3A8C 0%,#1a2266 100%);
+    }
+    .status-bar {
+      height: 47px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(255,255,255,.8);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .status-time, .status-icons { padding-top: 10px; }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .bg-ghost {
+      padding: 20px 24px;
+      opacity: .4;
+    }
+    .bg-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .ghost-box {
+      border-radius: 14px;
+      background: rgba(255,255,255,.1);
+      margin-bottom: 8px;
+    }
+    .sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--card);
+      border-radius: 22px 22px 0 0;
+      box-shadow: 0 -10px 40px rgba(10,10,18,.28);
+      max-height: 88%;
+      display: flex;
+      flex-direction: column;
+    }
+    .handle {
+      width: 36px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      margin: 10px auto 0;
+      flex-shrink: 0;
+    }
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px 6px;
+      flex-shrink: 0;
+    }
+    .sheet-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.3px;
+    }
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      background: var(--elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .sheet-content {
+      padding: 0 16px;
+      padding-bottom: 90px;
+      flex: 1;
+    }
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sec);
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      margin: 4px 0 8px;
+    }
+    .activity-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .activity-card {
+      flex: 1;
+      border-radius: 16px;
+      border: 2.5px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .activity-card.selected {
+      border-color: var(--teal);
+      background: var(--teal-bg);
+      box-shadow: 0 4px 14px rgba(75,184,204,.25);
+    }
+    .activity-top {
+      width: 100%;
+      padding: 16px 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .grad-run { background: linear-gradient(145deg,#1A6B7C 0%,#4BB8CC 100%); }
+    .grad-walk { background: linear-gradient(145deg,#166534 0%,#22C55E 100%); }
+    .grad-cycle { background: linear-gradient(145deg,#5B3F9E 0%,#9B84E8 100%); }
+    .grad-muted { background: linear-gradient(145deg,#EEF0FB,#F7F8FF); }
+    .activity-bottom {
+      padding: 6px 8px 10px;
+      width: 100%;
+      text-align: center;
+    }
+    .activity-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .activity-card.selected .activity-name { color: #1A7A8C; }
+    .activity-meta {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--text-sec);
+      margin-top: 3px;
+      opacity: .8;
+    }
+    .activity-card.selected .activity-meta { color: var(--teal); }
+    .segmented {
+      display: flex;
+      background: var(--elevated);
+      border-radius: 12px;
+      padding: 3px;
+      margin-bottom: 14px;
+    }
+    .seg {
+      flex: 1;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-sec);
+      background: transparent;
+    }
+    .seg.selected {
+      background: var(--card);
+      border: .5px solid var(--border);
+      color: var(--primary-dark);
+      box-shadow: var(--shadow);
+    }
+    .gps-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+    .gps-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 4px;
+      background: #10B981;
+      flex-shrink: 0;
+    }
+    .gps-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #059669;
+    }
+    .map {
+      border-radius: 12px;
+      overflow: hidden;
+      height: 80px;
+      background: #E8EDF0;
+      position: relative;
+      border: .5px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .indoor-note {
+      background: var(--elevated);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .indoor-copy {
+      font-size: 12px;
+      color: var(--text-sec);
+      line-height: 1.5;
+    }
+    .goal-card {
+      background: var(--card);
+      border-radius: 14px;
+      border: .5px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .goal-head {
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .goal-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .goal-body {
+      padding: 10px 14px 14px;
+      border-top: .5px solid var(--border);
+    }
+    .mini-seg {
+      display: flex;
+      background: var(--elevated);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 10px;
+    }
+    .mini-item {
+      flex: 1;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sec);
+    }
+    .mini-item.selected {
+      background: var(--card);
+      color: var(--primary-dark);
+    }
+    .goal-input {
+      width: 100%;
+      height: 44px;
+      border-radius: 11px;
+      border: 1.5px solid var(--teal);
+      padding: 0 12px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      background: #fff;
+    }
+    .goal-meta {
+      font-size: 11px;
+      color: var(--teal);
+      font-weight: 700;
+      margin-top: 6px;
+    }
+    .settings-card,
+    .hr-card {
+      background: var(--card);
+      border-radius: 14px;
+      border: .5px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .setting-row {
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .setting-row + .setting-row {
+      border-top: .5px solid var(--border);
+    }
+    .setting-main {
+      padding-right: 10px;
+    }
+    .setting-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .setting-sub {
+      font-size: 11px;
+      color: var(--text-sec);
+      margin-top: 1px;
+    }
+    .toggle {
+      width: 42px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--teal);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .toggle:after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 20px;
+      width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,.18);
+    }
+    .hr-card {
+      padding: 12px 14px;
+    }
+    .hr-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .hr-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+    .hr-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .hr-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+    .hr-range {
+      font-size: 11px;
+      color: var(--text-sec);
+    }
+    .cta-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 10px 16px 28px;
+      background: var(--card);
+      border-top: .5px solid var(--border);
+      z-index: 20;
+    }
+    .cta-btn {
+      width: 100%;
+      height: 54px;
+      border-radius: 14px;
+      background: var(--teal);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(75,184,204,.4);
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,18,.85);
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .overlay-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+      background: linear-gradient(145deg,#1A6B7C 0%,#4BB8CC 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: .9;
+    }
+    .overlay-kicker {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,.6);
+      letter-spacing: .6px;
+      text-transform: uppercase;
+    }
+    .overlay-count {
+      font-size: 110px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -4px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .count-dots {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .count-dots div {
+      width: 8px;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255,255,255,.25);
+    }
+    .count-dots .on { background: var(--teal); }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">S-20 Cardio Setup for Figma</h1>
+  <p class="page-subtitle">
+    This version keeps the cardio setup bottom sheet close to the original while flattening
+    the main UI states for HTML-to-Figma import. It includes outdoor GPS setup, indoor manual
+    setup, expanded goal and heart-rate settings, and the start countdown overlay.
+  </p>
+
+  <div class="storyboard">
+    <section class="frame-block">
+      <div class="frame-label">Outdoor GPS Setup</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="rgba(255,255,255,0.8)"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="rgba(255,255,255,0.4)" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="rgba(255,255,255,0.8)"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="rgba(255,255,255,0.4)"/></svg>
+          </div>
+        </div>
+        <div class="bg-ghost">
+          <div class="bg-title">Plans</div>
+          <div class="ghost-box" style="height:60px;"></div>
+          <div class="ghost-box" style="height:40px;background:rgba(255,255,255,.07);"></div>
+        </div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <div class="sheet-head">
+            <div class="sheet-title">Start Activity</div>
+            <div class="close-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#3D3D5C" stroke-width="2" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="sheet-content">
+            <div class="eyebrow">Activity</div>
+            <div class="activity-row">
+              <div class="activity-card selected">
+                <div class="activity-top grad-run"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="4" r="2" fill="#fff"/><path d="M9 9.5l1.5-3.5 3.5 2 2 4H9zM7.5 14l1.5-4.5m4.5.5l1.5 5.5-3.5 2L9.5 21" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Run</div><div class="activity-meta">Last used</div></div>
+              </div>
+              <div class="activity-card">
+                <div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="4" r="2" fill="#8A8A9E"/><path d="M8 12l1.5-4 4 2 2 5M9.5 20l1-4m4-3.5l1.5 5-3 1" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Walk</div></div>
+              </div>
+              <div class="activity-card">
+                <div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><circle cx="18" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><path d="M6 15l5-8h3l2 8M14 7l1.5 4" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Cycle</div></div>
+              </div>
+            </div>
+
+            <div class="eyebrow">Mode</div>
+            <div class="segmented">
+              <div class="seg selected"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 100 14A7 7 0 0012 2z" stroke="currentColor" stroke-width="1.5"/><path d="M12 16v5M8 20h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Outdoor</div>
+              <div class="seg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h18M9 9v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Indoor</div>
+            </div>
+
+            <div class="gps-row"><div class="gps-dot"></div><div class="gps-text">GPS ready · Accurate to 4m</div></div>
+            <div class="map">
+              <svg width="100%" height="80" viewBox="0 0 260 80" style="display:block">
+                <rect width="260" height="80" fill="#E8EDF0"/>
+                <line x1="0" y1="25" x2="260" y2="25" stroke="#D4DAE0" stroke-width=".5"/><line x1="0" y1="50" x2="260" y2="50" stroke="#D4DAE0" stroke-width=".5"/>
+                <line x1="65" y1="0" x2="65" y2="80" stroke="#D4DAE0" stroke-width=".5"/><line x1="130" y1="0" x2="130" y2="80" stroke="#D4DAE0" stroke-width=".5"/><line x1="195" y1="0" x2="195" y2="80" stroke="#D4DAE0" stroke-width=".5"/>
+                <path d="M0 50 Q130 40 260 55" fill="none" stroke="#D0D6DA" stroke-width="8"/>
+                <path d="M130 0 L130 80" fill="none" stroke="#D0D6DA" stroke-width="6"/>
+                <path d="M20 55L45 42L72 47L100 35L128 44L155 38L182 48L210 35L238 42" fill="none" stroke="#4BB8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="20" cy="55" r="4" fill="#10B981" stroke="#fff" stroke-width="1.5"/>
+                <circle cx="238" cy="42" r="9" fill="#4BB8CC" opacity=".25"/>
+                <circle cx="238" cy="42" r="5" fill="#4BB8CC" stroke="#fff" stroke-width="1.5"/>
+              </svg>
+            </div>
+
+            <div class="goal-card">
+              <div class="goal-head">
+                <div class="goal-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#6C7EE8" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke="#6C7EE8" stroke-width="1.5"/><circle cx="12" cy="12" r="1.5" fill="#6C7EE8"/></svg>Set a goal <span style="font-size:11px;font-weight:500;color:#8A8A9E;">(optional)</span></div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+
+            <div class="settings-card">
+              <div class="setting-row">
+                <div class="setting-main"><div class="setting-title">Audio cues</div><div class="setting-sub">Km distance &amp; pace announcements</div></div>
+                <div class="toggle"></div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-main"><div class="setting-title">Auto-pause</div><div class="setting-sub">Pause timer when stationary</div></div>
+                <div class="toggle" style="background:#C8C8D8;"><span style="display:none"></span></div>
+              </div>
+            </div>
+          </div>
+          <div class="cta-bar"><div class="cta-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>Start Run · Outdoor</div></div>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Indoor Manual Setup</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="rgba(255,255,255,0.8)"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="rgba(255,255,255,0.4)" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="rgba(255,255,255,0.8)"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="rgba(255,255,255,0.4)"/></svg>
+          </div>
+        </div>
+        <div class="bg-ghost">
+          <div class="bg-title">Plans</div>
+          <div class="ghost-box" style="height:60px;"></div>
+          <div class="ghost-box" style="height:40px;background:rgba(255,255,255,.07);"></div>
+        </div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <div class="sheet-head">
+            <div class="sheet-title">Start Activity</div>
+            <div class="close-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#3D3D5C" stroke-width="2" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="sheet-content">
+            <div class="eyebrow">Activity</div>
+            <div class="activity-row">
+              <div class="activity-card">
+                <div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="4" r="2" fill="#8A8A9E"/><path d="M9 9.5l1.5-3.5 3.5 2 2 4H9zM7.5 14l1.5-4.5m4.5.5l1.5 5.5-3.5 2L9.5 21" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Run</div><div class="activity-meta">Last used</div></div>
+              </div>
+              <div class="activity-card selected">
+                <div class="activity-top grad-walk"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="4" r="2" fill="#fff"/><path d="M8 12l1.5-4 4 2 2 5M9.5 20l1-4m4-3.5l1.5 5-3 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Walk</div></div>
+              </div>
+              <div class="activity-card">
+                <div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><circle cx="18" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><path d="M6 15l5-8h3l2 8M14 7l1.5 4" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Cycle</div></div>
+              </div>
+            </div>
+
+            <div class="eyebrow">Mode</div>
+            <div class="segmented">
+              <div class="seg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 100 14A7 7 0 0012 2z" stroke="currentColor" stroke-width="1.5"/><path d="M12 16v5M8 20h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Outdoor</div>
+              <div class="seg selected"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h18M9 9v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Indoor</div>
+            </div>
+
+            <div class="indoor-note">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="9" stroke="#8A8A9E" stroke-width="1.5"/><path d="M12 8v5M12 16v.5" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <div class="indoor-copy">No GPS tracking. You&apos;ll log distance and notes manually when you stop.</div>
+            </div>
+
+            <div class="goal-card">
+              <div class="goal-head">
+                <div class="goal-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#6C7EE8" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke="#6C7EE8" stroke-width="1.5"/><circle cx="12" cy="12" r="1.5" fill="#6C7EE8"/></svg>Set a goal <span style="font-size:11px;font-weight:500;color:#8A8A9E;">(optional)</span></div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+
+            <div class="settings-card">
+              <div class="setting-row">
+                <div class="setting-main"><div class="setting-title">Audio cues</div><div class="setting-sub">Km distance &amp; pace announcements</div></div>
+                <div class="toggle"></div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-main"><div class="setting-title">Auto-pause</div><div class="setting-sub">Pause timer when stationary</div></div>
+                <div class="toggle" style="background:#C8C8D8;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="cta-bar"><div class="cta-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>Start Walk · Indoor</div></div>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Goal And HR Expanded</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="rgba(255,255,255,0.8)"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="rgba(255,255,255,0.4)" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="rgba(255,255,255,0.8)"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="rgba(255,255,255,0.4)"/></svg>
+          </div>
+        </div>
+        <div class="bg-ghost">
+          <div class="bg-title">Plans</div>
+          <div class="ghost-box" style="height:60px;"></div>
+          <div class="ghost-box" style="height:40px;background:rgba(255,255,255,.07);"></div>
+        </div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <div class="sheet-head">
+            <div class="sheet-title">Start Activity</div>
+            <div class="close-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#3D3D5C" stroke-width="2" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="sheet-content">
+            <div class="eyebrow">Activity</div>
+            <div class="activity-row">
+              <div class="activity-card selected">
+                <div class="activity-top grad-run"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="4" r="2" fill="#fff"/><path d="M9 9.5l1.5-3.5 3.5 2 2 4H9zM7.5 14l1.5-4.5m4.5.5l1.5 5.5-3.5 2L9.5 21" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Run</div><div class="activity-meta">Last used</div></div>
+              </div>
+              <div class="activity-card">
+                <div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="4" r="2" fill="#8A8A9E"/><path d="M8 12l1.5-4 4 2 2 5M9.5 20l1-4m4-3.5l1.5 5-3 1" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Walk</div></div>
+              </div>
+              <div class="activity-card">
+                <div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><circle cx="18" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><path d="M6 15l5-8h3l2 8M14 7l1.5 4" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Cycle</div></div>
+              </div>
+            </div>
+            <div class="eyebrow">Mode</div>
+            <div class="segmented">
+              <div class="seg selected"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 100 14A7 7 0 0012 2z" stroke="currentColor" stroke-width="1.5"/><path d="M12 16v5M8 20h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Outdoor</div>
+              <div class="seg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h18M9 9v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Indoor</div>
+            </div>
+            <div class="gps-row"><div class="gps-dot"></div><div class="gps-text">GPS ready · Accurate to 4m</div></div>
+            <div class="map">
+              <svg width="100%" height="80" viewBox="0 0 260 80" style="display:block">
+                <rect width="260" height="80" fill="#E8EDF0"/>
+                <path d="M0 50 Q130 40 260 55" fill="none" stroke="#D0D6DA" stroke-width="8"/>
+                <path d="M130 0 L130 80" fill="none" stroke="#D0D6DA" stroke-width="6"/>
+                <path d="M20 55L45 42L72 47L100 35L128 44L155 38L182 48L210 35L238 42" fill="none" stroke="#4BB8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="20" cy="55" r="4" fill="#10B981" stroke="#fff" stroke-width="1.5"/>
+                <circle cx="238" cy="42" r="9" fill="#4BB8CC" opacity=".25"/>
+                <circle cx="238" cy="42" r="5" fill="#4BB8CC" stroke="#fff" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="goal-card">
+              <div class="goal-head">
+                <div class="goal-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#6C7EE8" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke="#6C7EE8" stroke-width="1.5"/><circle cx="12" cy="12" r="1.5" fill="#6C7EE8"/></svg>Set a goal <span style="font-size:11px;font-weight:500;color:#8A8A9E;">(optional)</span></div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="transform:rotate(180deg)"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <div class="goal-body">
+                <div class="mini-seg">
+                  <div class="mini-item selected">Distance (km)</div>
+                  <div class="mini-item">Time (min)</div>
+                </div>
+                <div class="goal-input">5.0</div>
+                <div class="goal-meta">Goal: 5.0 km</div>
+              </div>
+            </div>
+            <div class="settings-card">
+              <div class="setting-row">
+                <div class="setting-main"><div class="setting-title">Audio cues</div><div class="setting-sub">Km distance &amp; pace announcements</div></div>
+                <div class="toggle"></div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-main"><div class="setting-title">Auto-pause</div><div class="setting-sub">Pause timer when stationary</div></div>
+                <div class="toggle"></div>
+              </div>
+            </div>
+            <div class="hr-card">
+              <div class="hr-title">Heart Rate Zones</div>
+              <div class="hr-row"><div class="hr-dot" style="background:#4BB8CC;"></div><div class="hr-name">Z1 — Easy</div><div class="hr-range">&lt; 115 bpm</div></div>
+              <div class="hr-row"><div class="hr-dot" style="background:#6C7EE8;"></div><div class="hr-name">Z2 — Fat Burn</div><div class="hr-range">115–135</div></div>
+              <div class="hr-row"><div class="hr-dot" style="background:#F59E0B;"></div><div class="hr-name">Z3 — Cardio</div><div class="hr-range">135–155</div></div>
+              <div class="hr-row"><div class="hr-dot" style="background:#EF4444;"></div><div class="hr-name">Z4 — Peak</div><div class="hr-range">&gt; 155 bpm</div></div>
+            </div>
+          </div>
+          <div class="cta-bar"><div class="cta-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>Start Run · Outdoor</div></div>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Cycling Time Goal</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="rgba(255,255,255,0.8)"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="rgba(255,255,255,0.4)" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="rgba(255,255,255,0.8)"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="rgba(255,255,255,0.4)"/></svg>
+          </div>
+        </div>
+        <div class="bg-ghost">
+          <div class="bg-title">Plans</div>
+          <div class="ghost-box" style="height:60px;"></div>
+          <div class="ghost-box" style="height:40px;background:rgba(255,255,255,.07);"></div>
+        </div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <div class="sheet-head">
+            <div class="sheet-title">Start Activity</div>
+            <div class="close-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#3D3D5C" stroke-width="2" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="sheet-content">
+            <div class="eyebrow">Activity</div>
+            <div class="activity-row">
+              <div class="activity-card">
+                <div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="4" r="2" fill="#8A8A9E"/><path d="M9 9.5l1.5-3.5 3.5 2 2 4H9zM7.5 14l1.5-4.5m4.5.5l1.5 5.5-3.5 2L9.5 21" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Run</div><div class="activity-meta">Last used</div></div>
+              </div>
+              <div class="activity-card">
+                <div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="4" r="2" fill="#8A8A9E"/><path d="M8 12l1.5-4 4 2 2 5M9.5 20l1-4m4-3.5l1.5 5-3 1" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Walk</div></div>
+              </div>
+              <div class="activity-card selected">
+                <div class="activity-top grad-cycle"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="15" r="4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="15" r="4" stroke="#fff" stroke-width="1.6"/><path d="M6 15l5-8h3l2 8M14 7l1.5 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="activity-bottom"><div class="activity-name">Cycle</div></div>
+              </div>
+            </div>
+            <div class="eyebrow">Mode</div>
+            <div class="segmented">
+              <div class="seg selected"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2a7 7 0 100 14A7 7 0 0012 2z" stroke="currentColor" stroke-width="1.5"/><path d="M12 16v5M8 20h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Outdoor</div>
+              <div class="seg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h18M9 9v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Indoor</div>
+            </div>
+            <div class="gps-row"><div class="gps-dot"></div><div class="gps-text">GPS ready · Accurate to 4m</div></div>
+            <div class="map">
+              <svg width="100%" height="80" viewBox="0 0 260 80" style="display:block">
+                <rect width="260" height="80" fill="#E8EDF0"/>
+                <path d="M0 50 Q130 40 260 55" fill="none" stroke="#D0D6DA" stroke-width="8"/>
+                <path d="M130 0 L130 80" fill="none" stroke="#D0D6DA" stroke-width="6"/>
+                <path d="M20 55L45 42L72 47L100 35L128 44L155 38L182 48L210 35L238 42" fill="none" stroke="#4BB8CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="20" cy="55" r="4" fill="#10B981" stroke="#fff" stroke-width="1.5"/>
+                <circle cx="238" cy="42" r="9" fill="#4BB8CC" opacity=".25"/>
+                <circle cx="238" cy="42" r="5" fill="#4BB8CC" stroke="#fff" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="goal-card">
+              <div class="goal-head">
+                <div class="goal-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#6C7EE8" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke="#6C7EE8" stroke-width="1.5"/><circle cx="12" cy="12" r="1.5" fill="#6C7EE8"/></svg>Set a goal <span style="font-size:11px;font-weight:500;color:#8A8A9E;">(optional)</span></div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="transform:rotate(180deg)"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <div class="goal-body">
+                <div class="mini-seg">
+                  <div class="mini-item">Distance (km)</div>
+                  <div class="mini-item selected">Time (min)</div>
+                </div>
+                <div class="goal-input">45</div>
+                <div class="goal-meta">Goal: 45 min</div>
+              </div>
+            </div>
+            <div class="settings-card">
+              <div class="setting-row">
+                <div class="setting-main"><div class="setting-title">Audio cues</div><div class="setting-sub">Km distance &amp; pace announcements</div></div>
+                <div class="toggle"></div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-main"><div class="setting-title">Auto-pause</div><div class="setting-sub">Pause timer when stationary</div></div>
+                <div class="toggle" style="background:#C8C8D8;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="cta-bar"><div class="cta-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>Start Cycle · Outdoor</div></div>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Countdown 3</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar"><div class="status-time">9:41</div><div class="status-icons"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="rgba(255,255,255,0.8)"/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="rgba(255,255,255,0.4)" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="rgba(255,255,255,0.8)"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="rgba(255,255,255,0.4)"/></svg></div></div>
+        <div class="bg-ghost"><div class="bg-title">Plans</div><div class="ghost-box" style="height:60px;"></div><div class="ghost-box" style="height:40px;background:rgba(255,255,255,.07);"></div></div>
+        <div class="sheet"><div class="handle"></div><div class="sheet-head"><div class="sheet-title">Start Activity</div><div class="close-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#3D3D5C" stroke-width="2" stroke-linecap="round"/></svg></div></div><div class="sheet-content"><div class="eyebrow">Activity</div><div class="activity-row"><div class="activity-card selected"><div class="activity-top grad-run"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="4" r="2" fill="#fff"/><path d="M9 9.5l1.5-3.5 3.5 2 2 4H9zM7.5 14l1.5-4.5m4.5.5l1.5 5.5-3.5 2L9.5 21" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="activity-bottom"><div class="activity-name">Run</div><div class="activity-meta">Last used</div></div></div><div class="activity-card"><div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="4" r="2" fill="#8A8A9E"/><path d="M8 12l1.5-4 4 2 2 5M9.5 20l1-4m4-3.5l1.5 5-3 1" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="activity-bottom"><div class="activity-name">Walk</div></div></div><div class="activity-card"><div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><circle cx="18" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><path d="M6 15l5-8h3l2 8M14 7l1.5 4" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="activity-bottom"><div class="activity-name">Cycle</div></div></div></div></div><div class="cta-bar"><div class="cta-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>Start Run · Outdoor</div></div></div>
+        <div class="overlay"><div class="overlay-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="4" r="2" fill="#fff"/><path d="M9 9.5l1.5-3.5 3.5 2 2 4H9zM7.5 14l1.5-4.5m4.5.5l1.5 5.5-3.5 2L9.5 21" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="overlay-kicker">Get ready</div><div class="overlay-count">3</div><div class="count-dots"><div class="on"></div><div class="on"></div><div class="on"></div></div></div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Countdown 2</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar"><div class="status-time">9:41</div><div class="status-icons"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="rgba(255,255,255,0.8)"/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="rgba(255,255,255,0.4)" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="rgba(255,255,255,0.8)"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="rgba(255,255,255,0.4)"/></svg></div></div>
+        <div class="bg-ghost"><div class="bg-title">Plans</div><div class="ghost-box" style="height:60px;"></div><div class="ghost-box" style="height:40px;background:rgba(255,255,255,.07);"></div></div>
+        <div class="sheet"><div class="handle"></div><div class="sheet-head"><div class="sheet-title">Start Activity</div><div class="close-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#3D3D5C" stroke-width="2" stroke-linecap="round"/></svg></div></div><div class="sheet-content"><div class="eyebrow">Activity</div><div class="activity-row"><div class="activity-card selected"><div class="activity-top grad-run"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="4" r="2" fill="#fff"/><path d="M9 9.5l1.5-3.5 3.5 2 2 4H9zM7.5 14l1.5-4.5m4.5.5l1.5 5.5-3.5 2L9.5 21" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="activity-bottom"><div class="activity-name">Run</div><div class="activity-meta">Last used</div></div></div><div class="activity-card"><div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="4" r="2" fill="#8A8A9E"/><path d="M8 12l1.5-4 4 2 2 5M9.5 20l1-4m4-3.5l1.5 5-3 1" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="activity-bottom"><div class="activity-name">Walk</div></div></div><div class="activity-card"><div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><circle cx="18" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><path d="M6 15l5-8h3l2 8M14 7l1.5 4" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="activity-bottom"><div class="activity-name">Cycle</div></div></div></div></div><div class="cta-bar"><div class="cta-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>Start Run · Outdoor</div></div></div>
+        <div class="overlay"><div class="overlay-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="4" r="2" fill="#fff"/><path d="M9 9.5l1.5-3.5 3.5 2 2 4H9zM7.5 14l1.5-4.5m4.5.5l1.5 5.5-3.5 2L9.5 21" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="overlay-kicker">Get ready</div><div class="overlay-count">2</div><div class="count-dots"><div class="on"></div><div class="on"></div><div></div></div></div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Countdown 1</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar"><div class="status-time">9:41</div><div class="status-icons"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="rgba(255,255,255,0.8)"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="rgba(255,255,255,0.8)"/></svg><svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="rgba(255,255,255,0.4)" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="rgba(255,255,255,0.8)"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="rgba(255,255,255,0.4)"/></svg></div></div>
+        <div class="bg-ghost"><div class="bg-title">Plans</div><div class="ghost-box" style="height:60px;"></div><div class="ghost-box" style="height:40px;background:rgba(255,255,255,.07);"></div></div>
+        <div class="sheet"><div class="handle"></div><div class="sheet-head"><div class="sheet-title">Start Activity</div><div class="close-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#3D3D5C" stroke-width="2" stroke-linecap="round"/></svg></div></div><div class="sheet-content"><div class="eyebrow">Activity</div><div class="activity-row"><div class="activity-card selected"><div class="activity-top grad-run"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="4" r="2" fill="#fff"/><path d="M9 9.5l1.5-3.5 3.5 2 2 4H9zM7.5 14l1.5-4.5m4.5.5l1.5 5.5-3.5 2L9.5 21" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="activity-bottom"><div class="activity-name">Run</div><div class="activity-meta">Last used</div></div></div><div class="activity-card"><div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="4" r="2" fill="#8A8A9E"/><path d="M8 12l1.5-4 4 2 2 5M9.5 20l1-4m4-3.5l1.5 5-3 1" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="activity-bottom"><div class="activity-name">Walk</div></div></div><div class="activity-card"><div class="activity-top grad-muted"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><circle cx="18" cy="15" r="4" stroke="#8A8A9E" stroke-width="1.6"/><path d="M6 15l5-8h3l2 8M14 7l1.5 4" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="activity-bottom"><div class="activity-name">Cycle</div></div></div></div></div><div class="cta-bar"><div class="cta-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>Start Run · Outdoor</div></div></div>
+        <div class="overlay"><div class="overlay-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="14" cy="4" r="2" fill="#fff"/><path d="M9 9.5l1.5-3.5 3.5 2 2 4H9zM7.5 14l1.5-4.5m4.5.5l1.5 5.5-3.5 2L9.5 21" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="overlay-kicker">Get ready</div><div class="overlay-count">1</div><div class="count-dots"><div class="on"></div><div></div><div></div></div></div>
+      </div></div></div>
+    </section>
+  </div>
+</body>
+</html>

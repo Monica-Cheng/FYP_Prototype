@@ -1,0 +1,123 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-43 Blocked Users</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0;padding:0;background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .lbl{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .fade-in{animation:fadeIn .25s ease forwards}
+</style>
+</head><body>
+<div class="stage">
+  <div class="lbl">S-43 · Blocked Users</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+const PATHS={
+  'chevron-left':"M15 18l-6-6 6-6",
+  'shield-off':"M19.69 14a6.9 6.9 0 0 0 .31-2V5l-8-3-3.16 1.18M4.73 4.73L4 5v7c0 6 8 10 8 10a20.29 20.29 0 0 0 5.62-4.38M1 1l22 22",
+  check:"M20 6L9 17l-5-5",
+};
+function Icon({name,size=16,color='currentColor',style:s}){
+  const p=PATHS[name];if(!p)return null;
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-flex',flexShrink:0,...s}}><path d={p}/></svg>;
+}
+function StatusBar(){
+  return <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0,background:WW.card}}>
+    <span style={{paddingTop:10}}>9:41</span>
+    <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+      <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+      <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+    </div>
+  </div>;
+}
+
+const EXAMPLE_USERS=[
+  {id:1,name:'Alex Chen',username:'@alexchen99',initials:'AC',color:'#E0F4F8',textColor:'#1A7A8C'},
+  {id:2,name:'Jordan K.',username:'@jordan_k',initials:'JK',color:'#EDE9FE',textColor:'#6D28D9'},
+];
+
+function App(){
+  const [showExample,setShowExample]=React.useState(false);
+  const [blocked,setBlocked]=React.useState(EXAMPLE_USERS);
+  const [unblocking,setUnblocking]=React.useState(null);
+
+  function handleUnblock(id){
+    if(unblocking===id)return;
+    setUnblocking(id);
+    setTimeout(()=>{
+      setBlocked(prev=>prev.filter(u=>u.id!==id));
+      setUnblocking(null);
+    },700);
+  }
+
+  const isEmpty=!showExample||(showExample&&blocked.length===0);
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,fontFamily:"'Inter',system-ui,sans-serif"}}>
+      <StatusBar/>
+      <div style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',flexShrink:0,position:'relative'}}>
+        <a href="S-35-Settings.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,textDecoration:'none',flexShrink:0}}>
+          <Icon name="chevron-left" size={18} color={WW.textSec}/>
+        </a>
+        <span style={{position:'absolute',left:'50%',transform:'translateX(-50%)',fontSize:18,fontWeight:600,color:WW.primaryDark}}>Blocked Users</span>
+      </div>
+
+      <div style={{flex:1,overflowY:'auto',padding:'20px 16px 40px'}}>
+        {/* Empty state or list */}
+        {(!showExample||blocked.length===0)?(
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'60px 24px',gap:16,textAlign:'center'}}>
+            <div style={{width:72,height:72,borderRadius:36,background:WW.elevated,display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <Icon name="shield-off" size={32} color={WW.textSec}/>
+            </div>
+            <div>
+              <div style={{fontSize:18,fontWeight:700,color:WW.primaryDark,marginBottom:8}}>No blocked users</div>
+              <div style={{fontSize:14,color:WW.textSec,lineHeight:1.6}}>Users you block won't be able to see your profile or interact with you on WiseWorkout.</div>
+            </div>
+            {!showExample&&(
+              <button onClick={()=>setShowExample(true)} style={{marginTop:8,padding:'10px 20px',borderRadius:20,border:`1px solid ${WW.border}`,background:WW.card,color:WW.textSec,fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>
+                Show example
+              </button>
+            )}
+          </div>
+        ):(
+          <div className="fade-in">
+            <div style={{fontSize:12,color:WW.textSec,marginBottom:12,paddingLeft:4}}>{blocked.length} blocked user{blocked.length!==1?'s':''}</div>
+            {blocked.map(u=>(
+              <div key={u.id} style={{display:'flex',alignItems:'center',gap:12,padding:'14px 16px',background:WW.card,borderRadius:12,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,marginBottom:8}}>
+                <div style={{width:44,height:44,borderRadius:22,background:u.color,display:'flex',alignItems:'center',justifyContent:'center',fontSize:15,fontWeight:700,color:u.textColor,flexShrink:0}}>
+                  {u.initials}
+                </div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:15,fontWeight:500,color:WW.text}}>{u.name}</div>
+                  <div style={{fontSize:12,color:WW.textSec}}>{u.username}</div>
+                </div>
+                <button onClick={()=>handleUnblock(u.id)} style={{padding:'7px 14px',borderRadius:20,border:`1px solid ${WW.border}`,background:unblocking===u.id?WW.elevated:WW.card,color:unblocking===u.id?WW.textSec:WW.text,fontSize:13,fontWeight:500,cursor:'pointer',fontFamily:'inherit',flexShrink:0}}>
+                  {unblocking===u.id?'Unblocking…':'Unblock'}
+                </button>
+              </div>
+            ))}
+            <div style={{fontSize:12,color:WW.textSec,textAlign:'center',marginTop:12,lineHeight:1.5}}>
+              Unblocking a user lets them see your profile and interact with you again.
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

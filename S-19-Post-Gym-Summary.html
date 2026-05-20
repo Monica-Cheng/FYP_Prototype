@@ -1,0 +1,219 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-19 Post-Gym Summary</title>
+<style>
+  :root{color-scheme:light}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(60px) rotate(360deg);opacity:0}}
+  @keyframes popIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-19 · Post-Gym Summary</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',lavenderDark:'#7B5CB8',lavenderText:'#5B3F9E',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+const CONFETTI_COLORS=['#6C7EE8','#9B84E8','#4BB8CC','#F59E0B','#EF4444','#10B981'];
+
+function Confetti(){
+  const pieces=Array.from({length:18},(_,i)=>i);
+  return(
+    <div style={{position:'absolute',top:0,left:0,right:0,height:120,overflow:'hidden',pointerEvents:'none',zIndex:0}}>
+      {pieces.map(i=>(
+        <div key={i} style={{
+          position:'absolute',
+          left:`${(i*37+13)%90+5}%`,
+          top:`${(i*23)%40}%`,
+          width:i%3===0?8:6,height:i%3===0?8:6,
+          borderRadius:i%2===0?'50%':2,
+          background:CONFETTI_COLORS[i%CONFETTI_COLORS.length],
+          animation:`confettiFall ${1.2+(i%5)*0.3}s ease-out ${i*0.07}s forwards`,
+          opacity:0,
+        }}/>
+      ))}
+    </div>
+  );
+}
+
+function StatusBar(){
+  return(
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function MusclesDiagram(){
+  const muscles=[
+    {label:'Chest',x:95,y:58,active:true,primary:true},
+    {label:'Shoulders',x:58,y:48,active:true,primary:true},
+    {label:'Shoulders',x:132,y:48,active:true,primary:true},
+    {label:'Triceps',x:46,y:74,active:true,primary:false},
+    {label:'Triceps',x:144,y:74,active:true,primary:false},
+    {label:'Core',x:95,y:82,active:false,primary:false},
+  ];
+  return(
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+      <svg width="190" height="160" viewBox="0 0 190 160">
+        {/* Body outline */}
+        <ellipse cx="95" cy="30" rx="20" ry="22" fill="none" stroke={WW.border} strokeWidth="1.5"/>
+        <rect x="72" y="50" width="46" height="50" rx="8" fill="none" stroke={WW.border} strokeWidth="1.5"/>
+        <rect x="40" y="52" width="34" height="12" rx="6" fill="none" stroke={WW.border} strokeWidth="1.5"/>
+        <rect x="116" y="52" width="34" height="12" rx="6" fill="none" stroke={WW.border} strokeWidth="1.5"/>
+        <rect x="40" y="64" width="12" height="36" rx="6" fill="none" stroke={WW.border} strokeWidth="1.5"/>
+        <rect x="138" y="64" width="12" height="36" rx="6" fill="none" stroke={WW.border} strokeWidth="1.5"/>
+        <rect x="78" y="100" width="16" height="48" rx="6" fill="none" stroke={WW.border} strokeWidth="1.5"/>
+        <rect x="96" y="100" width="16" height="48" rx="6" fill="none" stroke={WW.border} strokeWidth="1.5"/>
+        {/* Highlighted muscles */}
+        <rect x="75" y="54" width="40" height="26" rx="6" fill={WW.primary} opacity=".5"/>
+        <rect x="42" y="54" width="30" height="10" rx="5" fill={WW.primary} opacity=".35"/>
+        <rect x="118" y="54" width="30" height="10" rx="5" fill={WW.primary} opacity=".35"/>
+        <rect x="41" y="66" width="10" height="30" rx="5" fill={WW.lavender} opacity=".4"/>
+        <rect x="139" y="66" width="10" height="30" rx="5" fill={WW.lavender} opacity=".4"/>
+      </svg>
+      <div style={{display:'flex',gap:12,marginTop:4}}>
+        <div style={{display:'flex',alignItems:'center',gap:4}}><div style={{width:10,height:10,borderRadius:3,background:WW.primary,opacity:.7}}/><span style={{fontSize:11,color:WW.textSec}}>Primary</span></div>
+        <div style={{display:'flex',alignItems:'center',gap:4}}><div style={{width:10,height:10,borderRadius:3,background:WW.lavender,opacity:.7}}/><span style={{fontSize:11,color:WW.textSec}}>Secondary</span></div>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [exOpen,setExOpen]=React.useState(false);
+
+  return(
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',position:'relative'}}>
+      <StatusBar/>
+      <div style={{flex:1,overflowY:'auto',paddingBottom:90}}>
+
+        {/* Celebration header */}
+        <div style={{background:`linear-gradient(160deg,${WW.primaryDark},#4a4ea8)`,padding:'20px 20px 24px',position:'relative',overflow:'hidden'}}>
+          <Confetti/>
+          <div style={{position:'relative',zIndex:1,textAlign:'center'}}>
+            <div style={{width:56,height:56,borderRadius:28,background:'rgba(255,255,255,.15)',border:'2px solid rgba(255,255,255,.4)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px',animation:'popIn .5s cubic-bezier(.2,.8,.2,1) both'}}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-9" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+            <div style={{fontSize:22,fontWeight:800,color:'#fff',letterSpacing:'-.3px',marginBottom:4,animation:'fadeUp .5s .2s ease both'}}>Workout Complete!</div>
+            <div style={{fontSize:14,color:'rgba(255,255,255,.65)',fontWeight:500,animation:'fadeUp .5s .3s ease both'}}>Push A · Mon 11 May 2026</div>
+          </div>
+        </div>
+
+        <div style={{padding:'0 16px'}}>
+          {/* Stat cards */}
+          <div style={{display:'flex',gap:8,margin:'14px 0'}}>
+            {[['41','min','Duration'],['18','sets','Total Sets'],['3,240','kg','Volume']].map(([v,u,l])=>(
+              <div key={l} style={{flex:1,background:WW.elevated,borderRadius:12,padding:'11px 10px',textAlign:'center',border:`0.5px solid ${WW.border}`}}>
+                <div style={{fontSize:20,fontWeight:800,color:WW.primaryDark,letterSpacing:'-.5px',lineHeight:1}}>{v}</div>
+                <div style={{fontSize:10,color:WW.textSec,fontWeight:600}}>{u}</div>
+                <div style={{fontSize:10,color:WW.textSec,marginTop:2}}>{l}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Muscles worked */}
+          <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'14px',marginBottom:12}}>
+            <div style={{fontSize:13,fontWeight:700,color:WW.text,marginBottom:10}}>Muscles Worked</div>
+            <MusclesDiagram/>
+          </div>
+
+          {/* Personal bests */}
+          <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'14px',marginBottom:12}}>
+            <div style={{fontSize:13,fontWeight:700,color:WW.text,marginBottom:8}}>Personal Bests 🏆</div>
+            {[{ex:'Bench Press',val:'82.5 kg × 8',prev:'80 kg × 8'},{ex:'Overhead Press',val:'52.5 kg × 10',prev:'50 kg × 10'}].map(pb=>(
+              <div key={pb.ex} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 0',borderBottom:`0.5px solid ${WW.border}`}}>
+                <div style={{width:28,height:28,borderRadius:8,background:'rgba(245,158,11,.12)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <span style={{fontSize:14}}>🥇</span>
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:700,color:WW.text}}>{pb.ex}</div>
+                  <div style={{fontSize:11,color:WW.textSec}}>was {pb.prev}</div>
+                </div>
+                <div style={{fontSize:13,fontWeight:800,color:WW.gold}}>{pb.val}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* WiseCoach summary */}
+          <div style={{background:WW.lavenderBg,borderRadius:16,borderLeft:`3px solid ${WW.lavender}`,padding:'13px 14px',marginBottom:12}}>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
+              <div style={{width:26,height:26,borderRadius:13,background:WW.lavender,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"/></svg>
+              </div>
+              <span style={{fontSize:12,fontWeight:700,color:WW.lavenderDark}}>WiseCoach</span>
+            </div>
+            <div style={{fontSize:13,color:WW.lavenderText,lineHeight:1.6}}>Solid Push A session — two new PBs and great volume consistency. Your chest and shoulders are responding well to progressive overload. Keep rest times tight next session for more metabolic stress.</div>
+          </div>
+
+          {/* XP banner */}
+          <div style={{background:WW.tealBg,borderRadius:14,border:`0.5px solid rgba(75,184,204,.35)`,padding:'12px 14px',marginBottom:12,display:'flex',alignItems:'center',gap:10}}>
+            <div style={{width:36,height:36,borderRadius:18,background:WW.teal,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.2L12 16.5l-6.2 4.4 2.4-7.2L2 9.2h7.6L12 2z" fill="#fff"/></svg>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:13,fontWeight:700,color:'#1A7A8C'}}>+280 XP earned!</div>
+              <div style={{height:5,borderRadius:3,background:'rgba(75,184,204,.25)',marginTop:5,overflow:'hidden'}}>
+                <div style={{height:'100%',width:'72%',background:WW.teal,borderRadius:3}}/>
+              </div>
+              <div style={{fontSize:10,color:'#1A7A8C',marginTop:2}}>Level 7 · 2,620 / 3,000 XP</div>
+            </div>
+          </div>
+
+          {/* Badges */}
+          <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'12px 14px',marginBottom:12}}>
+            <div style={{fontSize:12,fontWeight:700,color:WW.textSec,letterSpacing:.4,textTransform:'uppercase',marginBottom:8}}>Badges Earned</div>
+            <div style={{display:'flex',gap:10}}>
+              {[{icon:'💪',name:'Volume King'},{icon:'🔥',name:'On Fire'},{icon:'🎯',name:'Consistency'}].map(b=>(
+                <div key={b.name} style={{flex:1,textAlign:'center'}}>
+                  <div style={{fontSize:26,marginBottom:4}}>{b.icon}</div>
+                  <div style={{fontSize:10,fontWeight:700,color:WW.text}}>{b.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Exercise list collapsible */}
+          <button onClick={()=>setExOpen(o=>!o)} style={{width:'100%',background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'12px 14px',display:'flex',alignItems:'center',justifyContent:'space-between',cursor:'pointer',marginBottom:12}}>
+            <div style={{fontSize:13,fontWeight:700,color:WW.text}}>Exercises completed · 5 · 18 sets · 2 PBs</div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{transform:exOpen?'rotate(180deg)':'rotate(0)',transition:'transform .2s'}}><path d="M6 9l6 6 6-6" stroke={WW.textSec} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+          {exOpen&&(
+            <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'8px 14px',marginBottom:12,marginTop:-8}}>
+              {[{name:'Bench Press',sets:'4×8',wt:'82.5 kg',pb:true},{name:'Overhead Press',sets:'3×10',wt:'52.5 kg',pb:true},{name:'Tricep Pushdown',sets:'3×12',wt:'25 kg',pb:false},{name:'Lateral Raise',sets:'3×15',wt:'10 kg',pb:false},{name:'Cable Fly',sets:'3×12',wt:'15 kg',pb:false}].map(e=>(
+                <div key={e.name} style={{display:'flex',alignItems:'center',gap:8,padding:'8px 0',borderBottom:`0.5px solid ${WW.border}`}}>
+                  <div style={{flex:1,fontSize:13,fontWeight:600,color:WW.text}}>{e.name}</div>
+                  <div style={{fontSize:12,color:WW.textSec}}>{e.sets}</div>
+                  <div style={{fontSize:12,fontWeight:700,color:WW.text,minWidth:55,textAlign:'right'}}>{e.wt}</div>
+                  {e.pb&&<div style={{fontSize:10,fontWeight:700,color:WW.gold,background:'rgba(245,158,11,.1)',padding:'2px 6px',borderRadius:6}}>PB</div>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom actions */}
+      <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,borderTop:`0.5px solid ${WW.border}`,padding:'10px 16px 24px',display:'flex',gap:8,zIndex:20}}>
+        <a href="S38-Share-Card.html" style={{flex:1,height:46,borderRadius:12,border:`1.5px solid ${WW.border}`,background:'transparent',color:WW.text,fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none'}}>Share</a>
+        <a href="S-09-Home.html" style={{flex:2,height:46,borderRadius:12,background:WW.primary,color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 10px rgba(108,126,232,.35)'}}>Done</a>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

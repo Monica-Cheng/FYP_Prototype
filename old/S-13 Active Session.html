@@ -1,0 +1,437 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-13 Active Session</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell {
+    width: 390px; height: 844px; border-radius: 52px;
+    background: #0A0A12; padding: 5px;
+    box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12);
+    position: relative; box-sizing: content-box;
+  }
+  .phone-inner { width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #F7F8FF; position: relative; }
+  .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60; pointer-events: none; }
+  .tweaks-panel {
+    position: fixed; bottom: 20px; right: 20px; width: 280px;
+    background: #fff; border-radius: 14px; padding: 14px 16px 16px;
+    box-shadow: 0 10px 40px rgba(20,25,60,0.18), 0 0 0 0.5px rgba(0,0,0,0.08);
+    color: #3D3D5C; display: none; z-index: 100;
+  }
+  .tweaks-panel.open { display: block; }
+  .tweaks-panel h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; color: #8A8A9E; }
+  .tweak-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; gap: 10px; }
+  .tweak-row label { font-size: 13px; color: #3D3D5C; flex: 1; }
+  .tweak-row input[type="checkbox"] { accent-color: #6C7EE8; }
+  .tweak-row input[type="range"] { flex: 1.1; accent-color: #6C7EE8; }
+  .tweak-val { font-size: 11px; color: #8A8A9E; min-width: 34px; text-align: right; font-variant-numeric: tabular-nums; }
+  @keyframes pbSlide { 0% { transform: translateY(-110%); opacity: 0; } 15% { transform: translateY(0); opacity: 1; } 85% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-110%); opacity: 0; } }
+  .pb-banner { animation: pbSlide 5.5s ease both; }
+  @keyframes sheetUp { 0% { transform: translateY(100%);} 100% { transform: translateY(0);} }
+  .sheet { animation: sheetUp 450ms cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes ringCount {
+    from { stroke-dashoffset: var(--dash-start); }
+    to { stroke-dashoffset: var(--dash-end); }
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="label">S-13 · Active Session</div>
+    <div class="phone-shell" data-screen-label="S-13 Active Session">
+      <div class="island"></div>
+      <div class="phone-inner" id="app"></div>
+    </div>
+  </div>
+
+  <div class="tweaks-panel" id="tweaks">
+    <h3>Tweaks</h3>
+    <div class="tweak-row">
+      <label>Show PB banner</label>
+      <input type="checkbox" id="tw-pb" checked>
+    </div>
+    <div class="tweak-row">
+      <label>Show rest sheet</label>
+      <input type="checkbox" id="tw-sheet" checked>
+    </div>
+    <div class="tweak-row">
+      <label>Active set</label>
+      <input type="range" id="tw-set" min="1" max="4" step="1">
+      <span class="tweak-val" id="tw-set-v">3</span>
+    </div>
+    <div class="tweak-row">
+      <label>Working weight (kg)</label>
+      <input type="range" id="tw-kg" min="40" max="120" step="2.5">
+      <span class="tweak-val" id="tw-kg-v">77.5</span>
+    </div>
+  </div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const WW = {
+  bg: '#F7F8FF', card: '#FFFFFF', elevated: '#EEF0FB',
+  primary: '#6C7EE8', primaryDark: '#2D3A8C',
+  lavender: '#9B84E8', lavenderBg: '#F0EEFE', lavenderDark: '#7B5CB8',
+  teal: '#4BB8CC', tealBg: '#E0F4F8', tealDark: '#2E8B9E',
+  success: '#3EB37A', successBg: '#E6F5EC',
+  text: '#3D3D5C', textSec: '#8A8A9E', textTert: '#B5B5C8',
+  border: '#E2E3ED', borderSoft: '#EEEFF5',
+  shadow: '0 2px 8px rgba(45,58,140,0.06)',
+  shadowLg: '0 10px 28px rgba(45,58,140,0.12)',
+};
+
+// ————————————————————————————————— icons
+const Ico = {
+  pause:(c)=>(<svg width="18" height="18" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.3" fill={c||WW.text}/><rect x="14" y="5" width="4" height="14" rx="1.3" fill={c||WW.text}/></svg>),
+  play:(c,s=14)=>(<svg width={s} height={s} viewBox="0 0 24 24"><path d="M7 4l13 8-13 8V4z" fill={c||'#fff'}/></svg>),
+  check:(c,s=14)=>(<svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M4.5 12.5l5 5 10-11" stroke={c||'#fff'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>),
+  trophy:(c)=>(<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 4h8v5a4 4 0 01-8 0V4z" fill={c||'#fff'}/><path d="M16 5h3v2a3 3 0 01-3 3M8 5H5v2a3 3 0 003 3" stroke={c||'#fff'} strokeWidth="1.5" strokeLinecap="round"/><path d="M10 13h4v3h-4z" fill={c||'#fff'}/><path d="M8 18h8v2H8z" fill={c||'#fff'} rx="1"/></svg>),
+  chev:(c,dir='right')=>(<svg width="8" height="14" viewBox="0 0 8 14" style={{ transform: dir==='left'?'scaleX(-1)':'none' }}><path d="M1 1l6 6-6 6" stroke={c||WW.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>),
+  videoOverlay:()=>(<svg width="100%" height="100%" viewBox="0 0 260 120" preserveAspectRatio="none"><defs><linearGradient id="vg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#6C7EE8" stopOpacity="0.22"/><stop offset="1" stopColor="#4BB8CC" stopOpacity="0.14"/></linearGradient></defs><rect width="260" height="120" fill="url(#vg)"/></svg>),
+  bench:()=>(
+    <svg width="90" height="52" viewBox="0 0 120 70" fill="none" style={{ opacity:0.55 }}>
+      <rect x="20" y="30" width="80" height="6" rx="2" fill="#7B5CB8"/>
+      <rect x="8" y="22" width="6" height="22" rx="1.5" fill="#3D3D5C"/>
+      <rect x="106" y="22" width="6" height="22" rx="1.5" fill="#3D3D5C"/>
+      <circle cx="11" cy="33" r="10" fill="#3D3D5C"/>
+      <circle cx="109" cy="33" r="10" fill="#3D3D5C"/>
+      <rect x="30" y="46" width="60" height="4" rx="2" fill="#9B84E8" opacity="0.6"/>
+      <rect x="40" y="52" width="40" height="4" rx="2" fill="#9B84E8" opacity="0.4"/>
+    </svg>
+  ),
+};
+
+// ————————————————————————————————— status bar
+function StatusBar() {
+  return (
+    <div style={{ height:47, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 28px', fontSize:15, fontWeight:600, color:WW.text, position:'relative', zIndex:5 }}>
+      <div style={{ paddingTop:10 }}>9:41</div>
+      <div style={{ display:'flex', gap:6, alignItems:'center', paddingTop:10 }}>
+        <svg width="17" height="11" viewBox="0 0 17 11">
+          <rect x="0" y="7" width="3" height="4" rx="0.6" fill={WW.text}/>
+          <rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={WW.text}/>
+          <rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={WW.text}/>
+          <rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={WW.text}/>
+        </svg>
+        <svg width="24" height="11" viewBox="0 0 24 11">
+          <rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity="0.4" fill="none"/>
+          <rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/>
+          <rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={WW.text} opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— PB banner (top, teal)
+function PBBanner() {
+  return (
+    <div className="pb-banner" style={{ position:'absolute', top:47, left:10, right:10, background:WW.teal, borderRadius:14, padding:'10px 14px', display:'flex', alignItems:'center', gap:10, zIndex:40, boxShadow:'0 8px 22px rgba(75,184,204,0.35)' }}>
+      <div style={{ width:26, height:26, borderRadius:13, background:'rgba(255,255,255,0.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+        {Ico.trophy('#fff')}
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ fontSize:10.5, fontWeight:600, color:'rgba(255,255,255,0.85)', letterSpacing:'0.4px', textTransform:'uppercase', marginBottom:1 }}>New personal best</div>
+        <div style={{ fontSize:13.5, color:'#fff', fontWeight:600, letterSpacing:'-0.1px' }}>Bench Press · 80 kg</div>
+      </div>
+      <div style={{ fontSize:18, color:'rgba(255,255,255,0.5)', paddingRight:2, lineHeight:1 }}>×</div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— top bar (timer | name | pause)
+function TopBar({ timer, name }) {
+  return (
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'6px 18px 10px' }}>
+      <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+        <div style={{ width:7, height:7, borderRadius:4, background:WW.primary, boxShadow:`0 0 0 4px ${WW.primary}22` }}/>
+        <div style={{ fontSize:16, fontWeight:700, color:WW.text, fontVariantNumeric:'tabular-nums', letterSpacing:'-0.3px' }}>{timer}</div>
+      </div>
+      <div style={{ fontSize:14, fontWeight:600, color:WW.text, letterSpacing:'-0.1px' }}>{name}</div>
+      <button style={{ width:36, height:36, borderRadius:18, background:WW.elevated, border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+        {Ico.pause(WW.primaryDark)}
+      </button>
+    </div>
+  );
+}
+
+// ————————————————————————————————— current exercise card
+function CurrentExerciseCard({ index, name, setCurrent, setTotal }) {
+  return (
+    <div style={{ margin:'0 18px 14px', background:WW.card, borderRadius:18, boxShadow:WW.shadow, overflow:'hidden' }}>
+      {/* header */}
+      <div style={{ padding:'14px 16px 10px', display:'flex', alignItems:'center', gap:12 }}>
+        <div style={{ width:30, height:30, borderRadius:10, background:WW.elevated, display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:700, color:WW.primary, flexShrink:0 }}>{index}</div>
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ fontSize:17, fontWeight:600, color:WW.text, letterSpacing:'-0.2px' }}>{name}</div>
+          <div style={{ fontSize:12, color:WW.textSec, fontWeight:500, marginTop:1 }}>Set {setCurrent} of {setTotal}</div>
+        </div>
+        <div style={{ padding:'4px 8px', borderRadius:7, background:WW.tealBg, fontSize:10.5, fontWeight:700, color:WW.tealDark, letterSpacing:'0.3px', textTransform:'uppercase' }}>Chest</div>
+      </div>
+      {/* video thumb */}
+      <div style={{ margin:'0 14px 14px', height:120, borderRadius:12, background:'linear-gradient(135deg, #EEF0FB 0%, #E0F4F8 100%)', position:'relative', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
+        {Ico.bench()}
+        <div style={{ position:'absolute', inset:0 }}>{Ico.videoOverlay()}</div>
+        <button style={{ position:'absolute', width:46, height:46, borderRadius:23, background:'rgba(255,255,255,0.92)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 6px 18px rgba(45,58,140,0.18)', paddingLeft:3 }}>
+          {Ico.play(WW.primary, 16)}
+        </button>
+        <div style={{ position:'absolute', bottom:8, left:10, fontSize:10.5, fontWeight:600, color:WW.text, background:'rgba(255,255,255,0.9)', padding:'3px 7px', borderRadius:5, letterSpacing:'0.1px' }}>Form guide · 0:45</div>
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— set log table
+function SetLog({ activeSet, workingKg }) {
+  const rows = [
+    { n:1, prev:'75 kg', kg:75,  reps:8,  done:true  },
+    { n:2, prev:'75 kg', kg:77.5, reps:8,  done:true },
+    { n:3, prev:'75 kg', kg:workingKg, reps:8,  done:false, active:true },
+    { n:4, prev:'75 kg', kg:null, reps:null, done:false },
+  ];
+  // adjust state based on activeSet
+  rows.forEach(r => {
+    if (r.n < activeSet) { r.done = true; r.active = false; if (r.kg == null) r.kg = 77.5; if (r.reps == null) r.reps = 8; }
+    else if (r.n === activeSet) { r.done = false; r.active = true; if (r.kg == null) r.kg = workingKg; if (r.reps == null) r.reps = 8; }
+    else { r.done = false; r.active = false; r.kg = null; r.reps = null; }
+  });
+
+  const colGrid = '44px 1fr 1fr 0.9fr 52px';
+  return (
+    <div style={{ margin:'0 18px 14px', background:WW.card, borderRadius:18, boxShadow:WW.shadow, padding:'12px 12px 10px' }}>
+      {/* header */}
+      <div style={{ display:'grid', gridTemplateColumns:colGrid, alignItems:'center', padding:'4px 6px 8px', fontSize:10, fontWeight:700, color:WW.textSec, letterSpacing:'0.5px', textTransform:'uppercase', borderBottom:`0.5px solid ${WW.borderSoft}` }}>
+        <div>Set</div>
+        <div>Prev</div>
+        <div>kg</div>
+        <div>Reps</div>
+        <div style={{ textAlign:'center' }}>Done</div>
+      </div>
+      {/* rows */}
+      {rows.map((r,i) => {
+        const isActive = r.active;
+        const isPending = !r.done && !r.active;
+        return (
+          <div key={r.n} style={{
+            display:'grid', gridTemplateColumns:colGrid, alignItems:'center',
+            padding:'8px 6px',
+            borderRadius:10, marginTop:4,
+            background: isActive ? WW.elevated : 'transparent',
+            opacity: isPending ? 0.45 : 1,
+            transition:'background 200ms'
+          }}>
+            <div style={{ fontSize:14, fontWeight:700, color: isActive ? WW.primary : WW.text, fontVariantNumeric:'tabular-nums' }}>{r.n}</div>
+            <div style={{ fontSize:12.5, color:WW.textSec, fontVariantNumeric:'tabular-nums', fontWeight:500 }}>{r.prev}</div>
+            {/* kg cell */}
+            <div>
+              {r.kg != null ? (
+                <div style={{
+                  display:'inline-flex', alignItems:'baseline', gap:2,
+                  padding: isActive ? '4px 9px' : '3px 0',
+                  borderRadius:8,
+                  background: isActive ? '#fff' : 'transparent',
+                  border: isActive ? `1.5px solid ${WW.primary}` : 'none',
+                  boxShadow: isActive ? '0 1px 3px rgba(108,126,232,0.15)' : 'none',
+                }}>
+                  <span style={{ fontSize:14, fontWeight:700, color:WW.text, fontVariantNumeric:'tabular-nums' }}>{r.kg}</span>
+                  {!isActive && <span style={{ fontSize:10, color:WW.textSec, fontWeight:500, marginLeft:2 }}>kg</span>}
+                </div>
+              ) : (
+                <span style={{ fontSize:14, color:WW.textTert, fontWeight:500 }}>—</span>
+              )}
+            </div>
+            {/* reps */}
+            <div>
+              {r.reps != null ? (
+                <div style={{
+                  display:'inline-flex', alignItems:'baseline',
+                  padding: isActive ? '4px 9px' : '3px 0',
+                  borderRadius:8,
+                  background: isActive ? '#fff' : 'transparent',
+                  border: isActive ? `1.5px solid ${WW.primary}` : 'none',
+                  boxShadow: isActive ? '0 1px 3px rgba(108,126,232,0.15)' : 'none',
+                }}>
+                  <span style={{ fontSize:14, fontWeight:700, color:WW.text, fontVariantNumeric:'tabular-nums' }}>{r.reps}</span>
+                </div>
+              ) : (
+                <span style={{ fontSize:14, color:WW.textTert, fontWeight:500 }}>—</span>
+              )}
+            </div>
+            {/* done */}
+            <div style={{ display:'flex', justifyContent:'center' }}>
+              {r.done ? (
+                <div style={{ width:26, height:26, borderRadius:13, background:WW.success, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  {Ico.check('#fff', 14)}
+                </div>
+              ) : isActive ? (
+                <div style={{ width:26, height:26, borderRadius:13, border:`1.8px solid ${WW.primary}`, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+                  {Ico.check(WW.primary, 13)}
+                </div>
+              ) : (
+                <div style={{ width:26, height:26, borderRadius:13, border:`1.5px dashed ${WW.border}`, background:'transparent' }}/>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ————————————————————————————————— prev / next nav
+function PrevNext() {
+  return (
+    <div style={{ padding:'2px 18px 0', display:'flex', gap:10 }}>
+      <button style={{ flex:1, height:44, borderRadius:22, background:'#fff', border:`1px solid ${WW.border}`, display:'flex', alignItems:'center', justifyContent:'center', gap:7, cursor:'pointer', fontFamily:'inherit' }}>
+        {Ico.chev(WW.textSec,'left')}
+        <span style={{ fontSize:13, fontWeight:600, color:WW.text }}>Previous</span>
+      </button>
+      <button style={{ flex:1.3, height:44, borderRadius:22, background:WW.primary, border:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:7, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 6px 16px rgba(108,126,232,0.28)' }}>
+        <span style={{ fontSize:13.5, fontWeight:600, color:'#fff' }}>Next exercise</span>
+        {Ico.chev('#fff')}
+      </button>
+    </div>
+  );
+}
+
+// ————————————————————————————————— rest-timer bottom sheet
+function RestSheet() {
+  // countdown ring — 01:23 of 02:00
+  const r = 58;
+  const C = 2 * Math.PI * r;
+  const pct = 83/120; // 1:23 left of 2:00
+  const dash = C * pct;
+  return (
+    <div className="sheet" style={{
+      position:'absolute', left:0, right:0, bottom:0,
+      background:'#fff',
+      borderTopLeftRadius:28, borderTopRightRadius:28,
+      boxShadow:'0 -12px 40px rgba(45,58,140,0.15)',
+      padding:'10px 20px 24px',
+      zIndex:20,
+    }}>
+      {/* grabber */}
+      <div style={{ width:40, height:4, borderRadius:2, background:WW.border, margin:'0 auto 10px' }}/>
+      <div style={{ display:'flex', alignItems:'center', gap:18 }}>
+        {/* ring */}
+        <div style={{ position:'relative', width:130, height:130, flexShrink:0 }}>
+          <svg width="130" height="130" viewBox="0 0 130 130">
+            <circle cx="65" cy="65" r={r} stroke={WW.elevated} strokeWidth="8" fill="none"/>
+            <circle cx="65" cy="65" r={r} stroke={WW.primary} strokeWidth="8" fill="none"
+              strokeDasharray={`${dash} ${C}`} strokeLinecap="round"
+              transform="rotate(-90 65 65)"/>
+          </svg>
+          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
+            <div style={{ fontSize:10.5, fontWeight:700, color:WW.textSec, letterSpacing:'0.6px', textTransform:'uppercase', marginBottom:1 }}>Rest</div>
+            <div style={{ fontSize:30, fontWeight:700, color:WW.primary, fontVariantNumeric:'tabular-nums', letterSpacing:'-1px', lineHeight:1 }}>01:23</div>
+            <div style={{ fontSize:10, color:WW.textTert, fontWeight:500, marginTop:2 }}>of 02:00</div>
+          </div>
+        </div>
+        {/* side content */}
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ fontSize:11, fontWeight:700, color:WW.textSec, letterSpacing:'0.4px', textTransform:'uppercase', marginBottom:3 }}>Up next</div>
+          <div style={{ fontSize:14.5, fontWeight:600, color:WW.text, letterSpacing:'-0.1px', marginBottom:12 }}>Set 3 · 77.5 kg × 8</div>
+          <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+            <button style={{ padding:'7px 12px', borderRadius:14, background:WW.elevated, border:'none', fontSize:12, fontWeight:600, color:WW.primaryDark, cursor:'pointer', fontFamily:'inherit' }}>+30s</button>
+            <button style={{ padding:'7px 12px', borderRadius:14, background:WW.elevated, border:'none', fontSize:12, fontWeight:600, color:WW.primaryDark, cursor:'pointer', fontFamily:'inherit' }}>−30s</button>
+          </div>
+          <button style={{ marginTop:14, background:'none', border:'none', padding:0, cursor:'pointer', fontSize:13, fontWeight:600, color:WW.primary, fontFamily:'inherit', letterSpacing:'0.1px' }}>Skip rest →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— screen
+
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "showPB": true,
+  "showSheet": true,
+  "activeSet": 3,
+  "workingKg": 77.5
+}/*EDITMODE-END*/;
+
+function ActiveSessionScreen({ tw }) {
+  return (
+    <div style={{ width:390, height:844, background:WW.bg, fontFamily:'-apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif', color:WW.text, position:'relative', overflow:'hidden', WebkitFontSmoothing:'antialiased' }}>
+      <StatusBar/>
+      {tw.showPB && <PBBanner key={tw.showPB+''+Date.now()}/>}
+      <div style={{ position:'absolute', top:47, left:0, right:0, bottom:0, overflowY:'auto', paddingBottom: tw.showSheet ? 240 : 90 }}>
+        <TopBar timer="00:14:32" name="Push A"/>
+        <CurrentExerciseCard index={2} name="Bench Press" setCurrent={tw.activeSet} setTotal={4}/>
+        <SetLog activeSet={tw.activeSet} workingKg={tw.workingKg}/>
+        <PrevNext/>
+      </div>
+      {tw.showSheet && <RestSheet/>}
+    </div>
+  );
+}
+
+function App() {
+  const [tw, setTw] = React.useState(TWEAKS);
+  window.__getTweaks = () => tw;
+  window.__updateTweaks = (patch) => {
+    setTw(prev => {
+      const next = { ...prev, ...patch };
+      window.parent.postMessage({ type:'__edit_mode_set_keys', edits:patch }, '*');
+      return next;
+    });
+  };
+  return <ActiveSessionScreen tw={tw}/>;
+}
+
+function __mountWhenReady() {
+  if (!window.ReactDOM) return setTimeout(__mountWhenReady, 30);
+  ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+}
+__mountWhenReady();
+</script>
+
+<script>
+(function () {
+  const panel = document.getElementById('tweaks');
+  const pb = document.getElementById('tw-pb');
+  const sh = document.getElementById('tw-sheet');
+  const st = document.getElementById('tw-set');
+  const stV = document.getElementById('tw-set-v');
+  const kg = document.getElementById('tw-kg');
+  const kgV = document.getElementById('tw-kg-v');
+
+  function syncFrom(tw) {
+    pb.checked = !!tw.showPB;
+    sh.checked = !!tw.showSheet;
+    st.value = tw.activeSet;
+    stV.textContent = tw.activeSet;
+    kg.value = tw.workingKg;
+    kgV.textContent = tw.workingKg;
+  }
+  function whenReady(cb) {
+    if (window.__updateTweaks) return cb();
+    setTimeout(() => whenReady(cb), 30);
+  }
+  whenReady(() => {
+    syncFrom(window.__getTweaks());
+    pb.addEventListener('change', e => window.__updateTweaks({ showPB: e.target.checked }));
+    sh.addEventListener('change', e => window.__updateTweaks({ showSheet: e.target.checked }));
+    st.addEventListener('input', e => { const v = parseInt(e.target.value,10); stV.textContent = v; window.__updateTweaks({ activeSet: v }); });
+    kg.addEventListener('input', e => { const v = parseFloat(e.target.value); kgV.textContent = v; window.__updateTweaks({ workingKg: v }); });
+  });
+
+  window.addEventListener('message', (ev) => {
+    const d = ev.data;
+    if (!d || typeof d !== 'object') return;
+    if (d.type === '__activate_edit_mode') panel.classList.add('open');
+    else if (d.type === '__deactivate_edit_mode') panel.classList.remove('open');
+  });
+  window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+})();
+</script>
+
+</body></html>

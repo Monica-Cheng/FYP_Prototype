@@ -1,0 +1,245 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-07 Permission Priming</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell { width: 390px; height: 844px; border-radius: 52px; background: #0A0A12; padding: 5px; box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12); position: relative; box-sizing: content-box; }
+  .phone-inner { width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #F7F8FF; position: relative; }
+  .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60; pointer-events: none; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.06); } }
+  @keyframes ripple { 0% { transform:scale(0.8); opacity:0.6; } 100% { transform:scale(1.8); opacity:0; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="label">S-07 · Permission Priming — Step 3 of 3</div>
+  <div class="phone-shell">
+    <div class="island"></div>
+    <div class="phone-inner" id="app"></div>
+  </div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW = {
+  bg:'#F7F8FF', card:'#FFFFFF', elevated:'#EEF0FB',
+  primary:'#6C7EE8', primaryDark:'#2D3A8C',
+  lavender:'#9B84E8', lavenderBg:'#F0EEFE',
+  teal:'#4BB8CC', tealBg:'#E0F4F8',
+  text:'#3D3D5C', textSec:'#8A8A9E', border:'#C8C8D8',
+  chipBg:'#E6EAFE', shadow:'0 2px 8px rgba(45,58,140,0.06)',
+};
+
+/* ─── Permission cards data ──────────────────────────────── */
+const CARDS = [
+  {
+    id: 'notifications',
+    iconBg: WW.chipBg,
+    iconColor: WW.primary,
+    rippleColor: 'rgba(108,126,232,0.15)',
+    icon: (color) => (
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M13.73 21a2 2 0 01-3.46 0" stroke={color} strokeWidth="1.6" strokeLinecap="round"/>
+        <circle cx="18" cy="5" r="3" fill="#EF4444"/>
+      </svg>
+    ),
+    headline: 'Never miss a workout',
+    body: 'Get timely reminders for your scheduled sessions, celebrate milestones, and receive nudges when you\'re about to break your streak.',
+    benefits: ['Session reminders', 'Milestone alerts', 'Streak protection'],
+    ctaLabel: 'Enable Notifications',
+    ctaColor: WW.primary,
+    ctaShadow: '0 4px 14px rgba(108,126,232,0.35)',
+    note: 'You can change this any time in Settings.',
+  },
+  {
+    id: 'location',
+    iconBg: WW.tealBg,
+    iconColor: WW.teal,
+    rippleColor: 'rgba(75,184,204,0.15)',
+    icon: (color) => (
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
+        <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke={color} strokeWidth="1.6" fill={color} fillOpacity="0.1"/>
+        <circle cx="12" cy="10" r="3" stroke={color} strokeWidth="1.6"/>
+      </svg>
+    ),
+    headline: 'Track your routes',
+    body: 'GPS tracking maps your outdoor runs, cycling rides, and walks in real time — showing pace, elevation and route replay in your summary.',
+    benefits: ['Live GPS mapping', 'Pace & elevation', 'Route history'],
+    ctaLabel: 'Enable Location',
+    ctaColor: WW.teal,
+    ctaShadow: '0 4px 14px rgba(75,184,204,0.35)',
+    note: 'Used only during active outdoor sessions.',
+  },
+  {
+    id: 'motion',
+    iconBg: '#F0EEFE',
+    iconColor: WW.lavender,
+    rippleColor: 'rgba(155,132,232,0.15)',
+    icon: (color) => (
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
+        <rect x="7" y="2" width="10" height="18" rx="3" stroke={color} strokeWidth="1.6"/>
+        <path d="M10 7h4M10 10h4M10 13h2" stroke={color} strokeWidth="1.4" strokeLinecap="round"/>
+        <path d="M12 20v2M10 22h4" stroke={color} strokeWidth="1.4" strokeLinecap="round"/>
+        <path d="M19 9l2-2M19 14l2 2M5 9L3 7M5 14l-2 2" stroke={color} strokeWidth="1.2" strokeLinecap="round" opacity="0.5"/>
+      </svg>
+    ),
+    headline: 'Auto-track your activity',
+    body: 'Let WiseWorkout count your daily steps and estimate calories automatically using your phone\'s built-in motion sensors — no wearable needed.',
+    benefits: ['Step counting', 'Calorie estimation', 'Activity detection'],
+    ctaLabel: 'Enable Motion & Fitness',
+    ctaColor: WW.lavender,
+    ctaShadow: '0 4px 14px rgba(155,132,232,0.35)',
+    note: 'Never affects battery beyond normal usage.',
+  },
+];
+
+function StatusBar({light}) {
+  const c = light ? '#fff' : WW.text;
+  return (
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:c,flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill={c}/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={c}/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={c}/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={c}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={c} strokeOpacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={c}/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={c} opacity="0.4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function PermCard({card, idx, onNext, isLast}) {
+  const [tapped, setTapped] = React.useState(false);
+
+  const handleEnable = () => {
+    setTapped(true);
+    setTimeout(() => onNext(), 600);
+  };
+
+  return (
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',animation:'fadeUp 0.35s ease both'}}>
+      <StatusBar/>
+
+      {/* Step indicator */}
+      <div style={{padding:'0 24px 14px',flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+          <div style={{fontSize:12,fontWeight:700,color:WW.textSec,letterSpacing:'.3px'}}>Step 3 of 3 · {idx+1}/3</div>
+          <div style={{display:'flex',gap:6}}>
+            {CARDS.map((_,i) => (
+              <div key={i} style={{
+                width:i===idx?20:7,height:7,borderRadius:3.5,
+                background:i<=idx?WW.primary:WW.elevated,
+                transition:'all 0.3s',
+              }}/>
+            ))}
+          </div>
+        </div>
+        <div style={{height:6,borderRadius:3,background:WW.elevated,overflow:'hidden'}}>
+          <div style={{height:'100%',width:'100%',borderRadius:3,background:WW.primary}}/>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div style={{flex:1,display:'flex',flexDirection:'column',padding:'0 28px',justifyContent:'center'}}>
+
+        {/* Icon with ripple */}
+        <div style={{display:'flex',justifyContent:'center',marginBottom:32,position:'relative'}}>
+          <div style={{position:'relative',width:120,height:120,display:'flex',alignItems:'center',justifyContent:'center'}}>
+            {/* Ripple rings */}
+            <div style={{position:'absolute',width:120,height:120,borderRadius:60,background:card.rippleColor,animation:'ripple 2s ease-out infinite'}}/>
+            <div style={{position:'absolute',width:120,height:120,borderRadius:60,background:card.rippleColor,animation:'ripple 2s ease-out 0.7s infinite'}}/>
+            {/* Icon circle */}
+            <div style={{
+              width:96,height:96,borderRadius:32,background:card.iconBg,
+              border:`2px solid ${card.iconColor}22`,
+              display:'flex',alignItems:'center',justifyContent:'center',
+              boxShadow:`0 8px 24px ${card.rippleColor}`,
+              animation:'pulse 3s ease-in-out infinite',
+              position:'relative',zIndex:1,
+            }}>
+              {card.icon(card.iconColor)}
+            </div>
+          </div>
+        </div>
+
+        {/* Text */}
+        <div style={{textAlign:'center',marginBottom:28}}>
+          <div style={{fontSize:28,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.6px',lineHeight:1.15,marginBottom:14}}>
+            {card.headline}
+          </div>
+          <div style={{fontSize:15,color:WW.textSec,lineHeight:1.65,marginBottom:0}}>
+            {card.body}
+          </div>
+        </div>
+
+        {/* Benefit pills */}
+        <div style={{display:'flex',justifyContent:'center',gap:8,marginBottom:36,flexWrap:'wrap'}}>
+          {card.benefits.map(b => (
+            <div key={b} style={{padding:'6px 14px',borderRadius:20,background:card.iconBg,border:`0.5px solid ${card.iconColor}33`,fontSize:12,fontWeight:700,color:card.iconColor}}>
+              {b}
+            </div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <button onClick={handleEnable} style={{
+          width:'100%',height:54,borderRadius:14,
+          background:tapped?'#10B981':card.ctaColor,
+          color:'#fff',fontSize:16,fontWeight:700,border:'none',cursor:'pointer',
+          boxShadow:tapped?'0 4px 14px rgba(16,185,129,0.35)':card.ctaShadow,
+          marginBottom:16,transition:'all 0.3s',
+          display:'flex',alignItems:'center',justifyContent:'center',gap:8,
+        }}>
+          {tapped ? (
+            <>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="rgba(255,255,255,0.25)"/><path d="M7.5 12l3 3 6-6" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Done
+            </>
+          ) : card.ctaLabel}
+        </button>
+
+        {/* Skip / note */}
+        <div style={{textAlign:'center'}}>
+          <button onClick={onNext} style={{fontSize:14,color:WW.textSec,background:'none',border:'none',cursor:'pointer',fontWeight:600,fontFamily:'inherit',display:'block',width:'100%',marginBottom:8}}>
+            {isLast ? 'Skip and go to Home' : 'Skip for now'}
+          </button>
+          <div style={{fontSize:11,color:WW.textSec,lineHeight:1.5,opacity:0.7}}>{card.note}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [cardIdx, setCardIdx] = React.useState(0);
+
+  const advance = () => {
+    if (cardIdx < CARDS.length - 1) {
+      setCardIdx(i => i + 1);
+    } else {
+      window.location.href = 'S-09-Home.html';
+    }
+  };
+
+  return (
+    <div style={{width:'100%',height:'100%',position:'relative',overflow:'hidden'}}>
+      <PermCard
+        key={cardIdx}
+        card={CARDS[cardIdx]}
+        idx={cardIdx}
+        onNext={advance}
+        isLast={cardIdx === CARDS.length - 1}
+      />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

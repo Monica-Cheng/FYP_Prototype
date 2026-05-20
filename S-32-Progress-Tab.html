@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-32 Progress Tab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{color-scheme:light;}
+html,body{background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.stage{display:flex;flex-direction:column;align-items:center;gap:18px;}
+.screen-label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600;}
+.phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box;}
+.phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative;display:flex;flex-direction:column;}
+.island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none;}
+.status-bar{height:47px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;color:#3D3D5C;flex-shrink:0;}
+.status-time{padding-top:10px;}
+.status-icons{display:flex;gap:6px;align-items:center;padding-top:10px;}
+.screen-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 20px 100px;-webkit-overflow-scrolling:touch;}
+.screen-scroll::-webkit-scrollbar{display:none;}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px 8px;flex-shrink:0;}
+.top-bar h1{font-size:22px;font-weight:600;color:#2D3A8C;}
+.avatar{width:36px;height:36px;border-radius:50%;background:#6C7EE8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;}
+.subtab-row{display:flex;gap:8px;padding:0 20px 12px;overflow-x:auto;flex-shrink:0;}
+.subtab-row::-webkit-scrollbar{display:none;}
+.subtab-pill{height:32px;padding:0 16px;border-radius:16px;font-size:14px;font-weight:500;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:'Inter',sans-serif;}
+.subtab-pill.active{background:#6C7EE8;color:#fff;}
+.subtab-pill.inactive{background:#F2F2F7;color:#8A8A9E;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.card{background:#fff;border-radius:16px;border:.5px solid #C8C8D8;box-shadow:0 2px 8px rgba(45,58,140,.06);margin-bottom:12px;}
+.card-pad{padding:16px;}
+.filter-row{display:flex;gap:8px;margin-bottom:8px;}
+.filter-pill{flex:1;height:36px;border-radius:12px;font-size:13px;font-weight:500;border:none;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:4px;}
+.filter-pill.active{background:#6C7EE8;color:#fff;}
+.filter-pill.inactive{background:#F2F2F7;color:#8A8A9E;}
+.sport-row{display:flex;gap:8px;margin-bottom:12px;}
+.sport-pill{flex:1;height:36px;border-radius:12px;font-size:13px;font-weight:500;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
+.sport-pill.active{background:#6C7EE8;color:#fff;}
+.sport-pill.inactive{background:#F2F2F7;color:#8A8A9E;}
+.premium-tip{display:none;background:#FEF3C7;border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:#3D3D5C;}
+.premium-tip a{color:#F59E0B;font-weight:600;text-decoration:none;}
+.chart-toggles{display:flex;gap:6px;overflow-x:auto;}
+.chart-toggles::-webkit-scrollbar{display:none;}
+.toggle-pill{height:24px;padding:0 10px;border-radius:8px;font-size:11px;font-weight:500;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:'Inter',sans-serif;}
+.toggle-pill.active{background:#6C7EE8;color:#fff;}
+.toggle-pill.inactive{background:#F2F2F7;color:#8A8A9E;}
+.stat-chips{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+.stat-chip{font-size:12px;color:#8A8A9E;}
+.collapse-card{background:#fff;border-radius:16px;border:.5px solid #C8C8D8;box-shadow:0 2px 8px rgba(45,58,140,.06);margin-bottom:8px;overflow:hidden;}
+.collapse-header{height:56px;padding:0 16px;display:flex;align-items:center;gap:12px;cursor:pointer;flex-shrink:0;}
+.collapse-icon-sq{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.collapse-title{font-size:15px;font-weight:600;color:#3D3D5C;flex:1;}
+.collapse-chevron{color:#8A8A9E;transition:transform .2s;flex-shrink:0;}
+.collapse-chevron.open{transform:rotate(180deg);}
+.collapse-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.collapse-body.open{border-top:.5px solid #E8EAF8;}
+.collapse-inner{padding:16px;}
+.pct-bar{height:8px;border-radius:8px;background:#E6EAFE;margin:6px 0;}
+.pct-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#6C7EE8,#4BB8CC);}
+.xp-bar{height:8px;border-radius:8px;background:#E6EAFE;}
+.xp-fill{height:100%;border-radius:8px;background:#6C7EE8;}
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;height:84px;background:#fff;border-top:.5px solid #E8EAF8;display:flex;z-index:30;}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-decoration:none;padding-bottom:8px;position:relative;}
+.nav-tab span{font-size:10px;font-weight:600;}
+.nav-dot{position:absolute;top:8px;width:4px;height:4px;border-radius:50%;background:#6C7EE8;}
+.activity-card{background:#fff;border-radius:16px;border:.5px solid #C8C8D8;box-shadow:0 2px 8px rgba(45,58,140,.06);margin-bottom:8px;display:flex;overflow:hidden;color:inherit;}
+a.activity-card:active{background:#F7F8FF;}
+.activity-bar{width:4px;flex-shrink:0;}
+.lift-card{background:#F7F8FF;border-radius:12px;padding:12px;margin-bottom:8px;}
+.tier-labels{display:flex;justify-content:space-between;font-size:10px;color:#8A8A9E;margin-top:4px;}
+.badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px;}
+.badge-cell{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.badge-circle{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;}
+.weight-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid #E8EAF8;font-size:13px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:4px 0;}
+.cal-cell{border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;position:relative;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="screen-label">S-32 · Progress Tab</div>
+  <div class="phone-shell">
+    <div class="island"></div>
+    <div class="phone-inner">
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <div class="status-time">9:41</div>
+        <div class="status-icons">
+          <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+          <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <!-- Top bar -->
+      <div class="top-bar">
+        <h1>My progress</h1>
+        <a href="S-34-Profile.html?ref=S-32-Progress-Tab.html" style="text-decoration:none;"><div class="avatar">M</div></a>
+      </div>
+
+      <!-- Sub-tabs -->
+      <div class="subtab-row">
+        <button class="subtab-pill active" onclick="switchTab('charts')">Charts</button>
+        <button class="subtab-pill inactive" onclick="switchTab('activities')">Activities</button>
+        <button class="subtab-pill inactive" onclick="switchTab('xp')">XP History</button>
+      </div>
+
+      <!-- Scrollable content -->
+      <div class="screen-scroll" id="main-scroll">
+
+        <!-- ═══ CHARTS TAB ═══ -->
+        <div class="tab-content active" id="tab-charts">
+
+          <!-- Monthly Recap Card -->
+          <div class="card card-pad" id="recap-card" style="border-color:#E6EAFE;position:relative;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#6C7EE8" stroke-width="1.6"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#6C7EE8" stroke-width="1.6" stroke-linecap="round"/></svg>
+                <span style="font-size:15px;font-weight:600;color:#3D3D5C;">April recap</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span style="font-size:12px;color:#8A8A9E;">Share</span>
+                <button onclick="document.getElementById('recap-card').style.display='none'" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 8px;margin-bottom:12px;">
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#4BB8CC"/><rect x="18" y="10" width="3.5" height="7" rx="1" fill="#4BB8CC"/><rect x="8" y="11" width="8" height="5" rx="1" fill="#4BB8CC"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">12 workouts</div><div style="font-size:11px;color:#8A8A9E;">Sessions</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#6C7EE8" stroke-width="1.6"/><path d="M12 7v5l3 3" stroke="#6C7EE8" stroke-width="1.6" stroke-linecap="round"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">8h 45m</div><div style="font-size:11px;color:#8A8A9E;">Total time</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M23 6l-9.5 9.5-5-5L1 18" stroke="#6C7EE8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 6h6v6" stroke="#6C7EE8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">14,700 kg</div><div style="font-size:11px;color:#8A8A9E;">Volume lifted</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#4BB8CC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">31.2 km</div><div style="font-size:11px;color:#8A8A9E;">Distance</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#F59E0B"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">4 new PRs</div><div style="font-size:11px;color:#8A8A9E;">Records</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">Chest + Back</div><div style="font-size:11px;color:#8A8A9E;">Most trained</div></div></div>
+            </div>
+            <div style="text-align:right;"><a href="#" style="font-size:12px;color:#6C7EE8;text-decoration:none;font-weight:500;">View full recap &gt;</a></div>
+          </div>
+
+          <!-- Time filter -->
+          <div class="filter-row">
+            <button class="filter-pill active" id="tf-w" onclick="setTimeFilter('w')">W</button>
+            <button class="filter-pill inactive" id="tf-m" onclick="setTimeFilter('m')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> M</button>
+            <button class="filter-pill inactive" id="tf-y" onclick="setTimeFilter('y')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Y</button>
+          </div>
+          <div id="premium-tip" class="premium-tip">Unlock with Premium — <a href="#">Upgrade</a></div>
+
+          <!-- Sport toggle -->
+          <div class="sport-row">
+            <button class="sport-pill active" id="sp-all" onclick="setSport('all')">All</button>
+            <button class="sport-pill inactive" id="sp-gym" onclick="setSport('gym')">Gym</button>
+            <button class="sport-pill inactive" id="sp-cardio" onclick="setSport('cardio')">Cardio</button>
+          </div>
+
+          <!-- Chart 1: Calories -->
+          <div class="card card-pad">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="font-size:15px;font-weight:600;color:#3D3D5C;">Calories burned</span>
+              <div class="chart-toggles" id="cal-toggles">
+                <button class="toggle-pill active" onclick="setCalToggle('all',this)">All</button>
+                <button class="toggle-pill inactive" onclick="setCalToggle('gym',this)">Gym</button>
+                <button class="toggle-pill inactive" onclick="setCalToggle('cardio',this)">Cardio</button>
+              </div>
+            </div>
+            <div style="position:relative;height:160px;"><canvas id="cal-chart"></canvas></div>
+            <div class="stat-chips">
+              <span class="stat-chip">1,840 kcal this week</span>
+              <span class="stat-chip">Goal: 2,100 kcal</span>
+              <span class="stat-chip" style="display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:20px;border-top:1.5px dashed #9B84E8;"></span>Goal line</span>
+            </div>
+          </div>
+
+          <!-- Chart 2: Cardio -->
+          <div class="card card-pad">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="font-size:15px;font-weight:600;color:#3D3D5C;">Cardio activity</span>
+              <div class="chart-toggles" id="cardio-toggles">
+                <button class="toggle-pill active" onclick="setCardioToggle('distance',this)">Distance</button>
+                <button class="toggle-pill inactive" onclick="setCardioToggle('duration',this)">Duration</button>
+                <button class="toggle-pill inactive" onclick="setCardioToggle('sessions',this)">Sessions</button>
+              </div>
+            </div>
+            <div style="position:relative;height:160px;"><canvas id="cardio-chart"></canvas></div>
+            <div class="stat-chips">
+              <span class="stat-chip" id="cardio-stat1">16.7 km total</span>
+              <span class="stat-chip">3 sessions</span>
+              <span class="stat-chip" id="cardio-stat2">Avg 5.6 km/session</span>
+            </div>
+          </div>
+
+          <!-- Chart 3: Gym -->
+          <div class="card card-pad">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="font-size:15px;font-weight:600;color:#3D3D5C;">Gym training</span>
+              <div class="chart-toggles" id="gym-toggles">
+                <button class="toggle-pill active" onclick="setGymToggle('volume',this)">Volume</button>
+                <button class="toggle-pill inactive" onclick="setGymToggle('sets',this)">Sets</button>
+                <button class="toggle-pill inactive" onclick="setGymToggle('duration',this)">Duration</button>
+                <button class="toggle-pill inactive" onclick="setGymToggle('sessions',this)">Sessions</button>
+              </div>
+            </div>
+            <div style="position:relative;height:160px;"><canvas id="gym-chart"></canvas></div>
+            <div class="stat-chips">
+              <span class="stat-chip" id="gym-stat1">14,700 kg this week</span>
+              <span class="stat-chip">3 sessions</span>
+              <span class="stat-chip">Avg 47 min</span>
+            </div>
+          </div>
+
+          <!-- Section 1: Muscle Distribution -->
+          <div class="collapse-card">
+            <div class="collapse-header" onclick="toggleSection(this)">
+              <div class="collapse-icon-sq" style="background:#EEF0FB;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z" stroke="#6C7EE8" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+              <span class="collapse-title">Muscle Distribution</span>
+              <svg class="collapse-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="collapse-body" id="sec-muscle">
+              <div class="collapse-inner">
+                <div style="display:flex;gap:6px;margin-bottom:12px;">
+                  <button class="toggle-pill active" style="height:28px;font-size:12px;">30 days</button>
+                  <button class="toggle-pill inactive" style="height:28px;font-size:12px;">3 months</button>
+                  <button class="toggle-pill inactive" style="height:28px;font-size:12px;display:flex;align-items:center;gap:3px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>1 year</button>
+                </div>
+                <div style="display:flex;justify-content:center;margin-bottom:8px;"><div style="width:200px;height:200px;"><canvas id="muscle-chart"></canvas></div></div>
+                <div id="muscle-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;"></div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;padding:12px 0;border-top:.5px solid #E8EAF8;">
+                  <div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">12</div><div style="font-size:11px;color:#8A8A9E;">Workouts</div></div>
+                  <div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">8h 45m</div><div style="font-size:11px;color:#8A8A9E;">Total time</div></div>
+                  <div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">14,700 kg</div><div style="font-size:11px;color:#8A8A9E;">Volume</div></div>
+                  <div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">148</div><div style="font-size:11px;color:#8A8A9E;">Sets</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Strength Level -->
+          <div class="collapse-card">
+            <div class="collapse-header" onclick="toggleSection(this)">
+              <div class="collapse-icon-sq" style="background:#EEF0FB;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="18" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="8" y="11" width="8" height="5" rx="1" fill="#6C7EE8"/></svg></div>
+              <span class="collapse-title">Strength Level</span>
+              <svg class="collapse-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="collapse-body" id="sec-strength">
+              <div class="collapse-inner">
+                <div style="font-size:11px;font-weight:500;color:#8A8A9E;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">Your Gym Lifts</div>
+                <div id="lift-cards"></div>
+                <div style="border-top:.5px solid #E8EAF8;margin:12px 0;"></div>
+                <div style="font-size:11px;font-weight:500;color:#8A8A9E;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">Your Running Level</div>
+                <div style="display:flex;gap:12px;align-items:center;background:#F7F8FF;border-radius:12px;padding:12px;">
+                  <div style="width:48px;height:48px;border-radius:50%;background:#F59E0B;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" fill="#fff"/></svg></div>
+                  <div style="flex:1;">
+                    <div style="font-size:14px;font-weight:600;color:#3D3D5C;margin-bottom:2px;">Yellow · Emerging Runner</div>
+                    <div style="font-size:12px;color:#8A8A9E;margin-bottom:6px;">31 km of 50 km to Orange Level</div>
+                    <div style="height:6px;border-radius:6px;background:#FEF3C7;"><div style="height:100%;width:62%;border-radius:6px;background:#F59E0B;"></div></div>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#8A8A9E" stroke-width="1.6"/><path d="M12 8v4M12 16h.01" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Per-Exercise Chart -->
+          <div class="collapse-card">
+            <div class="collapse-header" onclick="toggleSection(this)">
+              <div class="collapse-icon-sq" style="background:#E0F4F8;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M23 6l-9.5 9.5-5-5L1 18" stroke="#4BB8CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="collapse-title">Per-Exercise Chart</span>
+              <svg class="collapse-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="collapse-body" id="sec-exercise">
+              <div class="collapse-inner">
+                <div style="position:relative;margin-bottom:10px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);"><circle cx="11" cy="11" r="8" stroke="#8A8A9E" stroke-width="1.8"/><path d="M21 21l-4.35-4.35" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  <input type="text" value="Bench Press" style="width:100%;height:40px;border:.5px solid #C8C8D8;border-radius:12px;padding:0 12px 0 36px;font-size:14px;font-family:Inter,sans-serif;color:#3D3D5C;background:#fff;outline:none;">
+                </div>
+                <div class="chart-toggles" style="margin-bottom:10px;">
+                  <button class="toggle-pill active">Heaviest Weight</button>
+                  <button class="toggle-pill inactive">Projected 1RM</button>
+                  <button class="toggle-pill inactive">Best Set Vol</button>
+                  <button class="toggle-pill inactive">Best Session Vol</button>
+                  <button class="toggle-pill inactive">Most Reps</button>
+                  <button class="toggle-pill inactive">Best Time</button>
+                </div>
+                <div style="position:relative;height:140px;"><canvas id="exercise-chart"></canvas></div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M23 6l-9.5 9.5-5-5L1 18" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 6h6v6" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span style="font-size:13px;font-weight:600;color:#22C55E;">+23% stronger vs last month</span>
+                </div>
+                <div style="font-size:11px;font-weight:500;color:#8A8A9E;letter-spacing:.5px;text-transform:uppercase;margin:12px 0 8px;">Set Records</div>
+                <div id="set-records"></div>
+                <div style="display:flex;gap:6px;margin-top:12px;">
+                  <button class="toggle-pill active">1M</button>
+                  <button class="toggle-pill inactive">3M</button>
+                  <button class="toggle-pill inactive">6M</button>
+                  <button class="toggle-pill inactive">1Y</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Best Efforts -->
+          <div class="collapse-card">
+            <div class="collapse-header" onclick="toggleSection(this)">
+              <div class="collapse-icon-sq" style="background:#FEF3C7;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#F59E0B"/></svg></div>
+              <span class="collapse-title">Best Efforts</span>
+              <svg class="collapse-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="collapse-body" id="sec-best">
+              <div class="collapse-inner">
+                <div style="font-size:11px;font-weight:500;color:#8A8A9E;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">Running Personal Bests</div>
+                <div id="best-efforts-table"></div>
+                <div style="margin-top:12px;">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <span style="font-size:13px;color:#3D3D5C;">Trend for</span>
+                    <div style="display:flex;gap:4px;">
+                      <button class="toggle-pill active">1km</button>
+                      <button class="toggle-pill inactive">5km</button>
+                      <button class="toggle-pill inactive">10km</button>
+                    </div>
+                  </div>
+                  <div style="position:relative;height:120px;"><canvas id="best-chart"></canvas></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 5: Heart Rate Trend -->
+          <div class="collapse-card">
+            <div class="collapse-header" onclick="toggleSection(this)">
+              <div class="collapse-icon-sq" style="background:#FEE2E2;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" fill="#EF4444"/></svg></div>
+              <span class="collapse-title">Heart Rate Trend</span>
+              <svg class="collapse-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="collapse-body" id="sec-hr">
+              <div class="collapse-inner">
+                <div style="position:relative;height:140px;">
+                  <div style="position:absolute;inset:0;display:flex;flex-direction:column;pointer-events:none;border-radius:4px;overflow:hidden;">
+                    <div style="flex:1;background:#FFF1F2;"></div>
+                    <div style="flex:1;background:#FFFBEB;"></div>
+                    <div style="flex:1;background:#F0FDF4;"></div>
+                    <div style="flex:1;background:#EFF6FF;"></div>
+                    <div style="flex:1;background:#F9FAFB;"></div>
+                  </div>
+                  <canvas id="hr-chart" style="position:relative;z-index:1;"></canvas>
+                </div>
+                <div style="display:flex;gap:16px;margin-top:8px;flex-wrap:wrap;">
+                  <div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">142 bpm</div><div style="font-size:11px;color:#8A8A9E;">Avg</div></div>
+                  <div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">161 bpm</div><div style="font-size:11px;color:#8A8A9E;">Peak</div></div>
+                  <div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">72 bpm</div><div style="font-size:11px;color:#8A8A9E;">Resting</div></div>
+                </div>
+                <div style="display:flex;justify-content:center;margin-top:12px;">
+                  <div style="position:relative;width:160px;height:160px;">
+                    <canvas id="zone-chart"></canvas>
+                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+                      <div style="font-size:14px;font-weight:600;color:#3D3D5C;">Zone 3</div>
+                      <div style="font-size:11px;color:#8A8A9E;">Most time</div>
+                    </div>
+                  </div>
+                </div>
+                <div id="zone-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 6: Activity Calendar -->
+          <div class="collapse-card">
+            <div class="collapse-header" onclick="toggleSection(this)">
+              <div class="collapse-icon-sq" style="background:#EEF0FB;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#6C7EE8" stroke-width="1.6"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#6C7EE8" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+              <span class="collapse-title">Activity Calendar</span>
+              <svg class="collapse-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="collapse-body" id="sec-calendar">
+              <div class="collapse-inner">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3s5 4 5 9a5 5 0 01-10 0c0-2 1-3 2-4-.5 1.5.5 3 2 3-.5-3 1-5 1-8z" fill="#4BB8CC" stroke="#4BB8CC" stroke-width="1" stroke-linejoin="round"/></svg>
+                  <span style="font-size:14px;font-weight:600;color:#3D3D5C;">8-week streak</span>
+                  <span style="font-size:12px;color:#8A8A9E;flex:1;">Keep going — train at least once this week.</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                  <button onclick="prevMonth()" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                  <span style="font-size:14px;font-weight:600;color:#3D3D5C;" id="cal-month-label">April 2026</span>
+                  <button onclick="nextMonth()" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;">
+                  <div style="text-align:center;font-size:11px;color:#8A8A9E;">S</div><div style="text-align:center;font-size:11px;color:#8A8A9E;">M</div><div style="text-align:center;font-size:11px;color:#8A8A9E;">T</div><div style="text-align:center;font-size:11px;color:#8A8A9E;">W</div><div style="text-align:center;font-size:11px;color:#8A8A9E;">T</div><div style="text-align:center;font-size:11px;color:#8A8A9E;">F</div><div style="text-align:center;font-size:11px;color:#8A8A9E;">S</div>
+                </div>
+                <div id="cal-grid" class="cal-grid"></div>
+                <div style="text-align:center;font-size:11px;color:#8A8A9E;font-style:italic;margin-top:8px;">Tap any session to view details</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 7: Body Measurements -->
+          <div class="collapse-card">
+            <div class="collapse-header" onclick="toggleSection(this)">
+              <div class="collapse-icon-sq" style="background:#E0F4F8;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M2 12h20M2 12l4-4M2 12l4 4M22 12l-4-4M22 12l-4 4" stroke="#4BB8CC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="collapse-title">Body Measurements</span>
+              <svg class="collapse-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="collapse-body" id="sec-body">
+              <div class="collapse-inner">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round"/><circle cx="7" cy="6" r="2" fill="#8A8A9E"/><circle cx="17" cy="12" r="2" fill="#8A8A9E"/><circle cx="10" cy="18" r="2" fill="#8A8A9E"/></svg>
+                  <span style="font-size:13px;color:#3D3D5C;flex:1;">Log today's weight</span>
+                  <button style="height:28px;padding:0 14px;background:#6C7EE8;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">+ Log</button>
+                </div>
+                <div style="position:relative;height:140px;margin-bottom:8px;"><canvas id="weight-chart-sec"></canvas></div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+                  <span style="font-size:18px;font-weight:600;color:#3D3D5C;">76.2 kg</span>
+                  <div style="display:flex;align-items:center;gap:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M23 18l-9.5-9.5-5 5L1 6" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 18h6v-6" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:13px;color:#22C55E;">-2.3 kg from start</span></div>
+                  <span style="font-size:13px;color:#4BB8CC;">Goal: 74 kg</span>
+                </div>
+                <a href="#" onclick="toggleMeasurements(event)" style="font-size:12px;color:#6C7EE8;text-decoration:none;font-weight:500;">+ Track more measurements</a>
+                <div id="measurements-expand" style="display:none;margin-top:8px;"><div id="measurements-rows"></div></div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#8A8A9E" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#8A8A9E" stroke-width="2" stroke-linecap="round"/></svg>
+                  <span style="font-size:12px;color:#8A8A9E;font-style:italic;">Measurements stored securely. Never shared.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 8: Achievements -->
+          <div class="collapse-card">
+            <div class="collapse-header" onclick="toggleSection(this)">
+              <div class="collapse-icon-sq" style="background:#FEF3C7;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12M12 2l1.85 5.69H20l-4.92 3.57 1.86 5.72L12 13.4l-4.94 3.58 1.86-5.72L4 7.69h6.15L12 2z" stroke="#F59E0B" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+              <span class="collapse-title">Achievements</span>
+              <svg class="collapse-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="collapse-body" id="sec-achieve">
+              <div class="collapse-inner">
+                <div style="background:#EEF0FB;border-radius:12px;padding:12px;">
+                  <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
+                    <span style="font-size:28px;font-weight:600;color:#2D3A8C;">Lv.7</span>
+                    <span style="font-size:14px;color:#8A8A9E;">Iron Athlete</span>
+                  </div>
+                  <div class="xp-bar"><div class="xp-fill" style="width:81%;"></div></div>
+                  <div style="text-align:right;font-size:12px;color:#8A8A9E;margin-top:4px;">3,240 XP · 760 to Level 8</div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:center;margin-top:12px;background:#F7F8FF;border-radius:12px;padding:12px;border:.5px solid #C8C8D8;">
+                  <div style="width:48px;height:48px;border-radius:50%;background:#F59E0B;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" fill="#fff"/></svg></div>
+                  <div style="flex:1;">
+                    <div style="font-size:14px;font-weight:600;color:#3D3D5C;margin-bottom:2px;">Yellow · Emerging Runner</div>
+                    <div style="font-size:12px;color:#8A8A9E;margin-bottom:4px;">31 km of 50 km to Orange Level</div>
+                    <div style="height:6px;border-radius:6px;background:#FEF3C7;"><div style="height:100%;width:62%;border-radius:6px;background:#F59E0B;"></div></div>
+                  </div>
+                </div>
+                <div style="border-top:.5px solid #E8EAF8;margin:12px 0;"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                  <span style="font-size:13px;font-weight:500;color:#8A8A9E;letter-spacing:.3px;text-transform:uppercase;">Badges</span>
+                  <a href="#" style="font-size:12px;color:#6C7EE8;text-decoration:none;">View all</a>
+                </div>
+                <div id="badge-grid" class="badge-grid"></div>
+                <div style="font-size:11px;font-weight:500;color:#8A8A9E;letter-spacing:.5px;text-transform:uppercase;margin:12px 0 8px;">Recent XP</div>
+                <div id="recent-xp"></div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end charts tab -->
+
+        <!-- ═══ ACTIVITIES TAB ═══ -->
+        <div class="tab-content" id="tab-activities">
+          <div style="display:flex;gap:8px;margin-bottom:12px;" id="act-filter-row">
+            <button class="toggle-pill active" style="height:30px;font-size:12px;" onclick="setActFilter('all',this)">All</button>
+            <button class="toggle-pill inactive" style="height:30px;font-size:12px;" onclick="setActFilter('gym',this)">Gym</button>
+            <button class="toggle-pill inactive" style="height:30px;font-size:12px;" onclick="setActFilter('cardio',this)">Cardio</button>
+            <button class="toggle-pill inactive" style="height:30px;font-size:12px;" onclick="setActFilter('manual',this)">Manual</button>
+          </div>
+          <div id="activity-list"></div>
+        </div>
+
+        <!-- ═══ XP HISTORY TAB ═══ -->
+        <div class="tab-content" id="tab-xp">
+          <div style="background:#EEF0FB;border-radius:12px;padding:12px;margin-bottom:12px;">
+            <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
+              <span style="font-size:28px;font-weight:600;color:#2D3A8C;">Lv.7</span>
+              <span style="font-size:14px;color:#8A8A9E;">Iron Athlete</span>
+            </div>
+            <div class="xp-bar"><div class="xp-fill" style="width:81%;"></div></div>
+            <div style="text-align:right;font-size:12px;color:#8A8A9E;margin-top:4px;">3,240 XP · 760 to Level 8</div>
+          </div>
+          <div style="font-size:11px;font-weight:500;color:#8A8A9E;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">XP History</div>
+          <div class="card" style="padding:4px 16px;" id="xp-history-list"></div>
+        </div>
+
+      </div><!-- end screen-scroll -->
+
+      <!-- Bottom nav -->
+      <div class="bottom-nav">
+        <a href="S-09-Home.html" class="nav-tab">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill="#8A8A9E"/></svg>
+          <span style="color:#8A8A9E;">Home</span>
+        </a>
+        <a href="S-10-Plans-Hub.html" class="nav-tab">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="18" y="10" width="3.5" height="7" rx="1" fill="#8A8A9E"/><rect x="8" y="11" width="8" height="5" rx="1" fill="#8A8A9E"/></svg>
+          <span style="color:#8A8A9E;">Plans</span>
+        </a>
+        <a href="S-25-Coach-Chat.html" class="nav-tab">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <span style="color:#8A8A9E;">Coach</span>
+        </a>
+        <a href="S-28-Club-Tab.html" class="nav-tab">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#8A8A9E" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span style="color:#8A8A9E;">Club</span>
+        </a>
+        <a href="S-32-Progress-Tab.html" class="nav-tab">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#6C7EE8" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span style="color:#6C7EE8;">Progress</span>
+        </a>
+      </div>
+
+    </div><!-- phone-inner -->
+  </div><!-- phone-shell -->
+</div><!-- stage -->
+
+<script>
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.plugins.legend.display = false;
+Chart.defaults.plugins.tooltip.backgroundColor = '#2D3A8C';
+Chart.defaults.plugins.tooltip.padding = 8;
+Chart.defaults.plugins.tooltip.cornerRadius = 8;
+
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const CAL_DATA = {
+  all: [420,310,580,0,650,200,180],
+  gym: [420,310,580,0,0,200,0],
+  cardio: [0,0,0,0,650,0,180],
+};
+const CARDIO_DATA = {
+  distance: [0,5.2,0,3.1,0,8.4,0],
+  duration: [0,32,0,25,0,54,0],
+  sessions: [0,1,0,1,0,1,0],
+};
+const GYM_DATA = {
+  volume: [0,4800,5200,0,4700,0,0],
+  sets: [0,18,22,0,20,0,0],
+  duration: [0,45,52,0,44,0,0],
+  sessions: [0,1,1,0,1,0,0],
+};
+
+let currentTime = 'w', currentSport = 'all', actFilter = 'all', currentMonth = 'april';
+let calChart, cardioChart, gymChart, muscleChart, exerciseChart, bestChart, hrChart, zoneChart, weightChartSec, weightChartTab;
+
+function makeGrad(ctx, color, alpha1, alpha2, h) {
+  const g = ctx.createLinearGradient(0, 0, 0, h || 160);
+  g.addColorStop(0, color.replace(')', `,${alpha1})`).replace('rgb', 'rgba'));
+  g.addColorStop(1, color.replace(')', `,${alpha2})`).replace('rgb', 'rgba'));
+  return g;
+}
+
+function barCfg(labels, data, color, goalVal) {
+  const ds = [{ data, backgroundColor: color, borderRadius: 6, borderSkipped: false, maxBarThickness: 32 }];
+  if (goalVal) ds.push({ type: 'line', data: Array(labels.length).fill(goalVal), borderColor: '#9B84E8', borderDash: [6,4], borderWidth: 1.5, pointRadius: 0, fill: false });
+  return {
+    type: 'bar',
+    data: { labels, datasets: ds },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#8A8A9E' } },
+        y: { display: false },
+      },
+    },
+  };
+}
+
+function initCharts() {
+  calChart = new Chart(document.getElementById('cal-chart'), barCfg(DAYS, CAL_DATA.all, 'rgba(108,126,232,0.85)', 600));
+  cardioChart = new Chart(document.getElementById('cardio-chart'), barCfg(DAYS, CARDIO_DATA.distance, 'rgba(75,184,204,0.85)'));
+  gymChart = new Chart(document.getElementById('gym-chart'), barCfg(DAYS, GYM_DATA.volume, 'rgba(155,132,232,0.85)'));
+
+  // Muscle donut
+  const mColors = ['#6C7EE8','#9B84E8','#4BB8CC','#A3DCE8','#F59E0B','#EF9F27','#C8C8D8'];
+  const mLabels = ['Chest','Back','Shoulders','Legs','Arms','Core','Glutes'];
+  const mData = [22,18,14,20,12,8,6];
+  muscleChart = new Chart(document.getElementById('muscle-chart'), {
+    type: 'doughnut',
+    data: { labels: mLabels, datasets: [{ data: mData, backgroundColor: mColors, borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false } } },
+  });
+  const leg = document.getElementById('muscle-legend');
+  mLabels.forEach((l,i) => {
+    leg.innerHTML += `<div style="display:flex;align-items:center;gap:4px;font-size:12px;color:#3D3D5C;"><div style="width:8px;height:8px;border-radius:50%;background:${mColors[i]};flex-shrink:0;"></div>${l} ${mData[i]}%</div>`;
+  });
+
+  // Exercise line
+  const exData = [65,67.5,67.5,70,72.5,72.5,77.5,80];
+  const exLabels = ['Apr 1','Apr 8','Apr 15','Apr 22','Apr 29','May 6','May 13','May 17'];
+  exerciseChart = new Chart(document.getElementById('exercise-chart'), {
+    type: 'line',
+    data: { labels: exLabels, datasets: [{
+      data: exData, borderColor: '#6C7EE8', borderWidth: 2.5, tension: 0.4,
+      pointBackgroundColor: exData.map((_,i) => i >= 6 ? '#F59E0B' : '#6C7EE8'),
+      pointRadius: exData.map((_,i) => i >= 6 ? 7 : 4),
+      fill: true,
+      backgroundColor: ctx => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,140); g.addColorStop(0,'rgba(108,126,232,0.15)'); g.addColorStop(1,'rgba(108,126,232,0)'); return g; },
+    }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.raw} kg${c.dataIndex >= 6 ? ' — New PB' : ''}` } } },
+      scales: { x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#8A8A9E', maxRotation: 30 } }, y: { display: false } },
+    },
+  });
+
+  // Best efforts chart
+  bestChart = new Chart(document.getElementById('best-chart'), {
+    type: 'line',
+    data: { labels: ['R1','R2','R3','R4','R5','R6'], datasets: [{
+      data: [310,305,301,298,295,292],
+      borderColor: '#4BB8CC', borderWidth: 2, tension: 0.4, pointRadius: 3, pointBackgroundColor: '#4BB8CC',
+      fill: true,
+      backgroundColor: ctx => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,120); g.addColorStop(0,'rgba(75,184,204,0.15)'); g.addColorStop(1,'rgba(75,184,204,0)'); return g; },
+    }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false, reverse: true } } },
+  });
+
+  // HR chart
+  hrChart = new Chart(document.getElementById('hr-chart'), {
+    type: 'line',
+    data: { labels: ['S1','S2','S3','S4','S5','S6','S7','S8'], datasets: [{
+      data: [142,138,155,147,143,151,139,144],
+      borderColor: '#EF4444', borderWidth: 2, tension: 0.4, pointRadius: 5, pointBackgroundColor: '#EF4444', fill: false,
+    }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.label} · ${c.raw} bpm avg` } } },
+      scales: { x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#8A8A9E' } }, y: { display: false } },
+    },
+  });
+
+  // Zone donut
+  const zColors = ['#C8C8D8','#4BB8CC','#6C7EE8','#F59E0B','#EF4444'];
+  const zLabels = ['Z1 Recovery','Z2 Aerobic Base','Z3 Tempo','Z4 Threshold','Z5 Max'];
+  const zData = [8,32,38,17,5];
+  zoneChart = new Chart(document.getElementById('zone-chart'), {
+    type: 'doughnut',
+    data: { labels: zLabels, datasets: [{ data: zData, backgroundColor: zColors, borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { display: false } } },
+  });
+  const zl = document.getElementById('zone-legend');
+  zLabels.forEach((l,i) => {
+    zl.innerHTML += `<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#3D3D5C;"><div style="width:8px;height:8px;border-radius:50%;background:${zColors[i]};flex-shrink:0;"></div>${l} ${zData[i]}%</div>`;
+  });
+
+  initWeightChart('weight-chart-sec');
+}
+
+function initWeightChart(id) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  const c = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan','Feb','Mar','Apr 1','Apr 8','Apr 15','Apr 22','Apr 25'],
+      datasets: [
+        { data: [78.5,78.2,77.9,77.5,77.1,76.8,76.4,76.2], borderColor: '#6C7EE8', borderWidth: 2, tension: 0.4, pointRadius: 3, pointBackgroundColor: '#6C7EE8', fill: true,
+          backgroundColor: ctx2 => { const g = ctx2.chart.ctx.createLinearGradient(0,0,0,140); g.addColorStop(0,'rgba(108,126,232,0.15)'); g.addColorStop(1,'rgba(108,126,232,0)'); return g; } },
+        { type: 'line', data: Array(8).fill(74), borderColor: '#4BB8CC', borderDash: [6,4], borderWidth: 1.5, pointRadius: 0, fill: false },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.label} · ${c.raw} kg` } } },
+      scales: { x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#8A8A9E', maxRotation: 0 } }, y: { display: false } },
+    },
+  });
+  if (id === 'weight-chart-sec') weightChartSec = c;
+  else weightChartTab = c;
+}
+
+// Toggle helpers
+function setActiveToggle(container, btn) {
+  container.querySelectorAll('.toggle-pill').forEach(b => b.className = 'toggle-pill ' + (b === btn ? 'active' : 'inactive'));
+}
+
+function setCalToggle(m, btn) {
+  setActiveToggle(document.getElementById('cal-toggles'), btn);
+  calChart.data.datasets[0].data = CAL_DATA[m];
+  calChart.update();
+}
+function setCardioToggle(m, btn) {
+  setActiveToggle(document.getElementById('cardio-toggles'), btn);
+  cardioChart.data.datasets[0].data = CARDIO_DATA[m];
+  cardioChart.update();
+  const s = { distance: ['16.7 km total','Avg 5.6 km/session'], duration: ['111 min total','Avg 37 min/session'], sessions: ['3 sessions','All this week'] };
+  document.getElementById('cardio-stat1').textContent = s[m][0];
+  document.getElementById('cardio-stat2').textContent = s[m][1];
+}
+function setGymToggle(m, btn) {
+  setActiveToggle(document.getElementById('gym-toggles'), btn);
+  gymChart.data.datasets[0].data = GYM_DATA[m];
+  gymChart.update();
+  const s = { volume: '14,700 kg this week', sets: '60 sets total', duration: '141 min total', sessions: '3 sessions' };
+  document.getElementById('gym-stat1').textContent = s[m];
+}
+function setTimeFilter(t) {
+  currentTime = t;
+  ['w','m','y'].forEach(x => document.getElementById('tf-'+x).className = 'filter-pill ' + (x === t ? 'active' : 'inactive'));
+  document.getElementById('premium-tip').style.display = t === 'w' ? 'none' : 'block';
+}
+function setSport(s) {
+  currentSport = s;
+  ['all','gym','cardio'].forEach(x => document.getElementById('sp-'+x).className = 'sport-pill ' + (x === s ? 'active' : 'inactive'));
+  calChart.data.datasets[0].data = CAL_DATA[s];
+  calChart.update();
+}
+
+// Sub-tab switching
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.subtab-pill').forEach(el => el.className = 'subtab-pill inactive');
+  document.getElementById('tab-'+tab).classList.add('active');
+  const idx = { charts:0, activities:1, xp:2 };
+  document.querySelectorAll('.subtab-pill')[idx[tab]].className = 'subtab-pill active';
+  setTimeout(() => { [calChart,cardioChart,gymChart].forEach(c => c && c.resize()); }, 50);
+}
+
+// Accordion
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.collapse-chevron');
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.collapse-body').forEach(b => { b.style.maxHeight = '0px'; b.classList.remove('open'); });
+  document.querySelectorAll('.collapse-chevron').forEach(c => c.classList.remove('open'));
+  if (!isOpen) {
+    body.style.maxHeight = body.scrollHeight + 'px';
+    body.classList.add('open');
+    chevron.classList.add('open');
+    setTimeout(() => {
+      body.style.maxHeight = body.scrollHeight + 'px';
+      [muscleChart,exerciseChart,bestChart,hrChart,zoneChart,weightChartSec].forEach(c => c && c.resize());
+    }, 320);
+  }
+}
+
+// Calendar
+const CAL_MONTHS = {
+  april: { label:'April 2026', startDay:3, days:30, gym:[1,5,7,14,19,21], cardio:[3,9,20,23], mixed:[12], today:25, missed:[17] },
+  march: { label:'March 2026', startDay:0, days:31, gym:[2,5,9,12,16,19,23,26], cardio:[7,14,21,28], mixed:[4,18], today:null, missed:[10,24] },
+};
+
+function renderCalendar() {
+  const m = CAL_MONTHS[currentMonth];
+  document.getElementById('cal-month-label').textContent = m.label;
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  for (let i = 0; i < m.startDay; i++) { const e = document.createElement('div'); e.className = 'cal-cell'; grid.appendChild(e); }
+  for (let d = 1; d <= m.days; d++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell';
+    const isGym = m.gym.includes(d), isCardio = m.cardio.includes(d), isMixed = m.mixed.includes(d);
+    const isToday = m.today === d, isMissed = (m.missed||[]).includes(d), isFuture = m.today && d > m.today;
+    let bg = 'transparent', col = '#8A8A9E', border = 'none', inner = '';
+    if (isFuture) { bg = '#F7F8FF'; col = '#C8C8D8'; }
+    else if (isMixed) { bg = '#EEF0FB'; inner = '<div style="display:flex;gap:2px;margin-bottom:1px;"><svg width="8" height="8" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3" height="6" rx="1" fill="#6C7EE8"/><rect x="18" y="10" width="3" height="6" rx="1" fill="#6C7EE8"/><rect x="8" y="11" width="8" height="4" rx="1" fill="#6C7EE8"/></svg><svg width="8" height="8" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#4BB8CC" stroke-width="2.5"/></svg></div>'; }
+    else if (isGym) { bg = '#EEF0FB'; inner = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="margin-bottom:1px;"><rect x="3" y="10" width="3" height="6" rx="1" fill="#6C7EE8"/><rect x="18" y="10" width="3" height="6" rx="1" fill="#6C7EE8"/><rect x="8" y="11" width="8" height="4" rx="1" fill="#6C7EE8"/></svg>'; }
+    else if (isCardio) { bg = '#E0F4F8'; inner = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="margin-bottom:1px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#4BB8CC" stroke-width="2.5"/></svg>'; }
+    if (isToday) { border = '1.5px solid #6C7EE8'; col = '#6C7EE8'; }
+    cell.style.cssText = `background:${bg};border:${border};`;
+    cell.innerHTML = `${inner}<span style="font-size:11px;color:${col};font-weight:${isToday?'600':'400'};">${d}</span>${isMissed&&!isFuture?'<div style="width:4px;height:4px;border-radius:50%;background:#F59E0B;margin-top:1px;"></div>':''}`;
+    grid.appendChild(cell);
+  }
+}
+function prevMonth() { currentMonth = 'march'; renderCalendar(); }
+function nextMonth() { currentMonth = 'april'; renderCalendar(); }
+
+// Lift cards
+function renderLiftCards() {
+  const lifts = [
+    { name:'Squat', best:'60 kg', pct:55, tier:'Intermediate', next:'Next tier at 80 kg for your stats' },
+    { name:'Bench Press', best:'80 kg', pct:65, tier:'Intermediate', next:'Next tier at 100 kg for your stats' },
+    { name:'Deadlift', best:'100 kg', pct:72, tier:'Advanced', next:'Next tier at 130 kg for your stats' },
+    { name:'Overhead Press', best:'50 kg', pct:48, tier:'Intermediate', next:'Next tier at 65 kg for your stats' },
+  ];
+  const tiers = ['Beginner','Intermediate','Advanced','Elite'];
+  document.getElementById('lift-cards').innerHTML = lifts.map(l => `
+    <div class="lift-card">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-size:14px;font-weight:600;color:#3D3D5C;">${l.name}</span>
+        <span style="font-size:14px;font-weight:600;color:#6C7EE8;">${l.best}</span>
+      </div>
+      <div class="pct-bar"><div class="pct-fill" style="width:${l.pct}%;"></div></div>
+      <div class="tier-labels">${tiers.map(t => `<span style="${t===l.tier?'color:#6C7EE8;font-weight:700;':''}">${t}</span>`).join('')}</div>
+      <div style="font-size:11px;color:#8A8A9E;font-style:italic;margin-top:4px;">${l.next}</div>
+    </div>`).join('');
+}
+
+// Set records
+function renderSetRecords() {
+  const recs = [['1 rep','85 kg'],['3 reps','77.5 kg'],['5 reps','75 kg'],['8 reps','70 kg'],['10 reps','65 kg']];
+  document.getElementById('set-records').innerHTML = recs.map((r,i) => `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;${i<4?'border-bottom:.5px solid #E8EAF8;':''}">
+      <span style="font-size:13px;color:#8A8A9E;">${r[0]}</span>
+      <span style="font-size:13px;font-weight:600;color:#3D3D5C;">${r[1]}</span>
+    </div>`).join('');
+}
+
+// Best efforts
+function renderBestEfforts() {
+  const efforts = [
+    { dist:'1 km', time:'4:52', has:true },
+    { dist:'5 km', time:'24:30', has:true },
+    { dist:'10 km', time:'52:14', has:true },
+    { dist:'Half Marathon', time:'—', has:false },
+    { dist:'Marathon', time:'—', has:false },
+  ];
+  const spark = () => { const pts=[18,15,12,8,5,3]; return pts.map((y,i)=>`${i*12},${y}`).join(' '); };
+  document.getElementById('best-efforts-table').innerHTML = efforts.map((e,i) => `
+    <div style="padding:10px 0;${i<4?'border-bottom:.5px solid #E8EAF8;':''}">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:14px;font-weight:600;color:#3D3D5C;width:110px;">${e.dist}</span>
+        <span style="font-size:14px;font-weight:600;color:${e.has?'#6C7EE8':'#8A8A9E'};">${e.time}</span>
+        ${e.has?`<svg width="60" height="20"><polyline points="${spark()}" fill="none" stroke="#6C7EE8" stroke-width="1.5"/></svg>`:''}
+      </div>
+      <div style="font-size:11px;color:#8A8A9E;margin-top:3px;">${e.has?'Set on Apr 12 · 3 runs at this distance':'<em>Run to set your first Best Effort</em>'}</div>
+    </div>`).join('');
+}
+
+// Activities
+const ACTIVITIES = [
+  { date:'Apr 25', name:'Push A', type:'gym', stats:'4,800 kg · 18 sets · 45 min', ai:'Great chest session. Volume up 12% vs last week — progressive overload on track.' },
+  { date:'Apr 23', name:'Morning Run', type:'cardio', stats:'5.2 km · 5:32/km pace', ai:'Solid aerobic base run. Heart rate stayed in Zone 2 for 80% of the session.' },
+  { date:'Apr 22', name:'Pull A', type:'gym', stats:'5,200 kg · 22 sets · 52 min', ai:'Strong pull day. New PR on deadlift — 100 kg for 3 reps.' },
+  { date:'Apr 20', name:'Evening Walk', type:'cardio', stats:'3.1 km · 8:04/km pace', ai:'Good active recovery. Low HR kept you in Zone 1 throughout.' },
+  { date:'Apr 19', name:'Legs', type:'gym', stats:'4,700 kg · 20 sets · 44 min', ai:'Leg day consistency is building. Squat volume up from last cycle.' },
+  { date:'Apr 17', name:'Yoga', type:'manual', stats:'60 min · Flexibility', ai:'Recovery session logged. Good complement to heavy training days.' },
+];
+const BAR_COL = { gym:'#6C7EE8', cardio:'#4BB8CC', manual:'#C8C8D8' };
+const ACT_ICON = {
+  gym: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="COLOR"/><rect x="18" y="10" width="3.5" height="7" rx="1" fill="COLOR"/><rect x="8" y="11" width="8" height="5" rx="1" fill="COLOR"/></svg>`,
+  cardio: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="COLOR" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  manual: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="COLOR" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="COLOR" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+};
+
+function renderActivities() {
+  const list = ACTIVITIES.filter(a => actFilter === 'all' || a.type === actFilter);
+  document.getElementById('activity-list').innerHTML = list.map(a => {
+    const c = BAR_COL[a.type];
+    const icon = ACT_ICON[a.type].replace(/COLOR/g, c);
+    const isCardio = a.type === 'cardio' || a.type === 'manual';
+    const cardInner = `
+      <div class="activity-bar" style="background:${c};"></div>
+      <div style="padding:12px 0 12px 8px;flex-shrink:0;">${icon}</div>
+      <div style="flex:1;padding:12px 8px;">
+        <div style="font-size:11px;color:#8A8A9E;margin-bottom:2px;">${a.date}</div>
+        <div style="font-size:14px;font-weight:600;color:#3D3D5C;margin-bottom:2px;">${a.name}</div>
+        <div style="font-size:12px;color:#8A8A9E;">${a.stats}</div>
+        ${a.type==='manual'?'<div style="display:inline-block;margin-top:4px;padding:2px 8px;background:#F2F2F7;border-radius:6px;font-size:10px;color:#8A8A9E;">Manually logged</div>':''}
+        <div style="margin-top:6px;">
+          <button onclick="event.preventDefault();event.stopPropagation();toggleAI(this)" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#C8C8D8" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span style="font-size:11px;color:#7B5CB8;">WiseCoach summary</span>
+          </button>
+          <div class="ai-text" style="display:none;font-size:12px;color:#7B5CB8;font-style:italic;margin-top:4px;line-height:1.5;">${a.ai}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;padding:12px 8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="${isCardio ? '#6C7EE8' : '#C8C8D8'}" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>`;
+    if (isCardio) {
+      return `<a href="S-33-Activity-Detail.html" class="activity-card" style="text-decoration:none;cursor:pointer;">${cardInner}</a>`;
+    }
+    return `<div class="activity-card">${cardInner}</div>`;
+  }).join('');
+}
+function toggleAI(btn) {
+  const d = btn.parentElement.querySelector('.ai-text');
+  d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+function setActFilter(f, btn) {
+  actFilter = f;
+  document.querySelectorAll('#act-filter-row .toggle-pill').forEach(b => b.className = 'toggle-pill inactive');
+  btn.className = 'toggle-pill active';
+  renderActivities();
+}
+
+// XP
+const XP_EVENTS = [
+  { xp:'+50', label:'Completed Push A', time:'2 days ago' },
+  { xp:'+20', label:'New PB: Bench Press', time:'2 days ago' },
+  { xp:'+40', label:'Morning Run 5.2km', time:'4 days ago' },
+  { xp:'+30', label:'Squad challenge contribution', time:'5 days ago' },
+  { xp:'+10', label:'Logged weight', time:'1 week ago' },
+  { xp:'+50', label:'Completed Pull A', time:'1 week ago' },
+  { xp:'+25', label:'Evening Walk 3.1km', time:'1 week ago' },
+  { xp:'+50', label:'Completed Legs', time:'8 days ago' },
+  { xp:'+15', label:'7-day streak bonus', time:'10 days ago' },
+  { xp:'+10', label:'Logged weight', time:'2 weeks ago' },
+];
+const zapIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#6C7EE8"/></svg>`;
+function renderXP(events, containerId) {
+  document.getElementById(containerId).innerHTML = events.map((e,i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;${i<events.length-1?'border-bottom:.5px solid #E8EAF8;':''}">
+      ${zapIcon}
+      <span style="font-size:13px;font-weight:600;color:#6C7EE8;width:36px;">${e.xp}</span>
+      <span style="font-size:13px;color:#3D3D5C;flex:1;">${e.label}</span>
+      <span style="font-size:11px;color:#8A8A9E;">${e.time}</span>
+    </div>`).join('');
+}
+
+// Badges
+function renderBadges() {
+  const earned = [
+    { name:'First Workout', bg:'#4BB8CC', svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#fff"/><rect x="18" y="10" width="3.5" height="7" rx="1" fill="#fff"/><rect x="8" y="11" width="8" height="5" rx="1" fill="#fff"/></svg>` },
+    { name:'7-Day Streak', bg:'#4BB8CC', svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3s5 4 5 9a5 5 0 01-10 0c0-2 1-3 2-4-.5 1.5.5 3 2 3-.5-3 1-5 1-8z" fill="#fff"/></svg>` },
+    { name:'Personal Best', bg:'#6C7EE8', svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" fill="#fff"/></svg>` },
+    { name:'Squad Win', bg:'#F59E0B', svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#fff" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#fff" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>` },
+  ];
+  const locked = [
+    { name:'5km Best Effort', svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#C8C8D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
+    { name:'100km Club', svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="#C8C8D8" stroke-width="1.8"/><circle cx="12" cy="10" r="3" stroke="#C8C8D8" stroke-width="1.8"/></svg>` },
+    { name:'Level 10', svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="#C8C8D8" stroke-width="1.8" fill="none"/></svg>` },
+    { name:'Marathon', svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 4a1 1 0 11-2 0 1 1 0 012 0zM5 7l4 2 1 4-2 4H5M19 7l-4 2-1 4 2 4h3" stroke="#C8C8D8" stroke-width="1.8" stroke-linecap="round"/></svg>` },
+  ];
+  const lockSvg = `<div style="position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;background:#fff;border-radius:50%;border:1px solid #E8EAF8;display:flex;align-items:center;justify-content:center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#8A8A9E" stroke-width="2.5"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#8A8A9E" stroke-width="2.5" stroke-linecap="round"/></svg></div>`;
+  document.getElementById('badge-grid').innerHTML =
+    earned.map(b => `<div class="badge-cell"><div class="badge-circle" style="background:${b.bg};">${b.svg}</div><span style="font-size:10px;color:#3D3D5C;text-align:center;">${b.name}</span></div>`).join('') +
+    locked.map(b => `<div class="badge-cell"><div class="badge-circle" style="background:#F2F2F7;position:relative;">${b.svg}${lockSvg}</div><span style="font-size:10px;color:#3D3D5C;text-align:center;">${b.name}</span></div>`).join('');
+}
+
+// Measurements
+function renderMeasurements() {
+  const fields = ['Body fat %','Waist','Chest','Hips','Arms','Thighs'];
+  document.getElementById('measurements-rows').innerHTML = fields.map((f,i) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;height:40px;${i<fields.length-1?'border-bottom:.5px solid #E8EAF8;':''}">
+      <span style="font-size:13px;color:#8A8A9E;">${f}</span>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <input type="number" placeholder="—" style="width:60px;border:none;text-align:right;font-size:13px;font-family:Inter,sans-serif;color:#3D3D5C;outline:none;background:transparent;">
+        <span style="font-size:13px;color:#8A8A9E;">cm</span>
+      </div>
+    </div>`).join('');
+}
+function toggleMeasurements(e) {
+  e.preventDefault();
+  const el = document.getElementById('measurements-expand');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// Boot
+window.addEventListener('DOMContentLoaded', () => {
+  initCharts();
+  renderLiftCards();
+  renderSetRecords();
+  renderBestEfforts();
+  renderActivities();
+  renderXP(XP_EVENTS, 'xp-history-list');
+  renderXP(XP_EVENTS.slice(0,5), 'recent-xp');
+  renderBadges();
+  renderMeasurements();
+  renderCalendar();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S38 Share Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0;padding:0;background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  @keyframes cardIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+  @keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-6px)}}
+  ::-webkit-scrollbar{display:none}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S38 · Share Card</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',lavenderDark:'#7B5CB8',lavenderText:'#5B3F9E',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+
+/* ─── ICON PATHS ─── */
+const PATHS = {
+  'chevron-left':  {d:'M15 18l-6-6 6-6', type:'stroke'},
+  'chevron-right': {d:'M9 18l6-6-6-6', type:'stroke'},
+  'x':             {d:'M18 6L6 18M6 6l12 12', type:'stroke'},
+  'dumbbell':      {d:'M6 4v16M18 4v16M8 8h8M8 16h8M3 8h3M18 8h3M3 16h3M18 16h3', type:'stroke'},
+  'activity':      {d:'M22 12h-4l-3 9L9 3l-3 9H2', type:'stroke'},
+  'award':         {d:'M12 15a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM8.21 13.89L7 23l5-3 5 3-1.21-9.12', type:'stroke'},
+  'flame':         {d:'M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z', type:'stroke'},
+  'star':          {d:'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z', type:'stroke'},
+  'trending-up':   {d:'M23 6l-9.5 9.5-5-5L1 18', type:'stroke'},
+  'arrow-right':   {d:'M5 12h14M12 5l7 7-7 7', type:'stroke'},
+  'camera':        {d:'M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', type:'stroke'},
+  'message-circle':{d:'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', type:'stroke'},
+  'music':         {d:'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0z', type:'stroke'},
+  'send':          {d:'M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z', type:'stroke'},
+  'message-square':{d:'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', type:'stroke'},
+  'more-horizontal':{type:'circles'},
+  'image':         {d:'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM21 15l-5-5L5 21', type:'stroke'},
+  'link-2':        {d:'M15 7h3a5 5 0 0 1 0 10h-3m-6 0H6A5 5 0 0 1 6 7h3M8 12h8', type:'stroke'},
+  'lock':          {d:'M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2zM7 11V7a5 5 0 0 1 10 0v4', type:'stroke'},
+  'x-twitter':     {d:'M18 6L6 18M6 6l12 12', type:'stroke'},
+};
+
+function Icon({name, size=20, color='currentColor', strokeWidth=1.8, style:extraStyle={}}){
+  const spec = PATHS[name];
+  if(!spec) return null;
+  if(spec.type === 'circles'){
+    return(
+      <svg width={size} height={size} viewBox="0 0 24 24" style={extraStyle}>
+        <circle cx="5"  cy="12" r="1.5" fill={color}/>
+        <circle cx="12" cy="12" r="1.5" fill={color}/>
+        <circle cx="19" cy="12" r="1.5" fill={color}/>
+      </svg>
+    );
+  }
+  return(
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"
+      style={extraStyle}>
+      <path d={spec.d}/>
+    </svg>
+  );
+}
+
+/* ─── STATUS BAR ─── */
+function StatusBar(){
+  return(
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11">
+          <rect x="0"    y="7"   width="3" height="4"    rx=".6" fill={WW.text}/>
+          <rect x="4.5"  y="5"   width="3" height="6"    rx=".6" fill={WW.text}/>
+          <rect x="9"    y="2.5" width="3" height="8.5"  rx=".6" fill={WW.text}/>
+          <rect x="13.5" y="0"   width="3" height="11"   rx=".6" fill={WW.text}/>
+        </svg>
+        <svg width="24" height="11" viewBox="0 0 24 11">
+          <rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/>
+          <rect x="2"  y="2"  width="17" height="7"  rx="1.5" fill={WW.text}/>
+          <rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+/* ─── CONTEXT DATA ─── */
+const CONTEXTS = {
+  Gym: {
+    badgeIcon: 'dumbbell', badgeLabel: 'Gym Session',
+    heroVal: '1,240', heroUnit: 'kg lifted',
+    s1v: '18',    s1l: 'sets',
+    s2v: '45',    s2l: 'min',
+    s3v: 'New PB', s3l: 'Bench Press', s3Gold: true,
+    mode: 'number',
+  },
+  Run: {
+    badgeIcon: 'activity', badgeLabel: 'Morning Run',
+    heroVal: '5.2', heroUnit: 'km covered',
+    s1v: '27:14', s1l: 'time',
+    s2v: '5:04',  s2l: 'pace /km',
+    s3v: 'New PB', s3l: 'Fastest 5km', s3Gold: true,
+    mode: 'number',
+  },
+  Badge: {
+    badgeIcon: 'award', badgeLabel: 'Achievement',
+    heroVal: null, heroUnit: null,
+    s1v: null, s1l: null,
+    s2v: null, s2l: null,
+    s3v: null, s3l: null,
+    mode: 'badge',
+  },
+  'Level Up': {
+    badgeIcon: 'trending-up', badgeLabel: 'Level Up',
+    heroVal: '7 → 8', heroUnit: 'Level Up!',
+    s1v: '3,240 XP', s1l: 'earned',
+    s2v: 'Iron Athlete', s2l: 'level name',
+    s3v: '+120 XP', s3l: 'this session', s3Gold: false,
+    mode: 'levelup',
+  },
+};
+
+/* ─── SHARE CARD ─── */
+function ShareCardPreview({ctx}){
+  const data = CONTEXTS[ctx];
+  const isBadge   = data.mode === 'badge';
+  const isLevelUp = data.mode === 'levelup';
+
+  return(
+    <div style={{
+      width:'100%', maxWidth:340, margin:'0 auto',
+      borderRadius:20, overflow:'hidden',
+      aspectRatio:'4/5',
+      background:'linear-gradient(160deg,#2D3A8C 0%,#1A2266 100%)',
+      position:'relative',
+      animation:'cardIn 0.4s ease-out both',
+      boxShadow:'0 8px 32px rgba(29,34,140,.35)',
+      display:'flex', flexDirection:'column',
+    }}>
+      {/* Radial glow overlay */}
+      <div style={{
+        position:'absolute', top:0, right:0, left:0, bottom:0,
+        background:'radial-gradient(circle at 100% 0%, rgba(108,126,232,0.25) 0%, transparent 60%)',
+        pointerEvents:'none', zIndex:0,
+      }}/>
+
+      <div style={{position:'relative',zIndex:1,padding:20,display:'flex',flexDirection:'column',height:'100%',boxSizing:'border-box'}}>
+
+        {/* TOP ROW */}
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          {/* Left: logo */}
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <div style={{width:28,height:28,borderRadius:14,background:'rgba(255,255,255,0.15)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <span style={{fontSize:14,fontWeight:700,color:'#fff'}}>W</span>
+            </div>
+            <span style={{fontSize:13,fontWeight:600,color:'#fff'}}>WiseWorkout</span>
+          </div>
+          {/* Right: avatar initial */}
+          <div style={{width:36,height:36,borderRadius:18,background:WW.primary,display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <span style={{fontSize:14,fontWeight:600,color:'#fff'}}>M</span>
+          </div>
+        </div>
+
+        {/* HERO SECTION */}
+        <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',paddingTop:12,paddingBottom:12}}>
+          {/* Badge pill */}
+          <div style={{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(255,255,255,0.15)',borderRadius:20,padding:'6px 10px'}}>
+            <Icon name={data.badgeIcon} size={14} color="#fff" strokeWidth={1.8}/>
+            <span style={{fontSize:12,fontWeight:500,color:'#fff'}}>{data.badgeLabel}</span>
+          </div>
+
+          {/* Hero value area */}
+          {isBadge ? (
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginTop:16}}>
+              <Icon name="award" size={56} color="#fff" strokeWidth={1.5}/>
+              <div style={{fontSize:22,fontWeight:600,color:'#fff',marginTop:10}}>Badge Earned</div>
+              <div style={{fontSize:15,color:'rgba(255,255,255,0.8)',marginTop:4}}>7-Day Streak</div>
+            </div>
+          ) : isLevelUp ? (
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',marginTop:12}}>
+              <div style={{display:'flex',alignItems:'center',gap:6,fontSize:44,fontWeight:700,color:'#fff'}}>
+                7
+                <Icon name="arrow-right" size={32} color="#fff" strokeWidth={2.5}/>
+                8
+              </div>
+              <div style={{fontSize:18,fontWeight:600,color:'rgba(255,255,255,0.9)',marginTop:4}}>Level Up!</div>
+            </div>
+          ) : (
+            <>
+              <div style={{fontSize:52,fontWeight:700,color:'#fff',marginTop:12,lineHeight:1,letterSpacing:'-1px'}}>{data.heroVal}</div>
+              <div style={{fontSize:15,fontWeight:400,color:'rgba(255,255,255,0.8)',marginTop:4}}>{data.heroUnit}</div>
+            </>
+          )}
+        </div>
+
+        {/* STATS ROW */}
+        {isBadge ? (
+          <div style={{borderTop:'1px solid rgba(255,255,255,0.15)',paddingTop:14,paddingBottom:14,textAlign:'center'}}>
+            <span style={{fontSize:13,color:'rgba(255,255,255,0.7)'}}>Earned on May 16, 2026</span>
+          </div>
+        ) : (
+          <div style={{display:'flex',borderTop:'1px solid rgba(255,255,255,0.15)',marginTop:16,paddingTop:14,paddingBottom:14}}>
+            {[
+              {v:data.s1v, l:data.s1l, gold:false},
+              {v:data.s2v, l:data.s2l, gold:false},
+              {v:data.s3v, l:data.s3l, gold:data.s3Gold},
+            ].map((s,i)=>(
+              <div key={i} style={{
+                flex:1,
+                display:'flex',flexDirection:'column',alignItems:'center',
+                borderRight: i<2 ? '1px solid rgba(255,255,255,0.2)' : 'none',
+                padding:'0 6px',
+              }}>
+                <div style={{fontSize:20,fontWeight:700,color:s.gold ? WW.gold : '#fff',lineHeight:1}}>{s.v}</div>
+                <div style={{fontSize:11,color:'rgba(255,255,255,0.7)',marginTop:3,textAlign:'center'}}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* CARD BOTTOM ROW */}
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:'1px solid rgba(255,255,255,0.15)',paddingTop:12}}>
+          <div style={{display:'flex',alignItems:'center',gap:4}}>
+            <Icon name="flame" size={14} color={WW.teal} strokeWidth={1.8}/>
+            <span style={{fontSize:13,color:'#fff'}}>7-day streak</span>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:4}}>
+            <Icon name="star" size={14} color={WW.gold} strokeWidth={1.8}/>
+            <span style={{fontSize:13,color:'#fff'}}>Level 7</span>
+          </div>
+          <div style={{fontSize:10,color:'rgba(255,255,255,0.5)'}}>App Store · Play Store</div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+/* ─── MAIN APP ─── */
+function App(){
+  const [ctx,setCtx]   = React.useState('Gym');
+  const [toast,setToast] = React.useState({text:'',visible:false});
+  const toastTimer = React.useRef(null);
+
+  function showToast(text){
+    if(toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({text,visible:true});
+    toastTimer.current = setTimeout(()=>setToast({text:'',visible:false}),2000);
+  }
+
+  const chips = ['Gym','Run','Badge','Level Up'];
+
+  const platforms = [
+    {name:'Instagram', icon:'camera',         bg:'linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', iconColor:'#fff'},
+    {name:'WhatsApp',  icon:'message-circle', bg:'#25D366',  iconColor:'#fff'},
+    {name:'TikTok',    icon:'music',          bg:'#000000',  iconColor:'#fff'},
+    {name:'Telegram',  icon:'send',           bg:'#0088CC',  iconColor:'#fff'},
+    {name:'Messages',  icon:'message-square', bg:'#34C759',  iconColor:'#fff'},
+    {name:'Twitter',   icon:'x-twitter',      bg:'#1D9BF0',  iconColor:'#fff'},
+    {name:'More',      icon:'more-horizontal', bg:'#E8EAF8', iconColor:WW.textSec},
+  ];
+
+  const [pressedPlatform, setPressedPlatform] = React.useState(null);
+
+  function handlePlatformTap(name){
+    if(name === 'More'){
+      alert('In the real app, this opens the native iOS/Android share sheet.');
+      return;
+    }
+    setPressedPlatform(name);
+    setTimeout(()=>setPressedPlatform(null),150);
+    setTimeout(()=>showToast(`${name}: share sheet would open here.`),300);
+  }
+
+  return(
+    <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',position:'relative',fontFamily:"'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif"}}>
+      <StatusBar/>
+
+      {/* TOP BAR */}
+      <div style={{
+        height:56, background:WW.card, borderBottom:`0.5px solid #E8EAF8`,
+        display:'flex',alignItems:'center',justifyContent:'space-between',
+        padding:'0 16px', flexShrink:0,
+      }}>
+        <button onClick={()=>window.history.back()} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'none',border:'none',cursor:'pointer',padding:0}}>
+          <Icon name="chevron-left" size={20} color={WW.textSec}/>
+        </button>
+        <span style={{fontSize:17,fontWeight:600,color:WW.primaryDark}}>Share your session</span>
+        <button onClick={()=>window.history.back()} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'none',border:'none',cursor:'pointer',padding:0}}>
+          <Icon name="x" size={20} color={WW.textSec}/>
+        </button>
+      </div>
+
+      {/* SCROLLABLE BODY */}
+      <div style={{flex:1,overflowY:'auto',padding:'16px 20px 40px'}}>
+
+        {/* ── SECTION 1: SHARE CARD PREVIEW ── */}
+        <ShareCardPreview ctx={ctx}/>
+
+        <div style={{fontSize:12,color:WW.textSec,fontStyle:'italic',textAlign:'center',marginTop:10}}>
+          This is how your card will look when shared.
+        </div>
+
+        {/* Context switcher chips */}
+        <div style={{display:'flex',justifyContent:'center',gap:8,marginTop:14,flexWrap:'wrap'}}>
+          {chips.map(c=>(
+            <button key={c} onClick={()=>setCtx(c)} style={{
+              height:30, padding:'0 12px', borderRadius:20,
+              fontSize:13, fontWeight:500, border:'none', cursor:'pointer',
+              background: ctx===c ? WW.primary : WW.elevated,
+              color:      ctx===c ? '#fff'     : WW.textSec,
+              transition:'background .15s,color .15s',
+            }}>{c}</button>
+          ))}
+        </div>
+
+        {/* ── SECTION 2: PLATFORM SHARING ROW ── */}
+        <div style={{marginTop:20}}>
+          <div style={{fontSize:13,fontWeight:500,color:WW.textSec,marginBottom:8}}>Share to</div>
+          <div style={{
+            display:'flex', gap:8,
+            overflowX:'auto', paddingBottom:4,
+            msOverflowStyle:'none', scrollbarWidth:'none',
+          }}>
+            {platforms.map(p=>(
+              <button key={p.name} onClick={()=>handlePlatformTap(p.name)} style={{
+                width:72, flexShrink:0,
+                display:'flex', flexDirection:'column', alignItems:'center', gap:6,
+                background:'none', border:'none', cursor:'pointer', padding:0,
+              }}>
+                <div style={{
+                  width:52, height:52, borderRadius:26,
+                  background:p.bg,
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  transform: pressedPlatform===p.name ? 'scale(0.9)' : 'scale(1)',
+                  transition:'transform .15s',
+                  flexShrink:0,
+                }}>
+                  <Icon name={p.icon} size={24} color={p.iconColor} strokeWidth={1.8}/>
+                </div>
+                <span style={{fontSize:11,fontWeight:500,color:WW.text,whiteSpace:'nowrap'}}>{p.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── SECTION 3: SAVE & COPY ── */}
+        <div style={{marginTop:20,display:'flex',flexDirection:'column',gap:8}}>
+          {/* Save to camera roll */}
+          <button onClick={()=>showToast('Image saved to your camera roll (simulated).')} style={{
+            height:64, borderRadius:16,
+            border:`0.5px solid ${WW.border}`,
+            background:WW.card,
+            boxShadow:WW.shadow,
+            padding:'0 16px',
+            display:'flex', alignItems:'center', gap:12,
+            cursor:'pointer', width:'100%', textAlign:'left',
+          }}>
+            <div style={{width:36,height:36,borderRadius:10,background:WW.elevated,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <Icon name="image" size={18} color={WW.primary} strokeWidth={1.8}/>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:14,fontWeight:600,color:WW.text}}>Save to camera roll</div>
+              <div style={{fontSize:12,color:WW.textSec,marginTop:1}}>Save as an image</div>
+            </div>
+            <Icon name="chevron-right" size={16} color={WW.border} strokeWidth={1.8}/>
+          </button>
+
+          {/* Copy link */}
+          <button onClick={()=>showToast('Link copied to clipboard (simulated).')} style={{
+            height:64, borderRadius:16,
+            border:`0.5px solid ${WW.border}`,
+            background:WW.card,
+            boxShadow:WW.shadow,
+            padding:'0 16px',
+            display:'flex', alignItems:'center', gap:12,
+            cursor:'pointer', width:'100%', textAlign:'left',
+          }}>
+            <div style={{width:36,height:36,borderRadius:10,background:WW.elevated,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <Icon name="link-2" size={18} color={WW.primary} strokeWidth={1.8}/>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:14,fontWeight:600,color:WW.text}}>Copy session link</div>
+              <div style={{fontSize:12,color:WW.textSec,marginTop:1}}>Share a link to your session</div>
+            </div>
+            <Icon name="chevron-right" size={16} color={WW.border} strokeWidth={1.8}/>
+          </button>
+        </div>
+
+        {/* ── SECTION 4: PRIVACY NOTE ── */}
+        <div style={{
+          marginTop:16,
+          background:WW.lavenderBg,
+          borderRadius:12, padding:12,
+          display:'flex', alignItems:'flex-start', gap:8,
+        }}>
+          <Icon name="lock" size={14} color={WW.lavender} strokeWidth={1.8} style={{flexShrink:0,marginTop:1}}/>
+          <span style={{fontSize:12,color:WW.lavenderDark,lineHeight:1.6}}>
+            Only friends you have added in WiseWorkout can see your shared activity. You control your privacy.
+          </span>
+        </div>
+
+      </div>
+
+      {/* ── TOAST ── */}
+      {toast.visible && (
+        <div style={{
+          position:'fixed',
+          top:70,
+          left:'50%',
+          transform:'translateX(-50%)',
+          background:WW.card,
+          borderRadius:12,
+          padding:'10px 16px',
+          boxShadow:'0 4px 20px rgba(45,58,140,.18)',
+          zIndex:999,
+          whiteSpace:'nowrap',
+          fontSize:13,
+          fontWeight:500,
+          color:WW.text,
+          border:`0.5px solid ${WW.border}`,
+          animation:'toastIn .2s ease-out both',
+          pointerEvents:'none',
+        }}>
+          {toast.text}
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>

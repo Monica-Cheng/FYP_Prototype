@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiseWorkout · S-14 Plan Match · For Figma</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #F7F8FF;
+      --canvas: #EDEEF5;
+      --card: #FFFFFF;
+      --elevated: #EEF0FB;
+      --primary: #6C7EE8;
+      --primary-dark: #2D3A8C;
+      --lavender: #9B84E8;
+      --lavender-bg: #F0EEFE;
+      --lavender-dark: #7B5CB8;
+      --teal: #4BB8CC;
+      --teal-bg: #E0F4F8;
+      --text: #3D3D5C;
+      --text-sec: #8A8A9E;
+      --border: #C8C8D8;
+      --chip-bg: #E6EAFE;
+      --shadow: 0 2px 8px rgba(45,58,140,.06);
+      --frame-shadow: 0 30px 70px rgba(20,25,60,.20), 0 0 0 1px rgba(0,0,0,.12);
+      --success: #059669;
+      --success-bg: #D1FAE5;
+      --loading-bg: rgba(108,126,232,.08);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    }
+    body { min-height: 100vh; padding: 48px 40px 64px; }
+    .page-title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.04em;
+    }
+    .page-subtitle {
+      margin: 0 0 32px;
+      color: var(--text-sec);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 980px;
+    }
+    .storyboard {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .frame-block {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    .frame-label {
+      font-size: 12px;
+      color: #6B6B80;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      font-weight: 700;
+      text-align: center;
+    }
+    .phone-shell {
+      width: 390px;
+      height: auto;
+      min-height: 844px;
+      border-radius: 52px;
+      background: #0A0A12;
+      padding: 5px;
+      box-shadow: var(--frame-shadow);
+      position: relative;
+    }
+    .phone-inner {
+      width: 100%;
+      height: auto;
+      min-height: 834px;
+      border-radius: 47px;
+      overflow: hidden;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 33px;
+      border-radius: 20px;
+      background: #000;
+      z-index: 60;
+    }
+    .app {
+      width: 100%;
+      height: auto;
+      min-height: 834px;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .status-bar {
+      height: 47px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .status-time, .status-icons { padding-top: 10px; }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 16px 10px;
+      flex-shrink: 0;
+    }
+    .back {
+      width: 38px;
+      height: 38px;
+      border-radius: 19px;
+      background: rgba(61,61,92,.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .top-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.2px;
+    }
+    .content {
+      padding: 0 16px;
+      min-height: 0;
+    }
+    .summary-card,
+    .plan-card {
+      background: var(--card);
+      border-radius: 14px;
+      border: .5px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .summary-card {
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .summary-label {
+      font-size: 11px;
+      color: var(--text-sec);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .summary-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .form-section { margin-bottom: 16px; }
+    .field-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .goal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .goal-card {
+      padding: 10px 8px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      text-align: center;
+    }
+    .goal-card.selected {
+      border-color: var(--primary);
+      background: var(--chip-bg);
+    }
+    .goal-emoji {
+      font-size: 20px;
+      margin-bottom: 3px;
+    }
+    .goal-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .goal-card.selected .goal-name { color: var(--primary); }
+    .chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text-sec);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .chip.selected {
+      border-color: var(--primary);
+      background: var(--chip-bg);
+      color: var(--primary);
+    }
+    .level-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      margin-bottom: 6px;
+    }
+    .level-row.selected {
+      border-color: var(--primary);
+      background: var(--chip-bg);
+    }
+    .radio {
+      width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+    }
+    .level-row.selected .radio {
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+    .radio-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .level-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1px;
+    }
+    .level-row.selected .level-name { color: var(--primary); }
+    .level-sub {
+      font-size: 11px;
+      color: var(--text-sec);
+    }
+    .primary-btn,
+    .secondary-btn {
+      width: 100%;
+      height: 50px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .primary-btn {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 3px 12px rgba(108,126,232,.35);
+    }
+    .secondary-btn {
+      height: 40px;
+      border: 1.5px solid var(--border);
+      color: var(--text-sec);
+      background: transparent;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+    .helper-copy {
+      font-size: 13px;
+      color: var(--text-sec);
+      margin-bottom: 12px;
+    }
+    .loading-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 110px 0 80px;
+    }
+    .spinner-shell {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+    }
+    .spinner-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .loading-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .loading-copy {
+      font-size: 12px;
+      color: var(--text-sec);
+    }
+    .match-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 13px;
+      background: var(--lavender-bg);
+      border-radius: 12px;
+      border: .5px solid rgba(155,132,232,.3);
+      margin-bottom: 14px;
+    }
+    .match-copy {
+      font-size: 13px;
+      color: var(--lavender-dark);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .plan-card {
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .plan-top {
+      height: 6px;
+      background: var(--primary);
+    }
+    .plan-body {
+      padding: 12px 14px;
+    }
+    .plan-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+    .pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+    .pill-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .mini-card {
+      background: var(--elevated);
+      border-radius: 8px;
+      padding: 7px 8px;
+    }
+    .mini-label {
+      font-size: 10px;
+      color: var(--text-sec);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .mini-value {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .outline-btn {
+      height: 46px;
+      border-radius: 12px;
+      border: 1.5px solid var(--primary);
+      background: transparent;
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .outline-btn.saved {
+      border-color: var(--success);
+      background: var(--success-bg);
+      color: var(--success);
+    }
+    .small-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .small-btn {
+      height: 42px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text-sec);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bottom-nav {
+      position: static;
+      height: 84px;
+      background: var(--card);
+      border-top: .5px solid #E8EAF8;
+      display: flex;
+      z-index: 30;
+      margin-top: 18px;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-decoration: none;
+      padding-bottom: 8px;
+    }
+    .nav-label {
+      font-size: 10px;
+      font-weight: 600;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">S-14 Plan Match for Figma</h1>
+  <p class="page-subtitle">
+    This version keeps the original `S-14-Plan-Match.html` visual language while
+    flattening the real states into separate static frames for import. It includes
+    the survey summary state, editable preferences form, loading state, matched
+    result, and saved result.
+  </p>
+
+  <div class="storyboard">
+    <section class="frame-block">
+      <div class="frame-label">Survey Summary</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+          </div>
+        </div>
+        <div class="topbar">
+          <div class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#3D3D5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="top-title">Plan Match</div>
+        </div>
+        <div class="content">
+          <div class="summary-card">
+            <div style="font-size:13px;font-weight:700;color:#3D3D5C;margin-bottom:10px;">Your preferences</div>
+            <div class="summary-grid">
+              <div><div class="summary-label">Goal</div><div class="summary-value">Build Muscle</div></div>
+              <div><div class="summary-label">Sport</div><div class="summary-value">Both</div></div>
+              <div><div class="summary-label">Level</div><div class="summary-value">Beginner</div></div>
+              <div><div class="summary-label">Days/week</div><div class="summary-value">3 days</div></div>
+              <div><div class="summary-label">Equipment</div><div class="summary-value">Gym with weights</div></div>
+              <div><div class="summary-label">Preferred time</div><div class="summary-value">Morning</div></div>
+            </div>
+          </div>
+          <div class="secondary-btn">Edit Preferences</div>
+          <div class="primary-btn">Generate Recommendation</div>
+        </div>
+        <div class="bottom-nav">
+          <a class="nav-item" href="S-09-Home.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill="#8A8A9E"/></svg><span class="nav-label" style="color:#8A8A9E;">Home</span></a>
+          <a class="nav-item" href="S-10-Plans-Hub.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="20" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill="#6C7EE8"/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill="#6C7EE8"/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill="#6C7EE8"/></svg><span class="nav-label" style="color:#6C7EE8;">Plans</span></a>
+          <a class="nav-item" href="S-25-Coach-Chat.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Coach</span></a>
+          <a class="nav-item" href="S-28-Club-Tab.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#8A8A9E" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Club</span></a>
+          <a class="nav-item" href="S-32-Progress-Tab.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Progress</span></a>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Edit Preferences</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+          </div>
+        </div>
+        <div class="topbar">
+          <div class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#3D3D5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="top-title">Plan Match</div>
+        </div>
+        <div class="content">
+          <div class="helper-copy">Update your preferences below.</div>
+          <div class="form-section">
+            <div class="field-title">What&apos;s your primary goal?</div>
+            <div class="goal-grid">
+              <div class="goal-card selected"><div class="goal-emoji">💪</div><div class="goal-name">Build Muscle</div></div>
+              <div class="goal-card"><div class="goal-emoji">🏃</div><div class="goal-name">Improve Endurance</div></div>
+              <div class="goal-card"><div class="goal-emoji">🔥</div><div class="goal-name">Lose Weight</div></div>
+              <div class="goal-card"><div class="goal-emoji">🏋️</div><div class="goal-name">Build Strength</div></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-title">Preferred sport type</div>
+            <div class="chips">
+              <div class="chip">Gym only</div>
+              <div class="chip">Running only</div>
+              <div class="chip selected">Both</div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-title">Experience level</div>
+            <div class="level-row selected">
+              <div class="radio"><div class="radio-dot"></div></div>
+              <div><div class="level-name">Beginner</div><div class="level-sub">New to structured training</div></div>
+            </div>
+            <div class="level-row">
+              <div class="radio"></div>
+              <div><div class="level-name">Intermediate</div><div class="level-sub">Training 6–12 months</div></div>
+            </div>
+            <div class="level-row">
+              <div class="radio"></div>
+              <div><div class="level-name">Advanced</div><div class="level-sub">Training 2+ years</div></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="field-title">Available equipment</div>
+            <div class="chips">
+              <div class="chip">Home</div>
+              <div class="chip selected">Gym with weights</div>
+              <div class="chip">Outdoor</div>
+              <div class="chip">Both</div>
+            </div>
+          </div>
+          <div class="form-section" style="margin-bottom:20px;">
+            <div class="field-title">Days per week</div>
+            <div class="chips">
+              <div class="chip">2</div>
+              <div class="chip selected">3</div>
+              <div class="chip">4</div>
+              <div class="chip">5</div>
+              <div class="chip">6</div>
+            </div>
+          </div>
+          <div class="primary-btn">Generate Recommendation</div>
+        </div>
+        <div class="bottom-nav">
+          <a class="nav-item" href="S-09-Home.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill="#8A8A9E"/></svg><span class="nav-label" style="color:#8A8A9E;">Home</span></a>
+          <a class="nav-item" href="S-10-Plans-Hub.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="20" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill="#6C7EE8"/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill="#6C7EE8"/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill="#6C7EE8"/></svg><span class="nav-label" style="color:#6C7EE8;">Plans</span></a>
+          <a class="nav-item" href="S-25-Coach-Chat.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Coach</span></a>
+          <a class="nav-item" href="S-28-Club-Tab.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#8A8A9E" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Club</span></a>
+          <a class="nav-item" href="S-32-Progress-Tab.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Progress</span></a>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Loading</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+          </div>
+        </div>
+        <div class="topbar">
+          <div class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#3D3D5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="top-title">Plan Match</div>
+        </div>
+        <div class="content">
+          <div class="loading-wrap">
+            <div class="spinner-shell">
+              <svg width="64" height="64" viewBox="0 0 64 64" style="animation:spin 1s linear infinite;position:absolute;top:0;left:0;">
+                <circle cx="32" cy="32" r="28" fill="none" stroke="#E6EAFE" stroke-width="5"></circle>
+                <path d="M32 4 A28 28 0 0 1 60 32" fill="none" stroke="#6C7EE8" stroke-width="5" stroke-linecap="round"></path>
+              </svg>
+              <div class="spinner-center">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill="#fff"></path></svg>
+              </div>
+            </div>
+            <div class="loading-title">Finding your perfect plan…</div>
+            <div class="loading-copy">Analysing your goals and health profile</div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <a class="nav-item" href="S-09-Home.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill="#8A8A9E"/></svg><span class="nav-label" style="color:#8A8A9E;">Home</span></a>
+          <a class="nav-item" href="S-10-Plans-Hub.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="20" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill="#6C7EE8"/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill="#6C7EE8"/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill="#6C7EE8"/></svg><span class="nav-label" style="color:#6C7EE8;">Plans</span></a>
+          <a class="nav-item" href="S-25-Coach-Chat.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Coach</span></a>
+          <a class="nav-item" href="S-28-Club-Tab.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#8A8A9E" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Club</span></a>
+          <a class="nav-item" href="S-32-Progress-Tab.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Progress</span></a>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Matched Result</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+          </div>
+        </div>
+        <div class="topbar">
+          <div class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#3D3D5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="top-title">Plan Match</div>
+        </div>
+        <div class="content">
+          <div class="match-card">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-.8-8-4.5-8-9V6l8-3z" stroke="#9B84E8" stroke-width="1.8" stroke-linejoin="round"></path><path d="M9 12l2 2 4-4" stroke="#9B84E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <div class="match-copy">Matched because: Both, Beginner, 3 days/week, Gym with weights.</div>
+          </div>
+          <div class="plan-card">
+            <div class="plan-top"></div>
+            <div class="plan-body">
+              <div class="plan-title">Beginner Push-Pull-Legs</div>
+              <div class="pill-row">
+                <span class="pill" style="background:#E6EAFE;color:#6C7EE8;">Build Muscle</span>
+                <span class="pill" style="background:#D1FAE5;color:#059669;">Beginner</span>
+                <span class="pill" style="background:#EEF0FB;color:#8A8A9E;">Gym</span>
+                <span class="pill" style="background:#EEF0FB;color:#8A8A9E;">3 days/week</span>
+                <span class="pill" style="background:#EEF0FB;color:#8A8A9E;">8 weeks</span>
+              </div>
+              <div style="font-size:12px;color:#8A8A9E;line-height:1.45;margin-bottom:10px;">A classic 3-day split perfect for building your first solid foundation of strength and muscle.</div>
+              <div class="pill-grid">
+                <div class="mini-card"><div class="mini-label">Schedule</div><div class="mini-value">3 days/wk</div></div>
+                <div class="mini-card"><div class="mini-label">Duration</div><div class="mini-value">8 weeks</div></div>
+                <div class="mini-card"><div class="mini-label">Session</div><div class="mini-value">~45 min</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="action-grid">
+            <div class="outline-btn">Save to Library</div>
+            <a class="primary-btn" href="S-08-Health-Declaration.html" style="height:46px;font-size:13px;">Track This Plan</a>
+          </div>
+          <div class="small-grid">
+            <div class="small-btn">Regenerate</div>
+            <div class="small-btn">Edit Preferences</div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <a class="nav-item" href="S-09-Home.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill="#8A8A9E"/></svg><span class="nav-label" style="color:#8A8A9E;">Home</span></a>
+          <a class="nav-item" href="S-10-Plans-Hub.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="20" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill="#6C7EE8"/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill="#6C7EE8"/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill="#6C7EE8"/></svg><span class="nav-label" style="color:#6C7EE8;">Plans</span></a>
+          <a class="nav-item" href="S-25-Coach-Chat.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Coach</span></a>
+          <a class="nav-item" href="S-28-Club-Tab.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#8A8A9E" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Club</span></a>
+          <a class="nav-item" href="S-32-Progress-Tab.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Progress</span></a>
+        </div>
+      </div></div></div>
+    </section>
+
+    <section class="frame-block">
+      <div class="frame-label">Saved Result</div>
+      <div class="phone-shell"><div class="island"></div><div class="phone-inner"><div class="app">
+        <div class="status-bar">
+          <div class="status-time">9:41</div>
+          <div class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="#3D3D5C"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="#3D3D5C"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="#3D3D5C"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="#3D3D5C"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="#3D3D5C" stroke-opacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#3D3D5C"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="#3D3D5C" opacity=".4"/></svg>
+          </div>
+        </div>
+        <div class="topbar">
+          <div class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#3D3D5C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="top-title">Plan Match</div>
+        </div>
+        <div class="content">
+          <div class="match-card">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-.8-8-4.5-8-9V6l8-3z" stroke="#9B84E8" stroke-width="1.8" stroke-linejoin="round"></path><path d="M9 12l2 2 4-4" stroke="#9B84E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <div class="match-copy">Matched because: Both, Beginner, 3 days/week, Gym with weights.</div>
+          </div>
+          <div class="plan-card">
+            <div class="plan-top"></div>
+            <div class="plan-body">
+              <div class="plan-title">Beginner Push-Pull-Legs</div>
+              <div class="pill-row">
+                <span class="pill" style="background:#E6EAFE;color:#6C7EE8;">Build Muscle</span>
+                <span class="pill" style="background:#D1FAE5;color:#059669;">Beginner</span>
+                <span class="pill" style="background:#EEF0FB;color:#8A8A9E;">Gym</span>
+                <span class="pill" style="background:#EEF0FB;color:#8A8A9E;">3 days/week</span>
+                <span class="pill" style="background:#EEF0FB;color:#8A8A9E;">8 weeks</span>
+              </div>
+              <div style="font-size:12px;color:#8A8A9E;line-height:1.45;margin-bottom:10px;">A classic 3-day split perfect for building your first solid foundation of strength and muscle.</div>
+              <div class="pill-grid">
+                <div class="mini-card"><div class="mini-label">Schedule</div><div class="mini-value">3 days/wk</div></div>
+                <div class="mini-card"><div class="mini-label">Duration</div><div class="mini-value">8 weeks</div></div>
+                <div class="mini-card"><div class="mini-label">Session</div><div class="mini-value">~45 min</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="action-grid">
+            <div class="outline-btn saved"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></path></svg>Saved</div>
+            <a class="primary-btn" href="S-08-Health-Declaration.html" style="height:46px;font-size:13px;">Track This Plan</a>
+          </div>
+          <div class="small-grid">
+            <div class="small-btn">Regenerate</div>
+            <div class="small-btn">Edit Preferences</div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <a class="nav-item" href="S-09-Home.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill="#8A8A9E"/></svg><span class="nav-label" style="color:#8A8A9E;">Home</span></a>
+          <a class="nav-item" href="S-10-Plans-Hub.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="20" y="10" width="3.5" height="7" rx="1" fill="#6C7EE8"/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill="#6C7EE8"/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill="#6C7EE8"/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill="#6C7EE8"/></svg><span class="nav-label" style="color:#6C7EE8;">Plans</span></a>
+          <a class="nav-item" href="S-25-Coach-Chat.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Coach</span></a>
+          <a class="nav-item" href="S-28-Club-Tab.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#8A8A9E" stroke-width="1.5"/><circle cx="17" cy="10" r="2.2" stroke="#8A8A9E" stroke-width="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Club</span></a>
+          <a class="nav-item" href="S-32-Progress-Tab.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round"/></svg><span class="nav-label" style="color:#8A8A9E;">Progress</span></a>
+        </div>
+      </div></div></div>
+    </section>
+  </div>
+</body>
+</html>

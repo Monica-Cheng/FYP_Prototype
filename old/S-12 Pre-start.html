@@ -1,0 +1,424 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-12 Pre-start</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell {
+    width: 390px; height: 844px; border-radius: 52px;
+    background: #0A0A12; padding: 5px;
+    box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12);
+    position: relative;
+    box-sizing: content-box;
+  }
+  .phone-inner {
+    width: 390px; height: 844px; border-radius: 47px; overflow: hidden;
+    background: #F7F8FF; position: relative;
+  }
+  .island {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60;
+    pointer-events: none;
+  }
+  .tweaks-panel {
+    position: fixed; bottom: 20px; right: 20px; width: 280px;
+    background: #fff; border-radius: 14px; padding: 14px 16px 16px;
+    box-shadow: 0 10px 40px rgba(20,25,60,0.18), 0 0 0 0.5px rgba(0,0,0,0.08);
+    font-family: -apple-system, "Inter", system-ui, sans-serif;
+    color: #3D3D5C; display: none; z-index: 100;
+  }
+  .tweaks-panel.open { display: block; }
+  .tweaks-panel h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; color: #8A8A9E; }
+  .tweak-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; gap: 10px; }
+  .tweak-row label { font-size: 13px; color: #3D3D5C; flex: 1; }
+  .tweak-row input[type="text"] { flex: 1.2; min-width: 0; font-size: 12px; padding: 5px 8px; border-radius: 8px; border: 0.5px solid #C8C8D8; color: #3D3D5C; background: #F7F8FF; font-family: inherit; }
+  .tweak-row select { font-size: 12px; padding: 5px 8px; border-radius: 8px; border: 0.5px solid #C8C8D8; background: #F7F8FF; color: #3D3D5C; }
+  .tweak-row input[type="checkbox"] { accent-color: #6C7EE8; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="label">S-12 · Workout Pre-start</div>
+    <div class="phone-shell" data-screen-label="S-12 Pre-start">
+      <div class="island"></div>
+      <div class="phone-inner" id="app"></div>
+    </div>
+  </div>
+
+  <div class="tweaks-panel" id="tweaks">
+    <h3>Tweaks</h3>
+    <div class="tweak-row">
+      <label>Session name</label>
+      <input type="text" id="tw-name">
+    </div>
+    <div class="tweak-row">
+      <label>Coach note</label>
+      <select id="tw-note">
+        <option value="heavy">Chest felt heavy</option>
+        <option value="fresh">Feeling fresh</option>
+        <option value="pr">PR attempt day</option>
+        <option value="recover">Deload week</option>
+      </select>
+    </div>
+    <div class="tweak-row">
+      <label>Show coach note</label>
+      <input type="checkbox" id="tw-show-note" checked>
+    </div>
+    <div class="tweak-row">
+      <label>Muscle tags on rows</label>
+      <input type="checkbox" id="tw-show-muscle" checked>
+    </div>
+  </div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const WW = {
+  bg: '#F7F8FF',
+  card: '#FFFFFF',
+  elevated: '#EEF0FB',
+  primary: '#6C7EE8',
+  primaryDark: '#2D3A8C',
+  lavender: '#9B84E8',
+  lavenderBg: '#F0EEFE',
+  lavenderDark: '#7B5CB8',
+  teal: '#4BB8CC',
+  tealBg: '#E0F4F8',
+  text: '#3D3D5C',
+  textSec: '#8A8A9E',
+  border: '#C8C8D8',
+  shadow: '0 2px 8px rgba(45,58,140,0.06)'
+};
+
+// ————————————————————————————————— icons
+const Icon = {
+  x: (c) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M6 6l12 12M18 6L6 18" stroke={c || WW.text} strokeWidth="1.8" strokeLinecap="round"/>
+    </svg>
+  ),
+  dots: (c) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <circle cx="5" cy="12" r="1.6" fill={c || WW.text}/>
+      <circle cx="12" cy="12" r="1.6" fill={c || WW.text}/>
+      <circle cx="19" cy="12" r="1.6" fill={c || WW.text}/>
+    </svg>
+  ),
+  sparkle: (c) => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill={c || '#fff'}/>
+      <circle cx="18.5" cy="5.5" r="1.2" fill={c || '#fff'}/>
+    </svg>
+  ),
+  clock: (c) => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" stroke={c || WW.textSec} strokeWidth="1.6"/>
+      <path d="M12 7v5l3 2" stroke={c || WW.textSec} strokeWidth="1.6" strokeLinecap="round"/>
+    </svg>
+  ),
+  dumbbell: (c) => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+      <rect x="2" y="9" width="3" height="6" rx="1" fill={c || WW.textSec}/>
+      <rect x="19" y="9" width="3" height="6" rx="1" fill={c || WW.textSec}/>
+      <rect x="5" y="10.5" width="2" height="3" rx="0.5" fill={c || WW.textSec}/>
+      <rect x="17" y="10.5" width="2" height="3" rx="0.5" fill={c || WW.textSec}/>
+      <rect x="7" y="11" width="10" height="2" rx="0.6" fill={c || WW.textSec}/>
+    </svg>
+  ),
+  home: (c) => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path d="M3 10.5L12 3l9 7.5V21a0.5 0.5 0 01-0.5 0.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A0.5 0.5 0 013 21V10.5z" stroke={c || WW.textSec} strokeWidth="1.5" strokeLinejoin="round"/>
+    </svg>
+  ),
+  plans: (c, filled) => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill={filled ? (c || WW.textSec) : 'none'}>
+      <rect x="3" y="10" width="3.5" height="7" rx="1" fill={c || WW.textSec}/>
+      <rect x="20" y="10" width="3.5" height="7" rx="1" fill={c || WW.textSec}/>
+      <rect x="6.5" y="11.5" width="2" height="4" rx="0.5" fill={c || WW.textSec}/>
+      <rect x="17.5" y="11.5" width="2" height="4" rx="0.5" fill={c || WW.textSec}/>
+      <rect x="8.5" y="12" width="9" height="3" rx="0.8" fill={c || WW.textSec}/>
+    </svg>
+  ),
+  coach: (c) => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke={c || WW.textSec} strokeWidth="1.5" strokeLinejoin="round"/>
+    </svg>
+  ),
+  chart: (c) => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke={c || WW.textSec} strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  ),
+  person: (c) => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="8" r="3.5" stroke={c || WW.textSec} strokeWidth="1.5"/>
+      <path d="M4.5 20c0-3.6 3.4-6 7.5-6s7.5 2.4 7.5 6" stroke={c || WW.textSec} strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  ),
+};
+
+// ————————————————————————————————— status bar
+function StatusBar() {
+  return (
+    <div style={{ height:47, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 28px', fontSize:15, fontWeight:600, color:WW.text, position:'relative', zIndex:5 }}>
+      <div style={{ paddingTop:10 }}>9:41</div>
+      <div style={{ display:'flex', gap:6, alignItems:'center', paddingTop:10 }}>
+        <svg width="17" height="11" viewBox="0 0 17 11">
+          <rect x="0" y="7" width="3" height="4" rx="0.6" fill={WW.text}/>
+          <rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={WW.text}/>
+          <rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={WW.text}/>
+          <rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={WW.text}/>
+        </svg>
+        <svg width="24" height="11" viewBox="0 0 24 11">
+          <rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity="0.4" fill="none"/>
+          <rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/>
+          <rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={WW.text} opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— top bar (close / title / menu)
+function TopBar({ title }) {
+  return (
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'6px 14px 10px' }}>
+      <button style={{ width:38, height:38, borderRadius:19, background:'rgba(61,61,92,0.06)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+        {Icon.x(WW.text)}
+      </button>
+      <div style={{ textAlign:'center', flex:1, padding:'0 8px' }}>
+        <div style={{ fontSize:15, fontWeight:600, color:WW.text, letterSpacing:'-0.1px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{title}</div>
+      </div>
+      <button style={{ width:38, height:38, borderRadius:19, background:'rgba(61,61,92,0.06)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+        {Icon.dots(WW.text)}
+      </button>
+    </div>
+  );
+}
+
+// ————————————————————————————————— stats + muscle tags row
+function StatsRow({ duration, count, muscles }) {
+  return (
+    <div style={{ padding:'0 20px 14px' }}>
+      <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:12 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:13, color:WW.textSec, fontWeight:500 }}>
+          {Icon.clock(WW.textSec)}
+          <span>{duration} min</span>
+        </div>
+        <div style={{ width:3, height:3, borderRadius:2, background:WW.textSec, opacity:0.5 }}/>
+        <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:13, color:WW.textSec, fontWeight:500 }}>
+          {Icon.dumbbell(WW.textSec)}
+          <span>{count} exercises</span>
+        </div>
+      </div>
+      <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+        {muscles.map(m => (
+          <div key={m} style={{ padding:'5px 10px', borderRadius:10, background:WW.elevated, fontSize:11, fontWeight:600, color:WW.primaryDark, letterSpacing:'0.1px' }}>{m}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— coach note
+function CoachNote({ text }) {
+  return (
+    <div style={{ margin:'0 20px 18px', background:WW.lavenderBg, borderRadius:16, padding:'14px 14px 14px 12px', display:'flex', gap:10, alignItems:'flex-start' }}>
+      <div style={{ width:28, height:28, borderRadius:14, background:WW.lavender, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>
+        {Icon.sparkle('#fff')}
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ fontSize:11, fontWeight:600, color:WW.lavenderDark, letterSpacing:'0.3px', textTransform:'uppercase', marginBottom:3 }}>WiseCoach</div>
+        <div style={{ fontSize:13.5, color:WW.text, lineHeight:1.45, fontWeight:500 }}>{text}</div>
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— exercise row
+function ExerciseRow({ index, name, sets, reps, muscle, showMuscle }) {
+  return (
+    <div style={{ display:'flex', alignItems:'center', padding:'14px 16px', background:WW.card, borderRadius:14, boxShadow:WW.shadow, gap:14 }}>
+      <div style={{ width:30, height:30, borderRadius:10, background:WW.elevated, display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:700, color:WW.primary, flexShrink:0, fontVariantNumeric:'tabular-nums' }}>
+        {index}
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ fontSize:15, fontWeight:600, color:WW.text, letterSpacing:'-0.1px', marginBottom: showMuscle ? 3 : 0 }}>{name}</div>
+        {showMuscle && (
+          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+            <div style={{ fontSize:12, color:WW.textSec, fontWeight:500, fontVariantNumeric:'tabular-nums' }}>{sets} × {reps}</div>
+            <div style={{ width:2.5, height:2.5, borderRadius:1.5, background:WW.textSec, opacity:0.5 }}/>
+            <div style={{ fontSize:11, color:WW.teal, fontWeight:600, padding:'2px 7px', borderRadius:6, background:WW.tealBg }}>{muscle}</div>
+          </div>
+        )}
+        {!showMuscle && (
+          <div style={{ fontSize:12, color:WW.textSec, fontWeight:500, fontVariantNumeric:'tabular-nums' }}>{sets} × {reps}</div>
+        )}
+      </div>
+      <div style={{ color:WW.textSec, opacity:0.6 }}>
+        <svg width="7" height="12" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————— exercise list
+function ExerciseList({ showMuscle }) {
+  const rows = [
+    { name:'Bench Press', sets:4, reps:8, muscle:'Chest' },
+    { name:'Overhead Press', sets:3, reps:10, muscle:'Shoulders' },
+    { name:'Tricep Pushdown', sets:3, reps:12, muscle:'Triceps' },
+    { name:'Lateral Raise', sets:3, reps:15, muscle:'Shoulders' },
+    { name:'Face Pull', sets:3, reps:15, muscle:'Rear Delts' },
+  ];
+  return (
+    <div style={{ padding:'0 20px 20px', display:'flex', flexDirection:'column', gap:10 }}>
+      <div style={{ display:'flex', alignItems:'baseline', justifyContent:'space-between', margin:'2px 2px 6px' }}>
+        <div style={{ fontSize:12, fontWeight:600, color:WW.textSec, letterSpacing:'0.4px', textTransform:'uppercase' }}>Exercises</div>
+        <div style={{ fontSize:11, color:WW.textSec, fontWeight:500 }}>Tap to preview</div>
+      </div>
+      {rows.map((r, i) => (
+        <ExerciseRow key={r.name} index={i+1} {...r} showMuscle={showMuscle} />
+      ))}
+    </div>
+  );
+}
+
+// ————————————————————————————————— start button (pinned above nav)
+function StartButton() {
+  return (
+    <div style={{ position:'absolute', left:0, right:0, bottom:83, padding:'0 20px', zIndex:10 }}>
+      <button style={{
+        width:'100%', height:56, borderRadius:28, border:'none',
+        background:WW.primary, color:'#fff', fontSize:16, fontWeight:600, letterSpacing:'-0.1px',
+        boxShadow:'0 8px 22px rgba(108,126,232,0.35), 0 1px 0 rgba(255,255,255,0.12) inset',
+        cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+        fontFamily:'inherit'
+      }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M6 4l14 8-14 8V4z"/></svg>
+        Start workout
+      </button>
+    </div>
+  );
+}
+
+// ————————————————————————————————— bottom nav (Plans active)
+function BottomNav() {
+  const tabs = [
+    { k:'home', l:'Home', ic:Icon.home },
+    { k:'plans', l:'Plans', ic:Icon.plans },
+    { k:'coach', l:'Coach', ic:Icon.coach },
+    { k:'progress', l:'Progress', ic:Icon.chart },
+    { k:'profile', l:'Profile', ic:Icon.person },
+  ];
+  const active = 'plans';
+  return (
+    <div style={{ position:'absolute', bottom:0, left:0, right:0, background:'rgba(255,255,255,0.96)', backdropFilter:'blur(16px) saturate(180%)', WebkitBackdropFilter:'blur(16px) saturate(180%)', borderTop:'0.5px solid rgba(200,200,216,0.5)', display:'flex', justifyContent:'space-around', paddingTop:10, paddingBottom:26, zIndex:5 }}>
+      {tabs.map(t => {
+        const isActive = t.k === active;
+        const c = isActive ? WW.primary : WW.textSec;
+        return (
+          <div key={t.k} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:3, cursor:'pointer', minWidth:56 }}>
+            {t.ic(c)}
+            <div style={{ fontSize:10, fontWeight:isActive ? 600 : 500, color:c, letterSpacing:'0.1px' }}>{t.l}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ————————————————————————————————— screen
+const NOTES = {
+  heavy:  'Your chest felt heavy last session — consider starting lighter today.',
+  fresh:  'Sleep and HRV look solid this morning. Good day to push intensity.',
+  pr:     'You\u2019re primed for a bench PR. Warm up carefully and aim for a single at ~95%.',
+  recover:'This is a deload week. Keep loads around 60–70% and focus on form.',
+};
+
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "name": "Push A \u2014 Upper Body",
+  "note": "heavy",
+  "showNote": true,
+  "showMuscle": true
+}/*EDITMODE-END*/;
+
+function PreStartScreen({ tw }) {
+  return (
+    <div style={{ width:390, height:844, background:WW.bg, fontFamily:'-apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif', color:WW.text, position:'relative', overflow:'hidden', WebkitFontSmoothing:'antialiased' }}>
+      <StatusBar/>
+      <div style={{ position:'absolute', top:47, left:0, right:0, bottom:0, overflowY:'auto', paddingBottom:170 }}>
+        <TopBar title={tw.name}/>
+        <StatsRow duration={45} count={5} muscles={['Chest', 'Shoulders', 'Triceps']}/>
+        {tw.showNote && <CoachNote text={NOTES[tw.note] || NOTES.heavy}/>}
+        <ExerciseList showMuscle={tw.showMuscle}/>
+      </div>
+      <StartButton/>
+      <BottomNav/>
+    </div>
+  );
+}
+
+function App() {
+  const [tw, setTw] = React.useState(TWEAKS);
+  window.__getTweaks = () => tw;
+  window.__updateTweaks = (patch) => {
+    setTw(prev => {
+      const next = { ...prev, ...patch };
+      window.parent.postMessage({ type:'__edit_mode_set_keys', edits:patch }, '*');
+      return next;
+    });
+  };
+  return <PreStartScreen tw={tw}/>;
+}
+
+function __mountWhenReady() {
+  if (!window.ReactDOM) return setTimeout(__mountWhenReady, 30);
+  ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+}
+__mountWhenReady();
+</script>
+
+<script>
+(function () {
+  const panel = document.getElementById('tweaks');
+  const nameI = document.getElementById('tw-name');
+  const noteS = document.getElementById('tw-note');
+  const showI = document.getElementById('tw-show-note');
+  const muscI = document.getElementById('tw-show-muscle');
+
+  function syncFrom(tw) {
+    nameI.value = tw.name;
+    noteS.value = tw.note;
+    showI.checked = !!tw.showNote;
+    muscI.checked = !!tw.showMuscle;
+  }
+  function whenReady(cb) {
+    if (window.__updateTweaks) return cb();
+    setTimeout(() => whenReady(cb), 30);
+  }
+  whenReady(() => {
+    syncFrom(window.__getTweaks());
+    nameI.addEventListener('input', e => window.__updateTweaks({ name: e.target.value || 'Push A — Upper Body' }));
+    noteS.addEventListener('change', e => window.__updateTweaks({ note: e.target.value }));
+    showI.addEventListener('change', e => window.__updateTweaks({ showNote: e.target.checked }));
+    muscI.addEventListener('change', e => window.__updateTweaks({ showMuscle: e.target.checked }));
+  });
+
+  window.addEventListener('message', (ev) => {
+    const d = ev.data;
+    if (!d || typeof d !== 'object') return;
+    if (d.type === '__activate_edit_mode') panel.classList.add('open');
+    else if (d.type === '__deactivate_edit_mode') panel.classList.remove('open');
+  });
+  window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+})();
+</script>
+
+</body></html>

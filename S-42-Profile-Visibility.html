@@ -1,0 +1,140 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-42 Profile Visibility</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0;padding:0;background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .lbl{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  .spin{animation:spin .8s linear infinite;display:inline-flex}
+  @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .slide-up{animation:slideUp .3s ease forwards}
+</style>
+</head><body>
+<div class="stage">
+  <div class="lbl">S-42 · Profile Visibility</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',shadow:'0 2px 8px rgba(45,58,140,.06)'};
+const PATHS={
+  'chevron-left':"M15 18l-6-6 6-6",
+  check:"M20 6L9 17l-5-5",
+  'loader-circle':"M21 12a9 9 0 1 1-6.22-8.56",
+  globe:"M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zM2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z",
+  users:"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
+  lock:"M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2zM17 11V7a5 5 0 0 0-10 0v4",
+  info:"M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zM12 16v-4M12 8h.01",
+};
+function Icon({name,size=16,color='currentColor',style:s,className:cn}){
+  const p=PATHS[name];if(!p)return null;
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-flex',flexShrink:0,...s}} className={cn}><path d={p}/></svg>;
+}
+function StatusBar(){
+  return <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0,background:WW.card}}>
+    <span style={{paddingTop:10}}>9:41</span>
+    <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+      <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
+      <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+    </div>
+  </div>;
+}
+
+const OPTIONS=[
+  {value:'everyone',icon:'globe',label:'Everyone',desc:'Anyone on WiseWorkout can see your profile, workouts, and stats.'},
+  {value:'friends',icon:'users',label:'Friends Only',desc:'Only people you follow and who follow you back can see your activity.'},
+  {value:'private',icon:'lock',label:'Only Me',desc:'Your profile is hidden. Only you can see your activity and stats.'},
+];
+
+function App(){
+  const [selected,setSelected]=React.useState('friends');
+  const [original,setOriginal]=React.useState('friends');
+  const [saveS,setSaveS]=React.useState('idle');
+  const [toast,setToast]=React.useState(false);
+
+  const dirty=selected!==original&&saveS==='idle';
+
+  function handleSave(){
+    if(!dirty)return;
+    setSaveS('loading');
+    setTimeout(()=>{
+      setSaveS('saved');
+      setOriginal(selected);
+      setToast(true);
+      setTimeout(()=>{setToast(false);setSaveS('idle');},1800);
+    },700);
+  }
+
+  const saveBg=saveS==='saved'?'#22C55E':dirty?WW.primary:'#E8EAF8';
+  const saveFg=saveS==='saved'||dirty?'#fff':'#8A8A9E';
+  const saveTxt=saveS==='loading'?'Saving...':saveS==='saved'?'Saved!':'Save Changes';
+
+  return(
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,fontFamily:"'Inter',system-ui,sans-serif"}}>
+      <StatusBar/>
+      <div style={{height:56,display:'flex',alignItems:'center',padding:'0 16px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',flexShrink:0,position:'relative'}}>
+        <a href="S-35-Settings.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,textDecoration:'none',flexShrink:0}}>
+          <Icon name="chevron-left" size={18} color={WW.textSec}/>
+        </a>
+        <span style={{position:'absolute',left:'50%',transform:'translateX(-50%)',fontSize:18,fontWeight:600,color:WW.primaryDark}}>Profile Visibility</span>
+      </div>
+
+      <div style={{flex:1,overflowY:'auto',padding:'20px 16px 120px',display:'flex',flexDirection:'column',gap:10}}>
+        {/* Option cards */}
+        {OPTIONS.map(o=>{
+          const active=selected===o.value;
+          return(
+            <button key={o.value} onClick={()=>{setSelected(o.value);setSaveS('idle');}}
+              style={{display:'flex',alignItems:'center',gap:14,padding:'16px',borderRadius:16,border:`1.5px solid ${active?WW.primary:WW.border}`,background:active?'#F0F2FD':WW.card,cursor:'pointer',fontFamily:'inherit',textAlign:'left',boxShadow:active?`0 0 0 3px rgba(108,126,232,.1)`:WW.shadow,transition:'all .15s',width:'100%',boxSizing:'border-box'}}>
+              <div style={{width:44,height:44,borderRadius:12,background:active?'#E6EAFE':WW.elevated,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                <Icon name={o.icon} size={22} color={active?WW.primary:WW.textSec}/>
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:15,fontWeight:600,color:active?WW.primaryDark:WW.text,marginBottom:3}}>{o.label}</div>
+                <div style={{fontSize:13,color:WW.textSec,lineHeight:1.4}}>{o.desc}</div>
+              </div>
+              <div style={{width:22,height:22,borderRadius:11,border:`2px solid ${active?WW.primary:WW.border}`,background:active?WW.primary:'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,transition:'all .15s'}}>
+                {active&&<Icon name="check" size={12} color="#fff"/>}
+              </div>
+            </button>
+          );
+        })}
+
+        {/* Info card */}
+        <div style={{background:'#F0EEFE',borderRadius:12,padding:'12px 14px',border:'0.5px solid #D8D0F4',display:'flex',gap:10,marginTop:4}}>
+          <Icon name="info" size={16} color="#7B5CB8" style={{marginTop:1,flexShrink:0}}/>
+          <div style={{fontSize:13,color:'#5B3F9E',lineHeight:1.5}}>Your visibility setting also controls who can find you by searching your username and who can send you friend requests.</div>
+        </div>
+      </div>
+
+      {/* Toast */}
+      {toast&&(
+        <div className="slide-up" style={{position:'absolute',top:70,left:'50%',transform:'translateX(-50%)',background:'#1C1C2E',color:'#fff',padding:'10px 18px',borderRadius:20,fontSize:13,fontWeight:500,whiteSpace:'nowrap',zIndex:50,display:'flex',alignItems:'center',gap:8}}>
+          <Icon name="check" size={14} color="#22C55E"/>Visibility updated
+        </div>
+      )}
+
+      {/* Sticky button */}
+      <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,padding:'12px 16px',paddingBottom:'calc(12px + env(safe-area-inset-bottom,0px))',borderTop:'0.5px solid #E8EAF8',zIndex:20}}>
+        <button onClick={handleSave} style={{width:'100%',height:52,borderRadius:16,border:'none',background:saveBg,color:saveFg,fontSize:16,fontWeight:500,cursor:dirty?'pointer':'not-allowed',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center',gap:8,transition:'background .2s'}}>
+          {saveS==='loading'&&<Icon name="loader-circle" size={16} color="#fff" className="spin"/>}
+          {saveS==='saved'&&<Icon name="check" size={16} color="#fff"/>}
+          {saveTxt}
+        </button>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body></html>

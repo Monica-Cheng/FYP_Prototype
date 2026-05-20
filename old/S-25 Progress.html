@@ -1,0 +1,406 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-25 Progress</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #EDEEF5; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-size: 12px; color: #6B6B80; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+  .phone-shell { width: 390px; height: 844px; border-radius: 52px; background: #0A0A12; padding: 5px; box-shadow: 0 30px 70px rgba(20,25,60,0.20), 0 0 0 1px rgba(0,0,0,0.12); position: relative; box-sizing: content-box; }
+  .phone-inner { width: 390px; height: 844px; border-radius: 47px; overflow: hidden; background: #F7F8FF; position: relative; }
+  .island { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 118px; height: 33px; border-radius: 20px; background: #000; z-index: 60; pointer-events: none; }
+  .tweaks-panel { position: fixed; bottom: 20px; right: 20px; width: 280px; background: #fff; border-radius: 14px; padding: 14px 16px 16px; box-shadow: 0 10px 40px rgba(20,25,60,0.18), 0 0 0 0.5px rgba(0,0,0,0.08); color: #3D3D5C; display: none; z-index: 100; }
+  .tweaks-panel.open { display: block; }
+  .tweaks-panel h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; color: #8A8A9E; }
+  .tweak-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; gap: 10px; }
+  .tweak-row label { font-size: 13px; color: #3D3D5C; flex: 1; }
+  .tweak-row input[type="checkbox"] { accent-color: #6C7EE8; }
+  .tweak-row select { font-size: 12px; padding: 5px 8px; border-radius: 8px; border: 0.5px solid #C8C8D8; background: #F7F8FF; color: #3D3D5C; }
+  @keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  .bar { transform-origin: bottom; animation: barGrow 700ms cubic-bezier(.2,.8,.2,1) both; }
+  .rise { opacity: 1; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="label">S-25 · Progress</div>
+    <div class="phone-shell" data-screen-label="S-25 Progress">
+      <div class="island"></div>
+      <div class="phone-inner" id="app"></div>
+    </div>
+  </div>
+
+  <div class="tweaks-panel" id="tweaks">
+    <h3>Tweaks</h3>
+    <div class="tweak-row">
+      <label>Overtraining alert</label>
+      <input type="checkbox" id="tw-alert" checked>
+    </div>
+    <div class="tweak-row">
+      <label>Metric</label>
+      <select id="tw-metric">
+        <option value="calories">Calories</option>
+        <option value="volume">Volume</option>
+        <option value="pace">Pace</option>
+        <option value="hr">Heart Rate</option>
+      </select>
+    </div>
+    <div class="tweak-row">
+      <label>Period</label>
+      <select id="tw-period">
+        <option value="week">Week</option>
+        <option value="month">Month</option>
+        <option value="all">All</option>
+      </select>
+    </div>
+    <div class="tweak-row">
+      <label>Coach insight</label>
+      <input type="checkbox" id="tw-insight" checked>
+    </div>
+  </div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const WW = {
+  bg: '#F7F8FF', card: '#FFFFFF', elevated: '#EEF0FB',
+  primary: '#6C7EE8', primaryDark: '#2D3A8C', primaryFaint: '#E6EAFE',
+  lavender: '#9B84E8', lavenderBg: '#F0EEFE', lavenderDark: '#7B5CB8',
+  teal: '#4BB8CC', tealBg: '#E0F4F8',
+  amber: '#E8A13B', amberBg: '#FFF3DE', amberDark: '#8C5E1A',
+  text: '#3D3D5C', textSec: '#8A8A9E', textTert: '#B5B5C8',
+  border: '#E2E3ED', borderSoft: '#EEEFF5',
+  shadow: '0 2px 8px rgba(45,58,140,0.06)',
+};
+
+const Ico = {
+  sparkle:(c,s=15)=>(<svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" fill={c||'#fff'}/><circle cx="18.5" cy="5.5" r="1.2" fill={c||'#fff'}/></svg>),
+  bell:(c)=>(<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8z" stroke={c||'#fff'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>),
+  chev:(c)=>(<svg width="7" height="12" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6" stroke={c||WW.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>),
+};
+
+function StatusBar() {
+  return (
+    <div style={{ height:47, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 28px', fontSize:15, fontWeight:600, color:WW.text, position:'relative', zIndex:5 }}>
+      <div style={{ paddingTop:10 }}>9:41</div>
+      <div style={{ display:'flex', gap:6, alignItems:'center', paddingTop:10 }}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={WW.text}/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity="0.4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx="0.5" fill={WW.text} opacity="0.4"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function OvertrainingAlert() {
+  return (
+    <div className="rise" style={{ margin:'0 16px 12px', background:WW.amberBg, borderRadius:14, padding:'10px 12px', display:'flex', gap:10, alignItems:'flex-start', border:`0.5px solid rgba(232,161,59,0.22)` }}>
+      <div style={{ width:26, height:26, borderRadius:13, background:WW.amber, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>
+        {Ico.bell('#fff')}
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ fontSize:11, fontWeight:700, color:WW.amberDark, letterSpacing:'0.4px', textTransform:'uppercase', marginBottom:2, display:'flex', alignItems:'center', gap:5 }}>
+          WiseCoach · Recovery
+        </div>
+        <div style={{ fontSize:12.5, color:WW.text, lineHeight:1.4, fontWeight:500 }}>
+          Rest day recommended — <span style={{ fontWeight:700 }}>5 consecutive</span> training days detected.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TopBar({ period, setPeriod }) {
+  const opts = [{k:'week',l:'Week'},{k:'month',l:'Month'},{k:'all',l:'All'}];
+  return (
+    <div style={{ padding:'4px 18px 14px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10 }}>
+      <div style={{ fontSize:22, fontWeight:700, color:WW.text, letterSpacing:'-0.5px' }}>My progress</div>
+      <div style={{ display:'flex', background:WW.elevated, borderRadius:11, padding:3, gap:2 }}>
+        {opts.map(o => {
+          const active = o.k === period;
+          return (
+            <button key={o.k} onClick={() => setPeriod(o.k)} style={{
+              padding:'5px 10px', borderRadius:9, border:'none', cursor:'pointer', fontFamily:'inherit',
+              background: active ? WW.primary : 'transparent',
+              color: active ? '#fff' : WW.textSec,
+              fontSize:11.5, fontWeight:600, letterSpacing:'-0.05px',
+              boxShadow: active ? '0 2px 6px rgba(108,126,232,0.3)' : 'none',
+              transition:'background 150ms',
+            }}>{o.l}</button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function CoachInsight() {
+  return (
+    <div className="rise" style={{ margin:'0 16px 14px', background:WW.lavenderBg, borderRadius:16, padding:'12px 13px 13px 11px', display:'flex', gap:10, alignItems:'flex-start' }}>
+      <div style={{ width:28, height:28, borderRadius:14, background:WW.lavender, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>
+        {Ico.sparkle('#fff', 14)}
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ fontSize:10.5, fontWeight:700, color:WW.lavenderDark, letterSpacing:'0.4px', textTransform:'uppercase', marginBottom:3 }}>WiseCoach insight</div>
+        <div style={{ fontSize:12.5, color:WW.text, lineHeight:1.45, fontWeight:500 }}>
+          This week you burned <span style={{ fontWeight:700, color:WW.primaryDark }}>1,840 kcal</span> — <span style={{ fontWeight:700, color:WW.primaryDark }}>92%</span> of your weekly goal. Your running pace improved <span style={{ fontWeight:700, color:WW.primaryDark }}>5%</span> month over month. Great consistency!
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MetricTabs({ metric, setMetric }) {
+  const tabs = [
+    { k:'calories', l:'Calories' },
+    { k:'volume', l:'Volume' },
+    { k:'pace', l:'Pace' },
+    { k:'hr', l:'Heart Rate' },
+  ];
+  return (
+    <div style={{ margin:'0 0 14px', borderBottom:`0.5px solid ${WW.borderSoft}`, padding:'0 16px', display:'flex', gap:24, overflowX:'auto' }}>
+      {tabs.map(t => {
+        const active = t.k === metric;
+        return (
+          <button key={t.k} onClick={() => setMetric(t.k)} style={{
+            padding:'10px 0 12px', border:'none', background:'none', cursor:'pointer', fontFamily:'inherit',
+            color: active ? WW.primary : WW.textSec, fontSize:13, fontWeight: active ? 600 : 500,
+            letterSpacing:'-0.1px',
+            borderBottom: active ? `2.5px solid ${WW.primary}` : '2.5px solid transparent',
+            marginBottom: -0.5,
+            position:'relative',
+          }}>{t.l}</button>
+        );
+      })}
+    </div>
+  );
+}
+
+function BarChart({ metric }) {
+  const data = {
+    calories: {
+      unit: 'kcal', goal: 600,
+      days: [
+        { d:'Mon', v: 420 }, { d:'Tue', v: 310 }, { d:'Wed', v: 580 },
+        { d:'Thu', v: 240 }, { d:'Fri', v: 0 }, { d:'Sat', v: 620 },
+        { d:'Sun', v: 290, today:true },
+      ],
+    },
+    volume: {
+      unit: 'kg', goal: 5000,
+      days: [
+        { d:'Mon', v: 3200 }, { d:'Tue', v: 0 }, { d:'Wed', v: 4100 },
+        { d:'Thu', v: 1240 }, { d:'Fri', v: 0 }, { d:'Sat', v: 5200 },
+        { d:'Sun', v: 0, today:true },
+      ],
+    },
+    pace: {
+      unit: 'min/km', goal: 5.3,
+      days: [
+        { d:'Mon', v: 5.8 }, { d:'Tue', v: 5.6 }, { d:'Wed', v: 5.4 },
+        { d:'Thu', v: 5.5 }, { d:'Fri', v: 5.2 }, { d:'Sat', v: 5.0 },
+        { d:'Sun', v: 5.1, today:true },
+      ],
+    },
+    hr: {
+      unit: 'bpm', goal: 140,
+      days: [
+        { d:'Mon', v: 132 }, { d:'Tue', v: 124 }, { d:'Wed', v: 148 },
+        { d:'Thu', v: 118 }, { d:'Fri', v: 110 }, { d:'Sat', v: 152 },
+        { d:'Sun', v: 128, today:true },
+      ],
+    },
+  }[metric];
+
+  const max = Math.max(data.goal * 1.15, ...data.days.map(d => d.v));
+  const W = 324, H = 168, padL = 36, padR = 12, padT = 6, padB = 22;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+  const barW = chartW / data.days.length * 0.58;
+  const slotW = chartW / data.days.length;
+
+  const yTicks = 4;
+  const ticks = Array.from({length: yTicks + 1}, (_, i) => Math.round((max / yTicks) * i));
+
+  const goalY = padT + chartH - (data.goal / max) * chartH;
+
+  return (
+    <div className="rise" style={{ margin:'0 16px 14px', background:WW.card, borderRadius:18, boxShadow:WW.shadow, padding:'14px 10px 12px 6px', border:`0.5px solid ${WW.borderSoft}` }}>
+      <div style={{ padding:'0 10px 10px', display:'flex', alignItems:'baseline', justifyContent:'space-between' }}>
+        <div>
+          <div style={{ fontSize:11, fontWeight:700, color:WW.textSec, letterSpacing:'0.4px', textTransform:'uppercase' }}>
+            {metric === 'calories' ? 'Calories burned' : metric === 'volume' ? 'Training volume' : metric === 'pace' ? 'Running pace' : 'Avg heart rate'}
+          </div>
+          <div style={{ fontSize:11, color:WW.textTert, marginTop:2 }}>Apr 13 – Apr 19 · per day</div>
+        </div>
+        <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:10.5, color:WW.lavenderDark, fontWeight:600 }}>
+          <span style={{ width:14, height:0, borderTop:`2px dashed ${WW.lavender}` }}/>
+          Goal
+        </div>
+      </div>
+      <svg width={W} height={H} style={{ display:'block' }}>
+        {/* y grid + labels */}
+        {ticks.map((t, i) => {
+          const y = padT + chartH - (t / max) * chartH;
+          return (
+            <g key={i}>
+              <line x1={padL} y1={y} x2={W - padR} y2={y} stroke={WW.borderSoft} strokeWidth="1"/>
+              <text x={padL - 6} y={y + 3.5} textAnchor="end" fontSize="9.5" fill={WW.textSec} fontWeight="500" style={{ fontVariantNumeric:'tabular-nums' }}>
+                {metric === 'pace' ? t.toFixed(1) : t.toLocaleString()}
+              </text>
+            </g>
+          );
+        })}
+        {/* bars */}
+        {data.days.map((d, i) => {
+          const x = padL + slotW * i + (slotW - barW) / 2;
+          const h = (d.v / max) * chartH;
+          const y = padT + chartH - h;
+          const isToday = d.today;
+          return (
+            <g key={d.d}>
+              {d.v > 0 && (
+                <rect className="bar" x={x} y={y} width={barW} height={Math.max(h, 2)} rx="4"
+                  fill={isToday ? WW.primaryDark : WW.primary}
+                  opacity={isToday ? 1 : 0.92}
+                  style={{ animationDelay:`${i * 60}ms` }}
+                />
+              )}
+              {isToday && d.v > 0 && (
+                <rect x={x - 1.5} y={y - 1.5} width={barW + 3} height={h + 1.5} rx="5.5"
+                  fill="none" stroke={WW.primaryDark} strokeWidth="1.2" opacity="0.35"/>
+              )}
+              <text x={x + barW / 2} y={H - 6} textAnchor="middle" fontSize="10"
+                fill={isToday ? WW.primaryDark : WW.textSec}
+                fontWeight={isToday ? 700 : 500}>{d.d}</text>
+            </g>
+          );
+        })}
+        {/* goal dashed line */}
+        <line x1={padL} y1={goalY} x2={W - padR} y2={goalY} stroke={WW.lavender} strokeWidth="1.5" strokeDasharray="4 3"/>
+        <rect x={W - padR - 48} y={goalY - 10} width="46" height="16" rx="5" fill={WW.lavenderBg}/>
+        <text x={W - padR - 25} y={goalY + 1.5} textAnchor="middle" fontSize="9.5" fill={WW.lavenderDark} fontWeight="700" style={{ fontVariantNumeric:'tabular-nums' }}>
+          {metric === 'pace' ? data.goal.toFixed(1) : data.goal.toLocaleString()}
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+function StatCards({ metric }) {
+  const info = {
+    calories: { total:'1,840 kcal', goal:'2,000 kcal' },
+    volume:   { total:'13,740 kg', goal:'15,000 kg' },
+    pace:     { total:'5:24 /km', goal:'5:20 /km' },
+    hr:       { total:'130 bpm', goal:'140 bpm' },
+  }[metric];
+  return (
+    <div className="rise" style={{ padding:'0 16px 10px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+      <div style={{ background:WW.elevated, borderRadius:14, padding:'11px 12px' }}>
+        <div style={{ fontSize:10, fontWeight:700, color:WW.textSec, letterSpacing:'0.4px', textTransform:'uppercase', marginBottom:4 }}>Weekly total</div>
+        <div style={{ fontSize:17, fontWeight:700, color:WW.text, letterSpacing:'-0.3px', fontVariantNumeric:'tabular-nums' }}>{info.total}</div>
+      </div>
+      <div style={{ background:WW.elevated, borderRadius:14, padding:'11px 12px' }}>
+        <div style={{ fontSize:10, fontWeight:700, color:WW.textSec, letterSpacing:'0.4px', textTransform:'uppercase', marginBottom:4 }}>Goal</div>
+        <div style={{ fontSize:17, fontWeight:700, color:WW.lavenderDark, letterSpacing:'-0.3px', fontVariantNumeric:'tabular-nums' }}>{info.goal}</div>
+      </div>
+    </div>
+  );
+}
+
+function RawLink() {
+  return (
+    <div style={{ padding:'2px 18px 20px', textAlign:'center' }}>
+      <button style={{ background:'none', border:'none', padding:'4px 6px', cursor:'pointer', fontFamily:'inherit', fontSize:12, fontWeight:600, color:WW.primary, letterSpacing:'-0.05px', display:'inline-flex', alignItems:'center', gap:4 }}>
+        View raw data
+        {Ico.chev(WW.primary)}
+      </button>
+    </div>
+  );
+}
+
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "showAlert": true,
+  "showInsight": true,
+  "metric": "calories",
+  "period": "week"
+}/*EDITMODE-END*/;
+
+function ProgressScreen({ tw, setMetric, setPeriod }) {
+  return (
+    <div style={{ width:390, height:844, background:WW.bg, fontFamily:'-apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif', color:WW.text, position:'relative', overflow:'hidden', WebkitFontSmoothing:'antialiased' }}>
+      <StatusBar/>
+      <div style={{ position:'absolute', top:47, left:0, right:0, bottom:0, overflowY:'auto', paddingBottom:20, paddingTop:8 }}>
+        {tw.showAlert && <OvertrainingAlert/>}
+        <TopBar period={tw.period} setPeriod={setPeriod}/>
+        {tw.showInsight && <CoachInsight/>}
+        <MetricTabs metric={tw.metric} setMetric={setMetric}/>
+        <BarChart metric={tw.metric}/>
+        <StatCards metric={tw.metric}/>
+        <RawLink/>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [tw, setTw] = React.useState(TWEAKS);
+  window.__getTweaks = () => tw;
+  window.__updateTweaks = (patch) => {
+    setTw(prev => {
+      const next = { ...prev, ...patch };
+      window.parent.postMessage({ type:'__edit_mode_set_keys', edits:patch }, '*');
+      return next;
+    });
+  };
+  return <ProgressScreen tw={tw}
+    setMetric={(m) => window.__updateTweaks({ metric: m })}
+    setPeriod={(p) => window.__updateTweaks({ period: p })}/>;
+}
+
+function __mountWhenReady() {
+  if (!window.ReactDOM) return setTimeout(__mountWhenReady, 30);
+  ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+}
+__mountWhenReady();
+</script>
+
+<script>
+(function () {
+  const panel = document.getElementById('tweaks');
+  const al = document.getElementById('tw-alert');
+  const me = document.getElementById('tw-metric');
+  const pe = document.getElementById('tw-period');
+  const ins = document.getElementById('tw-insight');
+
+  function syncFrom(tw) {
+    al.checked = !!tw.showAlert;
+    ins.checked = !!tw.showInsight;
+    me.value = tw.metric;
+    pe.value = tw.period;
+  }
+  function whenReady(cb) {
+    if (window.__updateTweaks) return cb();
+    setTimeout(() => whenReady(cb), 30);
+  }
+  whenReady(() => {
+    syncFrom(window.__getTweaks());
+    al.addEventListener('change', e => window.__updateTweaks({ showAlert: e.target.checked }));
+    ins.addEventListener('change', e => window.__updateTweaks({ showInsight: e.target.checked }));
+    me.addEventListener('change', e => window.__updateTweaks({ metric: e.target.value }));
+    pe.addEventListener('change', e => window.__updateTweaks({ period: e.target.value }));
+  });
+  window.addEventListener('message', (ev) => {
+    const d = ev.data;
+    if (!d || typeof d !== 'object') return;
+    if (d.type === '__activate_edit_mode') panel.classList.add('open');
+    else if (d.type === '__deactivate_edit_mode') panel.classList.remove('open');
+  });
+  window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+})();
+</script>
+
+</body></html>

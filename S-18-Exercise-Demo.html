@@ -1,0 +1,173 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiseWorkout · S-18 Exercise Demo</title>
+<style>
+  :root{color-scheme:dark}html,body{margin:0;padding:0;background:#EDEEF5;font-family:-apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .label{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
+  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#0A0A12;position:relative}
+  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  .tweaks-panel{position:fixed;bottom:20px;right:20px;width:240px;background:#fff;border-radius:14px;padding:14px 16px 16px;box-shadow:0 10px 40px rgba(20,25,60,.18),0 0 0 .5px rgba(0,0,0,.08);color:#3D3D5C;display:none;z-index:100}
+  .tweaks-panel.open{display:block}.tweaks-panel h3{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:#8A8A9E}
+  .tweak-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:10px}
+  .tweak-row label{font-size:13px;color:#3D3D5C;flex:1}.tweak-row input[type="checkbox"]{accent-color:#6C7EE8}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+</style>
+</head><body>
+<div class="stage">
+  <div class="label">S-18 · Exercise Demo</div>
+  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
+</div>
+<div class="tweaks-panel" id="tweaks">
+  <h3>State</h3>
+  <div class="tweak-row"><label>Injury warning</label><input type="checkbox" id="tw-injury"/></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const WW={bg:'#F7F8FF',card:'#FFFFFF',primary:'#6C7EE8',primaryDark:'#2D3A8C',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE'};
+
+const MUSCLES=[
+  {label:'Upper Chest',x:155,y:118,active:true},
+  {label:'Mid Chest',x:155,y:138,active:true},
+  {label:'Front Delts',x:118,y:112,active:true},
+  {label:'Triceps',x:100,y:145,active:false},
+];
+
+const STEPS=[
+  'Lie flat on a bench, grip barbell slightly wider than shoulder-width.',
+  'Unrack and lower the bar slowly to your mid-chest.',
+  'Press the bar back up in a slight arc until arms are fully extended.',
+  'Keep feet flat on the floor and back slightly arched throughout.',
+];
+
+function StatusBar(){
+  return(
+    <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:'rgba(255,255,255,.8)',flexShrink:0}}>
+      <div style={{paddingTop:10}}>9:41</div>
+      <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill="rgba(255,255,255,.7)"/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill="rgba(255,255,255,.7)"/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill="rgba(255,255,255,.7)"/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill="rgba(255,255,255,.7)"/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke="rgba(255,255,255,.5)" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="rgba(255,255,255,.7)"/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill="rgba(255,255,255,.4)"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [injury,setInjury]=React.useState(false);
+  const [playing,setPlaying]=React.useState(true);
+
+  React.useEffect(()=>{
+    const el=document.getElementById('tw-injury');
+    if(el)el.addEventListener('change',e=>setInjury(e.target.checked));
+    const panel=document.getElementById('tweaks');
+    if(panel)panel.style.display='none';
+    const btn=document.createElement('button');
+    btn.textContent='⚙';btn.style.cssText='position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:22px;background:#6C7EE8;color:#fff;border:none;font-size:20px;cursor:pointer;z-index:200;box-shadow:0 4px 12px rgba(108,126,232,.4)';
+    btn.onclick=()=>panel?.classList.toggle('open');document.body.appendChild(btn);
+  },[]);
+
+  return(
+    <div style={{width:'100%',height:'100%',background:'#0D0D1A',display:'flex',flexDirection:'column',position:'relative',color:'#fff'}}>
+      <StatusBar/>
+
+      {/* Top bar */}
+      <div style={{padding:'0 16px 12px',display:'flex',alignItems:'center',gap:10,flexShrink:0}}>
+        <a href="S-17-Gym-Session-Active.html" style={{width:38,height:38,borderRadius:19,background:'rgba(255,255,255,.1)',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none',flexShrink:0}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </a>
+        <div style={{flex:1}}>
+          <div style={{fontSize:18,fontWeight:800,color:'#fff',letterSpacing:'-.2px'}}>Bench Press</div>
+          <div style={{fontSize:12,color:'rgba(255,255,255,.5)',fontWeight:500}}>Barbell · Compound · Chest</div>
+        </div>
+        {injury&&(
+          <div style={{padding:'4px 8px',borderRadius:8,background:'rgba(245,158,11,.2)',border:'1px solid rgba(245,158,11,.5)',fontSize:11,fontWeight:700,color:'#F59E0B'}}>⚠ Caution</div>
+        )}
+      </div>
+
+      {/* Animation area */}
+      <div style={{height:220,background:'linear-gradient(160deg,#1a1a2e,#16213e)',margin:'0 16px',borderRadius:16,display:'flex',alignItems:'center',justifyContent:'center',position:'relative',overflow:'hidden',flexShrink:0}}>
+        {/* Animated figure */}
+        <div style={{animation:playing?'breathe 2s ease-in-out infinite':'none',display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+          <div style={{width:36,height:36,borderRadius:18,background:'rgba(108,126,232,.5)',border:'2px solid rgba(108,126,232,.8)'}}/>
+          <div style={{width:60,height:56,borderRadius:'12px 12px 4px 4px',background:'rgba(108,126,232,.4)',border:'2px solid rgba(108,126,232,.7)',position:'relative'}}>
+            <div style={{position:'absolute',left:-24,top:10,width:24,height:8,borderRadius:4,background:'rgba(108,126,232,.6)'}}/>
+            <div style={{position:'absolute',right:-24,top:10,width:24,height:8,borderRadius:4,background:'rgba(108,126,232,.6)'}}/>
+          </div>
+          <div style={{display:'flex',gap:6}}>
+            <div style={{width:20,height:48,borderRadius:'4px 4px 8px 8px',background:'rgba(108,126,232,.35)',border:'1.5px solid rgba(108,126,232,.6)'}}/>
+            <div style={{width:20,height:48,borderRadius:'4px 4px 8px 8px',background:'rgba(108,126,232,.35)',border:'1.5px solid rgba(108,126,232,.6)'}}/>
+          </div>
+        </div>
+        {/* Barbell */}
+        <div style={{position:'absolute',top:58,left:40,right:40,height:8,borderRadius:4,background:'rgba(255,255,255,.2)',border:'1px solid rgba(255,255,255,.3)'}}>
+          <div style={{position:'absolute',left:-8,top:-6,width:12,height:20,borderRadius:4,background:'rgba(255,255,255,.25)'}}/>
+          <div style={{position:'absolute',right:-8,top:-6,width:12,height:20,borderRadius:4,background:'rgba(255,255,255,.25)'}}/>
+        </div>
+        {/* Play/pause */}
+        <button onClick={()=>setPlaying(p=>!p)} style={{position:'absolute',bottom:12,right:12,width:36,height:36,borderRadius:18,background:'rgba(255,255,255,.15)',border:'1px solid rgba(255,255,255,.2)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
+          {playing?(
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="6" y="4" width="4" height="16" rx="1.5" fill="#fff"/><rect x="14" y="4" width="4" height="16" rx="1.5" fill="#fff"/></svg>
+          ):(
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M8 5l11 7-11 7V5z" fill="#fff"/></svg>
+          )}
+        </button>
+        <div style={{position:'absolute',bottom:12,left:12,fontSize:11,color:'rgba(255,255,255,.5)',fontWeight:600}}>3D Animation</div>
+      </div>
+
+      {/* Injury warning */}
+      {injury&&(
+        <div style={{margin:'10px 16px 0',padding:'10px 12px',borderRadius:10,background:'rgba(245,158,11,.15)',border:'1px solid rgba(245,158,11,.4)',display:'flex',gap:8,alignItems:'flex-start'}}>
+          <div style={{fontSize:16}}>⚠️</div>
+          <div style={{fontSize:12,color:'#F59E0B',lineHeight:1.4}}><span style={{fontWeight:700}}>Shoulder conflict detected.</span> This exercise may aggravate your shoulder injury. Consider a cable fly instead, or reduce range of motion.</div>
+        </div>
+      )}
+
+      {/* Scrollable info */}
+      <div style={{flex:1,overflowY:'auto',padding:'12px 16px 20px'}}>
+        {/* Muscles targeted */}
+        <div style={{marginBottom:14}}>
+          <div style={{fontSize:12,fontWeight:700,color:'rgba(255,255,255,.4)',letterSpacing:.5,textTransform:'uppercase',marginBottom:8}}>Muscles Targeted</div>
+          <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+            {[{n:'Upper Chest',p:true},{n:'Mid Chest',p:true},{n:'Front Delts',p:true},{n:'Triceps',p:false}].map(m=>(
+              <div key={m.n} style={{padding:'4px 10px',borderRadius:20,background:m.p?'rgba(108,126,232,.25)':'rgba(255,255,255,.08)',border:`1px solid ${m.p?'rgba(108,126,232,.6)':'rgba(255,255,255,.15)'}`,fontSize:11,fontWeight:600,color:m.p?'#aab4f0':'rgba(255,255,255,.5)'}}>
+                {m.p?'●':'○'} {m.n}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Instructions */}
+        <div style={{marginBottom:14}}>
+          <div style={{fontSize:12,fontWeight:700,color:'rgba(255,255,255,.4)',letterSpacing:.5,textTransform:'uppercase',marginBottom:8}}>Instructions</div>
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            {STEPS.map((step,i)=>(
+              <div key={i} style={{display:'flex',gap:10,alignItems:'flex-start'}}>
+                <div style={{width:22,height:22,borderRadius:11,background:'rgba(108,126,232,.3)',border:'1px solid rgba(108,126,232,.5)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <span style={{fontSize:11,fontWeight:800,color:'#aab4f0'}}>{i+1}</span>
+                </div>
+                <div style={{fontSize:13,color:'rgba(255,255,255,.75)',lineHeight:1.5}}>{step}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Safety notes */}
+        <div style={{padding:'10px 12px',borderRadius:10,background:'rgba(75,184,204,.1)',border:'1px solid rgba(75,184,204,.3)'}}>
+          <div style={{fontSize:12,fontWeight:700,color:'#4BB8CC',marginBottom:4}}>Safety Tips</div>
+          <div style={{fontSize:12,color:'rgba(255,255,255,.6)',lineHeight:1.5}}>Use a spotter for heavy sets. Don't bounce the bar off your chest. Control the descent for 2-3 seconds.</div>
+        </div>
+      </div>
+
+      {/* Bottom button */}
+      <div style={{padding:'10px 16px 24px',flexShrink:0,background:'rgba(13,13,26,.95)',borderTop:'0.5px solid rgba(255,255,255,.08)'}}>
+        <a href="S-17-Gym-Session-Active.html" style={{display:'flex',alignItems:'center',justifyContent:'center',height:48,borderRadius:14,background:WW.primary,color:'#fff',fontSize:15,fontWeight:700,textDecoration:'none',boxShadow:'0 4px 16px rgba(108,126,232,.4)'}}>Back to Session</a>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script></body></html>
