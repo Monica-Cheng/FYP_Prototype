@@ -1,313 +1,1350 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>WiseWorkout · S-45 Missed Workout Check-in</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{color-scheme:light}
-  html,body{margin:0;padding:0;background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
-  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
-  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
-  .lbl{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
-  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
-  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
-  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
-  @keyframes slideIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-</style>
-</head><body>
-<div class="stage">
-  <div class="lbl">S-45 · Missed Workout Check-in</div>
-  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
-</div>
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-<script type="text/babel">
-const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',lavenderDark:'#7B5CB8',teal:'#4BB8CC',tealBg:'#E0F4F8',amber:'#F59E0B',amberBg:'#FEF3C7',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',shadow:'0 2px 8px rgba(45,58,140,.06)'};
-
-const PATHS={
-  x:"M18 6L6 18M6 6l12 12",
-  'chevron-left':"M15 18l-6-6 6-6",
-  check:"M20 6L9 17l-5-5",
-  'check-circle':"M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3",
-  'chevron-right':"M9 18l6-6-6-6",
-  clock:["M12 22A10 10 0 1 1 12 2a10 10 0 0 1 0 20z","M12 6v6l4 2"],
-  thermometer:"M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z",
-  'shield-alert':["M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z","M12 8v4","M12 14h.01"],
-  moon:"M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z",
-  'skip-forward':["M5 4l10 8-10 8V4z","M19 5v14"],
-  heart:"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z",
-  shield:"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
-  flame:"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z",
-  scissors:["M6 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z","M18 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z","M8.47 8.47l7.06 7.06","M18 21a3 3 0 1 1 0-6 3 3 0 0 1 0 6z","M6 21a3 3 0 1 1 0-6 3 3 0 0 1 0 6z","M8.47 15.53l7.06-7.06"],
-  'pause-circle':["M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z","M10 15V9","M14 15V9"],
-  'minus-circle':["M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z","M8 12h8"],
-  'plus-circle':["M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z","M12 8v8","M8 12h8"],
-  calendar:["M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z","M16 2v4","M8 2v4","M3 10h18"],
-  sparkles:["M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.937A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z","M20 3v4","M22 5h-4","M4 17v2","M5 18H3"],
-};
-function Icon({name,size=16,color='currentColor',style:s}){
-  const p=PATHS[name];if(!p)return null;
-  const paths=Array.isArray(p)?p:[p];
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-flex',flexShrink:0,...s}}>{paths.map((d,i)=><path key={i} d={d}/>)}</svg>;
-}
-
-const REASONS=[
-  {id:'busy',icon:'clock',iconBg:'#6C7EE8',label:'Too busy',sub:'Not enough time today'},
-  {id:'sick',icon:'thermometer',iconBg:'#EF4444',label:'Not feeling well',sub:'Unwell or fatigued'},
-  {id:'injured',icon:'shield-alert',iconBg:'#F59E0B',label:'Injured',sub:'Something hurts — I need to adapt'},
-  {id:'rest',icon:'moon',iconBg:'#4BB8CC',label:'Needed rest',sub:'Body needed a recovery day'},
-  {id:'skip',icon:'skip-forward',iconBg:'#8A8A9E',label:'Just skipped',sub:'No particular reason'},
-];
-
-const DEMO_LABELS=['Too busy','Not well','Injured','Needed rest','Just skipped'];
-const DEMO_IDS=['busy','sick','injured','rest','skip'];
-
-function ResumePill({days,base}){
-  const PROTO=new Date(2026,4,14);PROTO.setDate(PROTO.getDate()+days+1);
-  const label=PROTO.toLocaleDateString('en-US',{weekday:'short',day:'numeric',month:'short'});
-  return <div style={{display:'inline-flex',alignItems:'center',gap:6,background:WW.tealBg,borderRadius:20,padding:'5px 10px'}}>
-    <Icon name="calendar" size={12} color={WW.teal}/>
-    <span style={{fontSize:12,color:WW.teal,fontWeight:500}}>Plan resumes on {label}</span>
-  </div>;
-}
-
-function BreakMiniStepper({days,setDays,min=1,max=3}){
-  return(
-    <div style={{display:'flex',alignItems:'center',gap:12,margin:'10px 0'}}>
-      <span style={{fontSize:13,color:WW.text}}>Days off:</span>
-      <button onClick={()=>setDays(d=>Math.max(min,d-1))} style={{background:'none',border:'none',cursor:'pointer',padding:4}}><Icon name="minus-circle" size={22} color={WW.primary}/></button>
-      <span style={{fontSize:20,fontWeight:700,color:WW.primaryDark,minWidth:24,textAlign:'center'}}>{days}</span>
-      <button onClick={()=>setDays(d=>Math.min(max,d+1))} style={{background:'none',border:'none',cursor:'pointer',padding:4}}><Icon name="plus-circle" size={22} color={WW.primary}/></button>
-    </div>
-  );
-}
-
-function ResponseBusy({onCompress,onBreak}){
-  return(
-    <div style={{background:'#E6EAFE',borderRadius:12,padding:'14px',animation:'slideIn .3s ease'}}>
-      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
-        <Icon name="clock" size={16} color={WW.primary}/><span style={{fontSize:14,fontWeight:600,color:WW.primaryDark}}>Got it — let's adapt.</span>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WiseWorkout · S-45 Missed Workout Check-in</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #edeef5;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          system-ui,
+          sans-serif;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+      }
+      .stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+      }
+      .lbl {
+        font-size: 12px;
+        color: #6b6b80;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .phone-shell {
+        width: 390px;
+        height: 844px;
+        border-radius: 52px;
+        background: #0a0a12;
+        padding: 5px;
+        box-shadow:
+          0 30px 70px rgba(20, 25, 60, 0.2),
+          0 0 0 1px rgba(0, 0, 0, 0.12);
+        position: relative;
+        box-sizing: content-box;
+      }
+      .phone-inner {
+        width: 390px;
+        height: 844px;
+        border-radius: 47px;
+        overflow: hidden;
+        background: #f7f8ff;
+        position: relative;
+      }
+      .island {
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 118px;
+        height: 33px;
+        border-radius: 20px;
+        background: #000;
+        z-index: 60;
+        pointer-events: none;
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="lbl">S-45 · Missed Workout Check-in</div>
+      <div class="phone-shell">
+        <div class="island"></div>
+        <div class="phone-inner" id="app"></div>
       </div>
-      <div style={{fontSize:13,color:WW.text,marginBottom:10}}>Here's what we can do:</div>
-      {[
-        {icon:'scissors',color:WW.primary,label:'Compress today\'s session',sub:'Remove accessory exercises to save ~12 min',onClick:onCompress},
-        {icon:'pause-circle',color:WW.lavender,label:'Take a break',sub:'Pause your plan for a few days and come back fresh',onClick:onBreak},
-      ].map((a,i)=>(
-        <button key={i} onClick={a.onClick} style={{width:'100%',display:'flex',alignItems:'center',gap:10,padding:'12px',background:WW.card,borderRadius:10,border:`0.5px solid ${WW.border}`,marginBottom:8,cursor:'pointer',fontFamily:'inherit',textAlign:'left'}}>
-          <Icon name={a.icon} size={18} color={a.color}/>
-          <div style={{flex:1}}>
-            <div style={{fontSize:13,fontWeight:600,color:WW.text}}>{a.label}</div>
-            <div style={{fontSize:11,color:WW.textSec,marginTop:2}}>{a.sub}</div>
+    </div>
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/babel">
+      const WW = {
+        bg: "#F7F8FF",
+        card: "#FFFFFF",
+        elevated: "#EEF0FB",
+        primary: "#6C7EE8",
+        primaryDark: "#2D3A8C",
+        lavender: "#9B84E8",
+        lavenderBg: "#F0EEFE",
+        lavenderDark: "#7B5CB8",
+        teal: "#4BB8CC",
+        tealBg: "#E0F4F8",
+        amber: "#F59E0B",
+        amberBg: "#FEF3C7",
+        text: "#3D3D5C",
+        textSec: "#8A8A9E",
+        border: "#C8C8D8",
+        shadow: "0 2px 8px rgba(45,58,140,.06)",
+      };
+
+      const PATHS = {
+        x: "M18 6L6 18M6 6l12 12",
+        "chevron-left": "M15 18l-6-6 6-6",
+        check: "M20 6L9 17l-5-5",
+        "check-circle": "M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3",
+        "chevron-right": "M9 18l6-6-6-6",
+        clock: ["M12 22A10 10 0 1 1 12 2a10 10 0 0 1 0 20z", "M12 6v6l4 2"],
+        thermometer: "M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z",
+        "shield-alert": [
+          "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+          "M12 8v4",
+          "M12 14h.01",
+        ],
+        moon: "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z",
+        "skip-forward": ["M5 4l10 8-10 8V4z", "M19 5v14"],
+        heart:
+          "M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z",
+        shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+        flame:
+          "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z",
+        scissors: [
+          "M6 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z",
+          "M18 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z",
+          "M8.47 8.47l7.06 7.06",
+          "M18 21a3 3 0 1 1 0-6 3 3 0 0 1 0 6z",
+          "M6 21a3 3 0 1 1 0-6 3 3 0 0 1 0 6z",
+          "M8.47 15.53l7.06-7.06",
+        ],
+        "pause-circle": [
+          "M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z",
+          "M10 15V9",
+          "M14 15V9",
+        ],
+        "minus-circle": [
+          "M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z",
+          "M8 12h8",
+        ],
+        "plus-circle": [
+          "M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z",
+          "M12 8v8",
+          "M8 12h8",
+        ],
+        calendar: [
+          "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z",
+          "M16 2v4",
+          "M8 2v4",
+          "M3 10h18",
+        ],
+        sparkles: [
+          "M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.937A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z",
+          "M20 3v4",
+          "M22 5h-4",
+          "M4 17v2",
+          "M5 18H3",
+        ],
+      };
+      function Icon({ name, size = 16, color = "currentColor", style: s }) {
+        const p = PATHS[name];
+        if (!p) return null;
+        const paths = Array.isArray(p) ? p : [p];
+        return (
+          <svg
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={color}
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ display: "inline-flex", flexShrink: 0, ...s }}
+          >
+            {paths.map((d, i) => (
+              <path key={i} d={d} />
+            ))}
+          </svg>
+        );
+      }
+
+      const REASONS = [
+        {
+          id: "busy",
+          icon: "clock",
+          iconBg: "#6C7EE8",
+          label: "Too busy",
+          sub: "Not enough time today",
+        },
+        {
+          id: "sick",
+          icon: "thermometer",
+          iconBg: "#EF4444",
+          label: "Not feeling well",
+          sub: "Unwell or fatigued",
+        },
+        {
+          id: "injured",
+          icon: "shield-alert",
+          iconBg: "#F59E0B",
+          label: "Injured",
+          sub: "Something hurts — I need to adapt",
+        },
+        {
+          id: "rest",
+          icon: "moon",
+          iconBg: "#4BB8CC",
+          label: "Needed rest",
+          sub: "Body needed a recovery day",
+        },
+        {
+          id: "skip",
+          icon: "skip-forward",
+          iconBg: "#8A8A9E",
+          label: "Just skipped",
+          sub: "No particular reason",
+        },
+      ];
+
+      const DEMO_LABELS = [
+        "Too busy",
+        "Not well",
+        "Injured",
+        "Needed rest",
+        "Just skipped",
+      ];
+      const DEMO_IDS = ["busy", "sick", "injured", "rest", "skip"];
+
+      function ResumePill({ days, base }) {
+        const PROTO = new Date(2026, 4, 14);
+        PROTO.setDate(PROTO.getDate() + days + 1);
+        const label = PROTO.toLocaleDateString("en-US", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+        });
+        return (
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              background: WW.tealBg,
+              borderRadius: 20,
+              padding: "5px 10px",
+            }}
+          >
+            <Icon name="calendar" size={12} color={WW.teal} />
+            <span style={{ fontSize: 12, color: WW.teal, fontWeight: 500 }}>
+              Plan resumes on {label}
+            </span>
           </div>
-          <Icon name="chevron-right" size={14} color={WW.textSec}/>
-        </button>
-      ))}
-      <button onClick={()=>window.location.href='S-09-Home.html'} style={{display:'block',width:'100%',textAlign:'center',fontSize:13,color:WW.textSec,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',marginTop:4}}>Skip this — resume normally</button>
-    </div>
-  );
-}
-function ResponseSick(){
-  const [days,setDays]=React.useState(2);
-  return(
-    <div style={{background:'#FEE2E2',borderRadius:12,padding:'14px',animation:'slideIn .3s ease'}}>
-      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
-        <Icon name="heart" size={16} color="#EF4444"/><span style={{fontSize:14,fontWeight:600,color:WW.primaryDark}}>Take care of yourself first.</span>
-      </div>
-      <div style={{fontSize:13,color:WW.text,marginBottom:8,lineHeight:1.5}}>We suggest taking 1–3 days off. Your plan will resume automatically.</div>
-      <BreakMiniStepper days={days} setDays={setDays} min={1} max={3}/>
-      <div style={{marginBottom:12}}><ResumePill days={days}/></div>
-      <button onClick={()=>{alert('Break confirmed!');window.location.href='S-09-Home.html';}} style={{width:'100%',height:48,borderRadius:12,border:'none',background:'#EF4444',color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:'inherit',marginBottom:8}}>Confirm break</button>
-      <button onClick={()=>window.location.href='S-09-Home.html'} style={{display:'block',width:'100%',textAlign:'center',fontSize:13,color:WW.textSec,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>I feel fine — resume normally</button>
-    </div>
-  );
-}
-function ResponseInjured(){
-  const [part,setPart]=React.useState(null);
-  const PARTS=['Knee','Shoulder','Back','Hip'];
-  return(
-    <div style={{background:'#FEF3C7',borderRadius:12,padding:'14px',animation:'slideIn .3s ease'}}>
-      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
-        <Icon name="shield-alert" size={16} color={WW.amber}/><span style={{fontSize:14,fontWeight:600,color:WW.primaryDark}}>Sorry to hear that. Let's protect the injury.</span>
-      </div>
-      <div style={{fontSize:13,color:WW.text,marginBottom:10}}>Which area is injured?</div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:10}}>
-        {PARTS.map(p=>(
-          <button key={p} onClick={()=>setPart(p)} style={{padding:'10px',borderRadius:10,border:`1.5px solid ${part===p?WW.amber:WW.border}`,background:part===p?'#FEF3C7':WW.card,color:WW.text,fontSize:13,fontWeight:part===p?600:400,cursor:'pointer',fontFamily:'inherit'}}>{p}</button>
-        ))}
-      </div>
-      {part&&<div style={{display:'flex',alignItems:'flex-start',gap:6,marginBottom:10}}>
-        <Icon name="shield" size={12} color={WW.textSec} style={{marginTop:2,flexShrink:0}}/>
-        <span style={{fontSize:11,color:WW.textSec,fontStyle:'italic',lineHeight:1.4}}>We will remove exercises that stress your {part.toLowerCase()}. This is guidance only — not medical advice.</span>
-      </div>}
-      <button onClick={()=>{alert(`Injury filter applied for ${part||'selected area'}.`);window.location.href='S-09-Home.html';}} style={{width:'100%',height:48,borderRadius:12,border:'none',background:WW.amber,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:'inherit',marginBottom:8}}>Apply injury filter</button>
-      <button onClick={()=>window.location.href='S-09-Home.html'} style={{display:'block',width:'100%',textAlign:'center',fontSize:13,color:WW.textSec,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>Skip for now</button>
-    </div>
-  );
-}
-function ResponseRest(){
-  const [days,setDays]=React.useState(1);
-  return(
-    <div style={{background:WW.tealBg,borderRadius:12,padding:'14px',animation:'slideIn .3s ease'}}>
-      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
-        <Icon name="moon" size={16} color={WW.teal}/><span style={{fontSize:14,fontWeight:600,color:WW.primaryDark}}>Rest is part of training.</span>
-      </div>
-      <div style={{fontSize:13,color:WW.text,marginBottom:8,lineHeight:1.5}}>We suggest 1–3 recovery days. Your streak is protected.</div>
-      <BreakMiniStepper days={days} setDays={setDays} min={1} max={3}/>
-      <div style={{marginBottom:8}}><ResumePill days={days}/></div>
-      <div style={{display:'inline-flex',alignItems:'center',gap:6,background:WW.tealBg,borderRadius:20,padding:'5px 10px',marginBottom:12}}>
-        <Icon name="flame" size={12} color={WW.teal}/><span style={{fontSize:12,color:WW.teal}}>Your streak is protected on rest days</span>
-      </div>
-      <button onClick={()=>{alert('Break confirmed!');window.location.href='S-09-Home.html';}} style={{width:'100%',height:48,borderRadius:12,border:'none',background:WW.teal,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:'inherit',marginBottom:8}}>Confirm break</button>
-      <button onClick={()=>window.location.href='S-09-Home.html'} style={{display:'block',width:'100%',textAlign:'center',fontSize:13,color:WW.textSec,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>Resume normally</button>
-    </div>
-  );
-}
-function ResponseSkip(){
-  return(
-    <div style={{background:WW.elevated,borderRadius:12,padding:'14px',animation:'slideIn .3s ease'}}>
-      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
-        <Icon name="check-circle" size={16} color={WW.primary}/><span style={{fontSize:14,fontWeight:600,color:WW.primaryDark}}>No worries — we all skip sometimes.</span>
-      </div>
-      <div style={{fontSize:13,color:WW.text,marginBottom:10,lineHeight:1.5}}>Your plan continues from today. Nothing is adjusted.</div>
-      <div style={{display:'inline-flex',background:'#E6EAFE',borderRadius:20,padding:'6px 12px',marginBottom:12}}>
-        <span style={{fontSize:13,color:WW.primary}}>Day 12 continues today — Push B, Upper Body.</span>
-      </div>
-      <br/>
-      <button onClick={()=>window.location.href='S-09-Home.html'} style={{width:'100%',height:48,borderRadius:12,border:'none',background:WW.primary,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:'inherit',marginTop:8}}>Got it — continue plan</button>
-    </div>
-  );
-}
+        );
+      }
 
-function App(){
-  const [selected,setSelected]=React.useState(null);
-  const [showCompress,setShowCompress]=React.useState(false);
-  const [showBreak,setShowBreak]=React.useState(false);
-  const [toast,setToast]=React.useState(null);
-  const [demoId,setDemoId]=React.useState(null);
+      function BreakMiniStepper({ days, setDays, min = 1, max = 3 }) {
+        return (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              margin: "10px 0",
+            }}
+          >
+            <span style={{ fontSize: 13, color: WW.text }}>Days off:</span>
+            <button
+              onClick={() => setDays((d) => Math.max(min, d - 1))}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 4,
+              }}
+            >
+              <Icon name="minus-circle" size={22} color={WW.primary} />
+            </button>
+            <span
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                color: WW.primaryDark,
+                minWidth: 24,
+                textAlign: "center",
+              }}
+            >
+              {days}
+            </span>
+            <button
+              onClick={() => setDays((d) => Math.min(max, d + 1))}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 4,
+              }}
+            >
+              <Icon name="plus-circle" size={22} color={WW.primary} />
+            </button>
+          </div>
+        );
+      }
 
-  function showToastMsg(msg){setToast(msg);setTimeout(()=>setToast(null),2500);}
-
-  function pickReason(id){
-    setSelected(id);setDemoId(id);
-  }
-  function pickDemo(id){
-    setSelected(id);setDemoId(id);
-  }
-
-  function goBackToChoices(){
-    setSelected(null);
-    setDemoId(null);
-  }
-
-  const active=demoId||selected;
-
-  function ResponseCard({id}){
-    if(id==='busy')return <ResponseBusy onCompress={()=>setShowCompress(true)} onBreak={()=>setShowBreak(true)}/>;
-    if(id==='sick')return <ResponseSick/>;
-    if(id==='injured')return <ResponseInjured/>;
-    if(id==='rest')return <ResponseRest/>;
-    if(id==='skip')return <ResponseSkip/>;
-    return null;
-  }
-
-  return(
-    <div style={{width:'100%',height:'100%',background:'rgba(26,26,26,0.45)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',fontFamily:"'Inter',system-ui,sans-serif",position:'relative'}}>
-
-      {/* Floating card */}
-      <div style={{width:'calc(100% - 32px)',background:WW.card,borderRadius:20,boxShadow:'0 8px 32px rgba(0,0,0,0.18)',maxHeight:'85%',display:'flex',flexDirection:'column',overflow:'hidden',position:'relative'}}>
-        {/* Header */}
-        <div style={{padding:'16px 16px 12px',flexShrink:0}}>
-          {!active?(
-            <div style={{display:'flex',justifyContent:'flex-end',marginBottom:12}}>
-              <span style={{fontSize:11,color:WW.textSec}}>Just now</span>
+      function ResponseBusy({ onCompress, onBreak }) {
+        return (
+          <div
+            style={{
+              background: "#E6EAFE",
+              borderRadius: 12,
+              padding: "14px",
+              animation: "slideIn .3s ease",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 8,
+              }}
+            >
+              <Icon name="clock" size={16} color={WW.primary} />
+              <span
+                style={{ fontSize: 14, fontWeight: 600, color: WW.primaryDark }}
+              >
+                Got it — let's adapt.
+              </span>
             </div>
-          ):(
-            <div style={{display:'flex',alignItems:'center',marginBottom:10}}>
-              <button onClick={goBackToChoices} style={{display:'flex',alignItems:'center',justifyContent:'center',width:32,height:32,borderRadius:16,background:WW.elevated,border:'none',cursor:'pointer',padding:0}}>
-                <Icon name="chevron-left" size={18} color={WW.textSec}/>
+            <div style={{ fontSize: 13, color: WW.text, marginBottom: 10 }}>
+              Here's what we can do:
+            </div>
+            {[
+              {
+                icon: "scissors",
+                color: WW.primary,
+                label: "Compress today's session",
+                sub: "Remove accessory exercises to save ~12 min",
+                onClick: onCompress,
+              },
+              {
+                icon: "pause-circle",
+                color: WW.lavender,
+                label: "Take a break",
+                sub: "Pause your plan for a few days and come back fresh",
+                onClick: onBreak,
+              },
+            ].map((a, i) => (
+              <button
+                key={i}
+                onClick={a.onClick}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "12px",
+                  background: WW.card,
+                  borderRadius: 10,
+                  border: `0.5px solid ${WW.border}`,
+                  marginBottom: 8,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  textAlign: "left",
+                }}
+              >
+                <Icon name={a.icon} size={18} color={a.color} />
+                <div style={{ flex: 1 }}>
+                  <div
+                    style={{ fontSize: 13, fontWeight: 600, color: WW.text }}
+                  >
+                    {a.label}
+                  </div>
+                  <div
+                    style={{ fontSize: 11, color: WW.textSec, marginTop: 2 }}
+                  >
+                    {a.sub}
+                  </div>
+                </div>
+                <Icon name="chevron-right" size={14} color={WW.textSec} />
               </button>
+            ))}
+            <button
+              onClick={() => (window.location.href = "S-09-Home.html")}
+              style={{
+                display: "block",
+                width: "100%",
+                textAlign: "center",
+                fontSize: 13,
+                color: WW.textSec,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "inherit",
+                marginTop: 4,
+              }}
+            >
+              Skip this — resume normally
+            </button>
+          </div>
+        );
+      }
+      function ResponseSick() {
+        const [days, setDays] = React.useState(2);
+        return (
+          <div
+            style={{
+              background: "#FEE2E2",
+              borderRadius: 12,
+              padding: "14px",
+              animation: "slideIn .3s ease",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 6,
+              }}
+            >
+              <Icon name="heart" size={16} color="#EF4444" />
+              <span
+                style={{ fontSize: 14, fontWeight: 600, color: WW.primaryDark }}
+              >
+                Take care of yourself first.
+              </span>
             </div>
-          )}
-          <div style={{fontSize:15,color:WW.text,lineHeight:1.4,marginBottom:4}}>Looks like you missed your Legs A session on Wednesday.</div>
-          <div style={{fontSize:15,fontWeight:600,color:WW.primaryDark}}>What happened?</div>
-        </div>
-
-        {/* Dismiss */}
-        <button onClick={()=>window.history.back()} style={{position:'absolute',top:14,right:14,background:'none',border:'none',cursor:'pointer',padding:4}}>
-          <Icon name="x" size={18} color={WW.border}/>
-        </button>
-
-        {/* Options or response */}
-        <div style={{flex:1,overflowY:'auto',padding:'0 16px 16px'}}>
-          {!active?(
-            <div style={{display:'flex',flexDirection:'column',gap:8}}>
-              {REASONS.map(r=>(
-                <button key={r.id} onClick={()=>pickReason(r.id)} style={{display:'flex',alignItems:'center',gap:12,padding:'14px',background:WW.card,borderRadius:12,border:`1px solid ${WW.border}`,cursor:'pointer',fontFamily:'inherit',textAlign:'left',width:'100%'}}>
-                  <div style={{width:36,height:36,borderRadius:10,background:r.iconBg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                    <Icon name={r.icon} size={18} color="#fff"/>
-                  </div>
-                  <div style={{flex:1}}>
-                    <div style={{fontSize:14,fontWeight:600,color:WW.text}}>{r.label}</div>
-                    <div style={{fontSize:11,color:WW.textSec,marginTop:2}}>{r.sub}</div>
-                  </div>
-                  <Icon name="chevron-right" size={14} color={WW.border}/>
+            <div
+              style={{
+                fontSize: 13,
+                color: WW.text,
+                marginBottom: 8,
+                lineHeight: 1.5,
+              }}
+            >
+              We suggest taking 1–3 days off. Your plan will resume
+              automatically.
+            </div>
+            <BreakMiniStepper days={days} setDays={setDays} min={1} max={3} />
+            <div style={{ marginBottom: 12 }}>
+              <ResumePill days={days} />
+            </div>
+            <button
+              onClick={() => {
+                alert("Break confirmed!");
+                window.location.href = "S-09-Home.html";
+              }}
+              style={{
+                width: "100%",
+                height: 48,
+                borderRadius: 12,
+                border: "none",
+                background: "#EF4444",
+                color: "#fff",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "inherit",
+                marginBottom: 8,
+              }}
+            >
+              Confirm break
+            </button>
+            <button
+              onClick={() => (window.location.href = "S-09-Home.html")}
+              style={{
+                display: "block",
+                width: "100%",
+                textAlign: "center",
+                fontSize: 13,
+                color: WW.textSec,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              I feel fine — resume normally
+            </button>
+          </div>
+        );
+      }
+      function ResponseInjured() {
+        const [part, setPart] = React.useState(null);
+        const PARTS = ["Knee", "Shoulder", "Back", "Hip"];
+        return (
+          <div
+            style={{
+              background: "#FEF3C7",
+              borderRadius: 12,
+              padding: "14px",
+              animation: "slideIn .3s ease",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 6,
+              }}
+            >
+              <Icon name="shield-alert" size={16} color={WW.amber} />
+              <span
+                style={{ fontSize: 14, fontWeight: 600, color: WW.primaryDark }}
+              >
+                Sorry to hear that. Let's protect the injury.
+              </span>
+            </div>
+            <div style={{ fontSize: 13, color: WW.text, marginBottom: 10 }}>
+              Which area is injured?
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 8,
+                marginBottom: 10,
+              }}
+            >
+              {PARTS.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPart(p)}
+                  style={{
+                    padding: "10px",
+                    borderRadius: 10,
+                    border: `1.5px solid ${part === p ? WW.amber : WW.border}`,
+                    background: part === p ? "#FEF3C7" : WW.card,
+                    color: WW.text,
+                    fontSize: 13,
+                    fontWeight: part === p ? 600 : 400,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {p}
                 </button>
               ))}
             </div>
-          ):(
-            <ResponseCard id={active}/>
-          )}
-        </div>
-      </div>
-
-      {/* Demo switcher */}
-      <div style={{marginTop:14,textAlign:'center'}}>
-        <div style={{fontSize:10,color:'rgba(255,255,255,0.4)',marginBottom:6}}>Demo: tap to preview each response</div>
-        <div style={{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'center'}}>
-          {DEMO_IDS.map((id,i)=>(
-            <button key={id} onClick={()=>pickDemo(id)} style={{padding:'4px 10px',borderRadius:12,border:'none',background:active===id?WW.primary:'#2A2A3A',color:active===id?'#fff':'rgba(255,255,255,0.6)',fontSize:11,cursor:'pointer',fontFamily:'inherit'}}>
-              {DEMO_LABELS[i]}
+            {part && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 6,
+                  marginBottom: 10,
+                }}
+              >
+                <Icon
+                  name="shield"
+                  size={12}
+                  color={WW.textSec}
+                  style={{ marginTop: 2, flexShrink: 0 }}
+                />
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: WW.textSec,
+                    fontStyle: "italic",
+                    lineHeight: 1.4,
+                  }}
+                >
+                  We will remove exercises that stress your {part.toLowerCase()}
+                  . This is guidance only — not medical advice.
+                </span>
+              </div>
+            )}
+            <button
+              onClick={() => {
+                alert(`Injury filter applied for ${part || "selected area"}.`);
+                window.location.href = "S-09-Home.html";
+              }}
+              style={{
+                width: "100%",
+                height: 48,
+                borderRadius: 12,
+                border: "none",
+                background: WW.amber,
+                color: "#fff",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "inherit",
+                marginBottom: 8,
+              }}
+            >
+              Apply injury filter
             </button>
-          ))}
-          <button onClick={goBackToChoices} style={{padding:'4px 10px',borderRadius:12,border:'none',background:'#2A2A3A',color:'rgba(255,255,255,0.5)',fontSize:11,cursor:'pointer',fontFamily:'inherit'}}>Reset</button>
-        </div>
-      </div>
-
-      {/* Compress mini-modal */}
-      <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:50,pointerEvents:showCompress?'auto':'none'}}>
-        <div onClick={()=>setShowCompress(false)} style={{position:'absolute',top:0,left:0,right:0,bottom:0,background:'rgba(26,26,26,0.5)',opacity:showCompress?1:0,transition:'opacity .3s'}}/>
-        <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,borderRadius:'20px 20px 0 0',transform:showCompress?'translateY(0)':'translateY(100%)',transition:'transform .3s ease-out',padding:'12px 20px 28px'}}>
-          <div style={{width:32,height:4,borderRadius:2,background:'#E8EAF8',margin:'0 auto 16px'}}/>
-          <div style={{fontSize:16,fontWeight:600,color:WW.primaryDark,marginBottom:4}}>Compress Workout</div>
-          <div style={{fontSize:13,color:WW.textSec,marginBottom:16,lineHeight:1.4}}>Removes 2 accessory exercises (Lateral Raise, Tricep Pushdown) to save ~12 minutes.</div>
-          <div style={{display:'flex',gap:10}}>
-            <button onClick={()=>setShowCompress(false)} style={{flex:1,height:48,borderRadius:12,border:`1.5px solid ${WW.primary}`,background:'transparent',color:WW.primary,fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Cancel</button>
-            <button onClick={()=>{setShowCompress(false);showToastMsg('Session compressed — 2 exercises removed.');}} style={{flex:1,height:48,borderRadius:12,border:'none',background:WW.primary,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Confirm</button>
+            <button
+              onClick={() => (window.location.href = "S-09-Home.html")}
+              style={{
+                display: "block",
+                width: "100%",
+                textAlign: "center",
+                fontSize: 13,
+                color: WW.textSec,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              Skip for now
+            </button>
           </div>
-        </div>
-      </div>
-
-      {/* Break mini-modal */}
-      <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:50,pointerEvents:showBreak?'auto':'none'}}>
-        <div onClick={()=>setShowBreak(false)} style={{position:'absolute',top:0,left:0,right:0,bottom:0,background:'rgba(26,26,26,0.5)',opacity:showBreak?1:0,transition:'opacity .3s'}}/>
-        <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,borderRadius:'20px 20px 0 0',transform:showBreak?'translateY(0)':'translateY(100%)',transition:'transform .3s ease-out',padding:'12px 20px 28px'}}>
-          <div style={{width:32,height:4,borderRadius:2,background:'#E8EAF8',margin:'0 auto 16px'}}/>
-          <div style={{fontSize:16,fontWeight:600,color:WW.primaryDark,marginBottom:4}}>Start Break Mode</div>
-          <div style={{fontSize:13,color:WW.textSec,marginBottom:16,lineHeight:1.4}}>Pause your plan for 1–14 days. Progress is saved and notifications pause.</div>
-          <div style={{display:'flex',gap:10}}>
-            <button onClick={()=>setShowBreak(false)} style={{flex:1,height:48,borderRadius:12,border:`1.5px solid ${WW.lavender}`,background:'transparent',color:WW.lavender,fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Cancel</button>
-            <button onClick={()=>{setShowBreak(false);showToastMsg('Break Mode active. Plan paused.');}} style={{flex:1,height:48,borderRadius:12,border:'none',background:WW.lavender,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Start Break</button>
+        );
+      }
+      function ResponseRest() {
+        const [days, setDays] = React.useState(1);
+        return (
+          <div
+            style={{
+              background: WW.tealBg,
+              borderRadius: 12,
+              padding: "14px",
+              animation: "slideIn .3s ease",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 6,
+              }}
+            >
+              <Icon name="moon" size={16} color={WW.teal} />
+              <span
+                style={{ fontSize: 14, fontWeight: 600, color: WW.primaryDark }}
+              >
+                Rest is part of training.
+              </span>
+            </div>
+            <div
+              style={{
+                fontSize: 13,
+                color: WW.text,
+                marginBottom: 8,
+                lineHeight: 1.5,
+              }}
+            >
+              We suggest 1–3 recovery days. Your streak is protected.
+            </div>
+            <BreakMiniStepper days={days} setDays={setDays} min={1} max={3} />
+            <div style={{ marginBottom: 8 }}>
+              <ResumePill days={days} />
+            </div>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                background: WW.tealBg,
+                borderRadius: 20,
+                padding: "5px 10px",
+                marginBottom: 12,
+              }}
+            >
+              <Icon name="flame" size={12} color={WW.teal} />
+              <span style={{ fontSize: 12, color: WW.teal }}>
+                Your streak is protected on rest days
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                alert("Break confirmed!");
+                window.location.href = "S-09-Home.html";
+              }}
+              style={{
+                width: "100%",
+                height: 48,
+                borderRadius: 12,
+                border: "none",
+                background: WW.teal,
+                color: "#fff",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "inherit",
+                marginBottom: 8,
+              }}
+            >
+              Confirm break
+            </button>
+            <button
+              onClick={() => (window.location.href = "S-09-Home.html")}
+              style={{
+                display: "block",
+                width: "100%",
+                textAlign: "center",
+                fontSize: 13,
+                color: WW.textSec,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              Resume normally
+            </button>
           </div>
-        </div>
-      </div>
+        );
+      }
+      function ResponseSkip() {
+        return (
+          <div
+            style={{
+              background: WW.elevated,
+              borderRadius: 12,
+              padding: "14px",
+              animation: "slideIn .3s ease",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 6,
+              }}
+            >
+              <Icon name="check-circle" size={16} color={WW.primary} />
+              <span
+                style={{ fontSize: 14, fontWeight: 600, color: WW.primaryDark }}
+              >
+                No worries — we all skip sometimes.
+              </span>
+            </div>
+            <div
+              style={{
+                fontSize: 13,
+                color: WW.text,
+                marginBottom: 10,
+                lineHeight: 1.5,
+              }}
+            >
+              Your plan continues from today. Nothing is adjusted.
+            </div>
+            <div
+              style={{
+                display: "inline-flex",
+                background: "#E6EAFE",
+                borderRadius: 20,
+                padding: "6px 12px",
+                marginBottom: 12,
+              }}
+            >
+              <span style={{ fontSize: 13, color: WW.primary }}>
+                Day 12 continues today — Push B, Upper Body.
+              </span>
+            </div>
+            <br />
+            <button
+              onClick={() => (window.location.href = "S-09-Home.html")}
+              style={{
+                width: "100%",
+                height: 48,
+                borderRadius: 12,
+                border: "none",
+                background: WW.primary,
+                color: "#fff",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "inherit",
+                marginTop: 8,
+              }}
+            >
+              Got it — continue plan
+            </button>
+          </div>
+        );
+      }
 
-      {/* Toast */}
-      {toast&&<div style={{position:'absolute',bottom:140,left:'50%',transform:'translateX(-50%)',background:'#1C1C2E',color:'#fff',padding:'10px 16px',borderRadius:20,fontSize:13,fontWeight:500,whiteSpace:'nowrap',zIndex:80,display:'flex',alignItems:'center',gap:8,animation:'toastIn .3s ease'}}><Icon name="check-circle" size={14} color="#22C55E"/>{toast}</div>}
-    </div>
-  );
-}
-ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
-</script>
-</body></html>
+      function App() {
+        const [selected, setSelected] = React.useState(null);
+        const [showCompress, setShowCompress] = React.useState(false);
+        const [showBreak, setShowBreak] = React.useState(false);
+        const [toast, setToast] = React.useState(null);
+        const [demoId, setDemoId] = React.useState(null);
+
+        function showToastMsg(msg) {
+          setToast(msg);
+          setTimeout(() => setToast(null), 2500);
+        }
+
+        function pickReason(id) {
+          setSelected(id);
+          setDemoId(id);
+        }
+        function pickDemo(id) {
+          setSelected(id);
+          setDemoId(id);
+        }
+
+        function goBackToChoices() {
+          setSelected(null);
+          setDemoId(null);
+        }
+
+        const active = demoId || selected;
+
+        function ResponseCard({ id }) {
+          if (id === "busy")
+            return (
+              <ResponseBusy
+                onCompress={() => setShowCompress(true)}
+                onBreak={() => setShowBreak(true)}
+              />
+            );
+          if (id === "sick") return <ResponseSick />;
+          if (id === "injured") return <ResponseInjured />;
+          if (id === "rest") return <ResponseRest />;
+          if (id === "skip") return <ResponseSkip />;
+          return null;
+        }
+
+        return (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              background: "rgba(26,26,26,0.45)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: "'Inter',system-ui,sans-serif",
+              position: "relative",
+            }}
+          >
+            {/* Floating card */}
+            <div
+              style={{
+                width: "calc(100% - 32px)",
+                background: WW.card,
+                borderRadius: 20,
+                boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+                maxHeight: "85%",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden",
+                position: "relative",
+              }}
+            >
+              {/* Header */}
+              <div style={{ padding: "16px 16px 12px", flexShrink: 0 }}>
+                {!active ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      marginBottom: 12,
+                    }}
+                  >
+                    <span style={{ fontSize: 11, color: WW.textSec }}>
+                      Just now
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: 10,
+                    }}
+                  >
+                    <button
+                      onClick={goBackToChoices}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 32,
+                        height: 32,
+                        borderRadius: 16,
+                        background: WW.elevated,
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      <Icon name="chevron-left" size={18} color={WW.textSec} />
+                    </button>
+                  </div>
+                )}
+                <div
+                  style={{
+                    fontSize: 15,
+                    color: WW.text,
+                    lineHeight: 1.4,
+                    marginBottom: 4,
+                  }}
+                >
+                  Looks like you missed your Legs A session on Wednesday.
+                </div>
+                <div
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 600,
+                    color: WW.primaryDark,
+                  }}
+                >
+                  What happened?
+                </div>
+              </div>
+
+              {/* Dismiss */}
+              <button
+                onClick={() => window.history.back()}
+                style={{
+                  position: "absolute",
+                  top: 14,
+                  right: 14,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 4,
+                }}
+              >
+                <Icon name="x" size={18} color={WW.border} />
+              </button>
+
+              {/* Options or response */}
+              <div
+                style={{ flex: 1, overflowY: "auto", padding: "0 16px 16px" }}
+              >
+                {!active ? (
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                  >
+                    {REASONS.map((r) => (
+                      <button
+                        key={r.id}
+                        onClick={() => pickReason(r.id)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          padding: "14px",
+                          background: WW.card,
+                          borderRadius: 12,
+                          border: `1px solid ${WW.border}`,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                          textAlign: "left",
+                          width: "100%",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: 10,
+                            background: r.iconBg,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                          }}
+                        >
+                          <Icon name={r.icon} size={18} color="#fff" />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div
+                            style={{
+                              fontSize: 14,
+                              fontWeight: 600,
+                              color: WW.text,
+                            }}
+                          >
+                            {r.label}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: WW.textSec,
+                              marginTop: 2,
+                            }}
+                          >
+                            {r.sub}
+                          </div>
+                        </div>
+                        <Icon
+                          name="chevron-right"
+                          size={14}
+                          color={WW.border}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <ResponseCard id={active} />
+                )}
+              </div>
+            </div>
+
+            {/* Demo switcher */}
+            <div style={{ marginTop: 14, textAlign: "center" }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  color: "rgba(255,255,255,0.4)",
+                  marginBottom: 6,
+                }}
+              >
+                Demo: tap to preview each response
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 6,
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                }}
+              >
+                {DEMO_IDS.map((id, i) => (
+                  <button
+                    key={id}
+                    onClick={() => pickDemo(id)}
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: 12,
+                      border: "none",
+                      background: active === id ? WW.primary : "#2A2A3A",
+                      color: active === id ? "#fff" : "rgba(255,255,255,0.6)",
+                      fontSize: 11,
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    {DEMO_LABELS[i]}
+                  </button>
+                ))}
+                <button
+                  onClick={goBackToChoices}
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: 12,
+                    border: "none",
+                    background: "#2A2A3A",
+                    color: "rgba(255,255,255,0.5)",
+                    fontSize: 11,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            {/* Compress mini-modal */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 50,
+                pointerEvents: showCompress ? "auto" : "none",
+              }}
+            >
+              <div
+                onClick={() => setShowCompress(false)}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: "rgba(26,26,26,0.5)",
+                  opacity: showCompress ? 1 : 0,
+                  transition: "opacity .3s",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: WW.card,
+                  borderRadius: "20px 20px 0 0",
+                  transform: showCompress
+                    ? "translateY(0)"
+                    : "translateY(100%)",
+                  transition: "transform .3s ease-out",
+                  padding: "12px 20px 28px",
+                }}
+              >
+                <div
+                  style={{
+                    width: 32,
+                    height: 4,
+                    borderRadius: 2,
+                    background: "#E8EAF8",
+                    margin: "0 auto 16px",
+                  }}
+                />
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: WW.primaryDark,
+                    marginBottom: 4,
+                  }}
+                >
+                  Compress Workout
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: WW.textSec,
+                    marginBottom: 16,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  Removes 2 accessory exercises (Lateral Raise, Tricep Pushdown)
+                  to save ~12 minutes.
+                </div>
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button
+                    onClick={() => setShowCompress(false)}
+                    style={{
+                      flex: 1,
+                      height: 48,
+                      borderRadius: 12,
+                      border: `1.5px solid ${WW.primary}`,
+                      background: "transparent",
+                      color: WW.primary,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowCompress(false);
+                      showToastMsg("Session compressed — 2 exercises removed.");
+                    }}
+                    style={{
+                      flex: 1,
+                      height: 48,
+                      borderRadius: 12,
+                      border: "none",
+                      background: WW.primary,
+                      color: "#fff",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Break mini-modal */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 50,
+                pointerEvents: showBreak ? "auto" : "none",
+              }}
+            >
+              <div
+                onClick={() => setShowBreak(false)}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: "rgba(26,26,26,0.5)",
+                  opacity: showBreak ? 1 : 0,
+                  transition: "opacity .3s",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: WW.card,
+                  borderRadius: "20px 20px 0 0",
+                  transform: showBreak ? "translateY(0)" : "translateY(100%)",
+                  transition: "transform .3s ease-out",
+                  padding: "12px 20px 28px",
+                }}
+              >
+                <div
+                  style={{
+                    width: 32,
+                    height: 4,
+                    borderRadius: 2,
+                    background: "#E8EAF8",
+                    margin: "0 auto 16px",
+                  }}
+                />
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: WW.primaryDark,
+                    marginBottom: 4,
+                  }}
+                >
+                  Start Break Mode
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: WW.textSec,
+                    marginBottom: 16,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  Pause your plan for 1–14 days. Progress is saved and
+                  notifications pause.
+                </div>
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button
+                    onClick={() => setShowBreak(false)}
+                    style={{
+                      flex: 1,
+                      height: 48,
+                      borderRadius: 12,
+                      border: `1.5px solid ${WW.lavender}`,
+                      background: "transparent",
+                      color: WW.lavender,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowBreak(false);
+                      showToastMsg("Break Mode active. Plan paused.");
+                    }}
+                    style={{
+                      flex: 1,
+                      height: 48,
+                      borderRadius: 12,
+                      border: "none",
+                      background: WW.lavender,
+                      color: "#fff",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    Start Break
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Toast */}
+            {toast && (
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 140,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "#1C1C2E",
+                  color: "#fff",
+                  padding: "10px 16px",
+                  borderRadius: 20,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  whiteSpace: "nowrap",
+                  zIndex: 80,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  animation: "toastIn .3s ease",
+                }}
+              >
+                <Icon name="check-circle" size={14} color="#22C55E" />
+                {toast}
+              </div>
+            )}
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+    </script>
+  </body>
+</html>
