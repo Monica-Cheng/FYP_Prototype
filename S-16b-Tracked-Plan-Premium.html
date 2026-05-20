@@ -1,422 +1,2160 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>WiseWorkout · S-16b Tracked Plan Premium</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{color-scheme:light}
-  html,body{margin:0;padding:0;background:#EDEEF5;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
-  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
-  .stage{display:flex;flex-direction:column;align-items:center;gap:18px}
-  .lbl{font-size:12px;color:#6B6B80;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
-  .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
-  .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
-  .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
-  @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-</style>
-</head><body>
-<div class="stage">
-  <div class="lbl">S-16b · Tracked Plan Premium</div>
-  <div class="phone-shell"><div class="island"></div><div class="phone-inner" id="app"></div></div>
-</div>
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-<script type="text/babel">
-const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',lavenderDark:'#7B5CB8',teal:'#4BB8CC',tealBg:'#E0F4F8',amber:'#F59E0B',amberBg:'#FEF3C7',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',shadow:'0 2px 8px rgba(45,58,140,.06)'};
-
-/* ── Icon system ── */
-const PATHS={
-  'chevron-left':"M15 18l-6-6 6-6",
-  'chevron-right':"M9 18l6-6-6-6",
-  star:"M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
-  scissors:["M6 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z","M18 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z","M8.47 8.47l7.06 7.06","M18 21a3 3 0 1 1 0-6 3 3 0 0 1 0 6z","M6 21a3 3 0 1 1 0-6 3 3 0 0 1 0 6z","M8.47 15.53l7.06-7.06"],
-  'pause-circle':["M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z","M10 15V9","M14 15V9"],
-  check:"M20 6L9 17l-5-5",
-  x:"M18 6L6 18M6 6l12 12",
-  minus:"M5 12h14",
-  dumbbell:"M6 4v16M18 4v16M8 8h8M8 16h8M3 8h3M18 8h3M3 16h3M18 16h3",
-  clock:["M12 22A10 10 0 1 1 12 2a10 10 0 0 1 0 20z","M12 6v6l4 2"],
-  tag:"M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01",
-  'triangle-alert':["M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z","M12 9v4","M12 17h.01"],
-  'rotate-ccw':"M1 4v6h6M3.51 15a9 9 0 1 0 .49-3.95",
-  'x-circle':["M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z","M15 9l-6 6","M9 9l6 6"],
-  'check-circle':"M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3",
-  info:["M12 22A10 10 0 1 1 12 2a10 10 0 0 1 0 20z","M12 16v-4","M12 8h.01"],
-  pause:"M10 4H6v16h4V4zM18 4h-4v16h4V4z",
-  moon:"M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z",
-  calendar:["M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z","M16 2v4","M8 2v4","M3 10h18"],
-  'minus-circle':["M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z","M8 12h8"],
-  'plus-circle':["M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z","M12 8v8","M8 12h8"],
-};
-const Ico={
-  home:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z" fill={c}/></svg>,
-  plans:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="20" y="10" width="3.5" height="7" rx="1" fill={c}/><rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill={c}/><rect x="8.5" y="12" width="9" height="3" rx=".8" fill={c}/></svg>,
-  coach:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" stroke={c} strokeWidth="1.5" strokeLinejoin="round"/></svg>,
-  club:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke={c} strokeWidth="1.5"/><circle cx="17" cy="10" r="2.2" stroke={c} strokeWidth="1.5"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke={c} strokeWidth="1.5" strokeLinecap="round"/><path d="M17.5 14c2.2.5 4 2.2 4 4.5" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
-  progress:c=><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke={c} strokeWidth="1.6" strokeLinecap="round"/></svg>,
-};
-function Icon({name,size=16,color='currentColor',style:s,className:cn}){
-  if(name==='more-horizontal'){return <svg width={size} height={size} viewBox="0 0 24 24" style={{display:'inline-flex',flexShrink:0,...s}} className={cn}><circle cx="5" cy="12" r="1.5" fill={color}/><circle cx="12" cy="12" r="1.5" fill={color}/><circle cx="19" cy="12" r="1.5" fill={color}/></svg>;}
-  const p=PATHS[name];if(!p)return null;
-  const paths=Array.isArray(p)?p:[p];
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-flex',flexShrink:0,...s}} className={cn}>{paths.map((d,i)=><path key={i} d={d}/>)}</svg>;
-}
-function StatusBar(){
-  return <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0,background:WW.card}}>
-    <span style={{paddingTop:10}}>9:41</span>
-    <div style={{display:'flex',gap:6,alignItems:'center',paddingTop:10}}>
-      <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text}/><rect x="4.5" y="5" width="3" height="6" rx=".6" fill={WW.text}/><rect x="9" y="2.5" width="3" height="8.5" rx=".6" fill={WW.text}/><rect x="13.5" y="0" width="3" height="11" rx=".6" fill={WW.text}/></svg>
-      <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" stroke={WW.text} strokeOpacity=".4" fill="none"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={WW.text}/><rect x="21" y="3.5" width="1.5" height="4" rx=".5" fill={WW.text} opacity=".4"/></svg>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WiseWorkout · S-16b Tracked Plan Premium</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #edeef5;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          system-ui,
+          sans-serif;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+      }
+      .stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+      }
+      .lbl {
+        font-size: 12px;
+        color: #6b6b80;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .phone-shell {
+        width: 390px;
+        height: 844px;
+        border-radius: 52px;
+        background: #0a0a12;
+        padding: 5px;
+        box-shadow:
+          0 30px 70px rgba(20, 25, 60, 0.2),
+          0 0 0 1px rgba(0, 0, 0, 0.12);
+        position: relative;
+        box-sizing: content-box;
+      }
+      .phone-inner {
+        width: 390px;
+        height: 844px;
+        border-radius: 47px;
+        overflow: hidden;
+        background: #f7f8ff;
+        position: relative;
+      }
+      .island {
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 118px;
+        height: 33px;
+        border-radius: 20px;
+        background: #000;
+        z-index: 60;
+        pointer-events: none;
+      }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="lbl">S-16b · Tracked Plan Premium</div>
+      <div class="phone-shell">
+        <div class="island"></div>
+        <div class="phone-inner" id="app"></div>
+      </div>
     </div>
-  </div>;
-}
-const NAV=[{id:'home',label:'Home',icon:Ico.home,href:'S-09-Home.html'},{id:'plans',label:'Plans',icon:Ico.plans,href:'S-10-Plans-Hub.html'},{id:'coach',label:'Coach',icon:Ico.coach,href:'S-25-Coach-Chat.html'},{id:'club',label:'Club',icon:Ico.club,href:'S-28-Club-Tab.html'},{id:'progress',label:'Progress',icon:Ico.progress,href:'S-32-Progress-Tab.html'}];
-function BottomNav(){
-  return <div style={{position:'absolute',bottom:0,left:0,right:0,height:84,background:WW.card,borderTop:'0.5px solid #E8EAF8',display:'flex',zIndex:30}}>
-    {NAV.map(n=>{const c=WW.textSec;return <a key={n.id} href={n.href} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,textDecoration:'none',paddingBottom:8}}>{n.icon(c)}<span style={{fontSize:10,fontWeight:600,color:c}}>{n.label}</span></a>;})}
-  </div>;
-}
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/babel">
+      const WW = {
+        bg: "#F7F8FF",
+        card: "#FFFFFF",
+        elevated: "#EEF0FB",
+        primary: "#6C7EE8",
+        primaryDark: "#2D3A8C",
+        lavender: "#9B84E8",
+        lavenderBg: "#F0EEFE",
+        lavenderDark: "#7B5CB8",
+        teal: "#4BB8CC",
+        tealBg: "#E0F4F8",
+        amber: "#F59E0B",
+        amberBg: "#FEF3C7",
+        text: "#3D3D5C",
+        textSec: "#8A8A9E",
+        border: "#C8C8D8",
+        chipBg: "#E6EAFE",
+        shadow: "0 2px 8px rgba(45,58,140,.06)",
+      };
 
-/* ── Plan data with Day 1/Day 2 naming ── */
-const WEEKS_DATA=[
-  {week:1,days:[
-    {day:'Mon',session:'Day 1',status:'completed',exercises:['Bench Press 4×8','Overhead Press 3×10','Lateral Raise 3×15','Tricep Pushdown 3×12']},
-    {day:'Tue',session:'Day 2',status:'completed',exercises:['Pull-ups 4×8','Barbell Row 3×10','Face Pull 3×15','Bicep Curl 3×12']},
-    {day:'Wed',session:'Day 3',status:'completed',exercises:['Squat 4×8','Romanian Deadlift 3×10','Leg Press 3×12','Calf Raise 4×15']},
-    {day:'Thu',session:'Day 4',status:'completed',exercises:['Incline Press 4×8','DB Chest Press 3×10','Overhead Tricep 3×12']},
-    {day:'Fri',session:null,status:'rest',exercises:[]},
-    {day:'Sat',session:null,status:'rest',exercises:[]},
-    {day:'Sun',session:null,status:'rest',exercises:[]},
-  ]},
-  {week:2,days:[
-    {day:'Mon',session:'Day 1',status:'done',exercises:['Bench Press 4×8','Overhead Press 3×10','Lateral Raise 3×15','Tricep Pushdown 3×12']},
-    {day:'Tue',session:'Day 2',status:'done',exercises:['Pull-ups 4×8','Barbell Row 3×10','Face Pull 3×15','Bicep Curl 3×12']},
-    {day:'Wed',session:'Day 3',status:'missed',exercises:['Squat 4×8','Romanian Deadlift 3×10','Leg Press 3×12','Calf Raise 4×15']},
-    {day:'Thu',session:'Day 4',status:'today',exercises:['Bench Press 4×8','Incline DB Press 3×10','Overhead Press 3×10','Lateral Raise 3×15','Tricep Pushdown 3×12']},
-    {day:'Fri',session:'Day 5',status:'scheduled',exercises:['Pull-ups 4×8','Barbell Row 3×10','Face Pull 3×15','Bicep Curl 3×12']},
-    {day:'Sat',session:null,status:'rest',exercises:[]},
-    {day:'Sun',session:null,status:'rest',exercises:[]},
-  ]},
-];
-
-/* Current week calendar (always shows Week 2 = current) */
-const THIS_WEEK=[
-  {day:'M',state:'done',label:'Day 1'},
-  {day:'T',state:'done',label:'Day 2'},
-  {day:'W',state:'missed',label:'Day 3'},
-  {day:'T',state:'today',label:'Day 4'},
-  {day:'F',state:'scheduled',label:'Day 5'},
-  {day:'S',state:'rest',label:'Rest'},
-  {day:'S',state:'rest',label:'Rest'},
-];
-
-const TODAY_EXERCISES=[
-  {id:1,name:'Bench Press',sets:'4×8',accessory:false},
-  {id:2,name:'Incline DB Press',sets:'3×10',accessory:false},
-  {id:3,name:'Overhead Press',sets:'3×10',accessory:false},
-  {id:4,name:'Lateral Raise',sets:'3×15',accessory:true},
-  {id:5,name:'Tricep Pushdown',sets:'3×12',accessory:true},
-];
-
-function GoldPill(){
-  return <span style={{background:'#FFFBEB',border:'1px solid #FDE68A',color:'#92400E',fontSize:9,fontWeight:700,padding:'2px 5px',borderRadius:8,flexShrink:0}}>Premium</span>;
-}
-
-function SessionRow({s}){
-  const isRest=s.status==='rest';
-  const statusColor={completed:WW.teal,done:WW.teal,today:WW.primary,scheduled:WW.border,rest:WW.border,missed:WW.amber}[s.status];
-  return(
-    <div style={{display:'flex',alignItems:'center',gap:10,padding:'9px 0',borderBottom:`0.5px solid #F2F2F7`}}>
-      <div style={{width:3,height:36,borderRadius:2,background:statusColor,flexShrink:0}}/>
-      <div style={{flex:1}}>
-        <div style={{fontSize:13,fontWeight:700,color:isRest?WW.textSec:WW.text}}>{isRest?'Rest Day':s.session}</div>
-        {!isRest&&s.exercises.length>0&&<div style={{fontSize:11,color:WW.textSec}}>{s.exercises.length} exercises</div>}
-      </div>
-      {(s.status==='completed'||s.status==='done')&&(
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill={WW.tealBg}/><path d="M8 12l3 3 5-5" stroke={WW.teal} strokeWidth="2" strokeLinecap="round"/></svg>
-      )}
-      {s.status==='today'&&<span style={{fontSize:10,fontWeight:700,color:WW.primary,background:WW.chipBg,padding:'3px 8px',borderRadius:10}}>TODAY</span>}
-      {s.status==='missed'&&<span style={{fontSize:10,fontWeight:700,color:WW.amber,background:WW.amberBg,padding:'3px 8px',borderRadius:10}}>MISSED</span>}
-    </div>
-  );
-}
-
-function App(){
-  const [weekIdx,setWeekIdx]=React.useState(1); // default = Week 2 (current)
-  const [showCompress,setShowCompress]=React.useState(false);
-  const [showBreak,setShowBreak]=React.useState(false);
-  const [compressConfirmed,setCompressConfirmed]=React.useState(false);
-  const [breakActive,setBreakActive]=React.useState(false);
-  const [breakDays,setBreakDays]=React.useState(3);
-  const [emptyState,setEmptyState]=React.useState(false);
-  const [toast,setToast]=React.useState(null);
-
-  function showToastMsg(msg){setToast(msg);setTimeout(()=>setToast(null),3000);}
-  function confirmCompress(){setShowCompress(false);setCompressConfirmed(true);showToastMsg('Session compressed — 2 exercises removed. Good luck!');}
-  function startBreak(){setShowBreak(false);setBreakActive(true);showToastMsg('Break Mode active. Plan paused.');}
-  function endBreak(){if(window.confirm('End break mode now?'))setBreakActive(false);}
-
-  const PROTO_TODAY=new Date(2026,4,14);
-  function resumeDate(days){const d=new Date(PROTO_TODAY);d.setDate(d.getDate()+days+1);return d.toLocaleDateString('en-US',{weekday:'short',day:'numeric',month:'short'});}
-
-  function DayCircle({w}){
-    const s=w.state;
-    const isCompressed=s==='today'&&compressConfirmed;
-    let bg,content,border='none';
-    if(isCompressed){bg='#E6EAFE';content=<Icon name="scissors" size={11} color={WW.primary}/>;border=`1px solid ${WW.primary}`;}
-    else if(s==='done'||s==='completed'){bg=WW.teal;content=<Icon name="check" size={13} color="#fff"/>;}
-    else if(s==='today'){bg=WW.primary;content=<span style={{fontSize:11,fontWeight:700,color:'#fff'}}>4</span>;}
-    else if(s==='missed'){bg='#FEF3C7';content=<Icon name="x" size={11} color={WW.amber}/>;border=`1px solid ${WW.amber}`;}
-    else if(s==='rest'){bg:'#F7F8FF';content=<Icon name="minus" size={11} color={WW.border}/>;border=`1px solid ${WW.border}`;bg='#F7F8FF';}
-    else{bg=WW.card;content=<span style={{fontSize:11,color:WW.textSec}}>{w.day}</span>;border=`1px solid ${WW.border}`;}
-    return <div style={{width:32,height:32,borderRadius:16,background:bg,border,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>{content}</div>;
-  }
-
-  const currentWeek=WEEKS_DATA[weekIdx];
-
-  return(
-    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,fontFamily:"'Inter',system-ui,sans-serif",position:'relative'}}>
-      <StatusBar/>
-
-      {/* Top bar */}
-      <div style={{height:52,display:'flex',alignItems:'center',padding:'0 16px',background:WW.card,borderBottom:'0.5px solid #E8EAF8',flexShrink:0,position:'relative'}}>
-        <a href="S-10-Plans-Hub.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:10,background:WW.elevated,textDecoration:'none',flexShrink:0}}>
-          <Icon name="chevron-left" size={18} color={WW.textSec}/>
-        </a>
-        <div style={{position:'absolute',left:'50%',transform:'translateX(-50%)',textAlign:'center'}}>
-          <div style={{fontSize:16,fontWeight:700,color:WW.primaryDark}}>Beginner Push-Pull-Legs</div>
-        </div>
-        <button onClick={()=>alert('Plan menu')} style={{marginLeft:'auto',width:34,height:34,borderRadius:10,background:WW.elevated,border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',padding:0}}>
-          <Icon name="more-horizontal" size={16} color={WW.textSec}/>
-        </button>
-      </div>
-
-      {/* Premium banner */}
-      <div style={{height:34,background:'#FFFBEB',display:'flex',alignItems:'center',justifyContent:'center',gap:6,borderBottom:'0.5px solid #FDE68A',flexShrink:0}}>
-        <Icon name="star" size={13} color={WW.amber}/>
-        <span style={{fontSize:12,fontWeight:600,color:'#92400E'}}>Premium plan features active</span>
-      </div>
-
-      {/* Scroll body */}
-      <div style={{flex:1,overflowY:'auto',padding:'12px 16px 0',paddingBottom:168}}>
-
-        {/* Plan overview */}
-        <div style={{background:WW.card,borderRadius:14,padding:'12px 14px',border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,marginBottom:12}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
-            <div style={{fontSize:13,fontWeight:700,color:WW.text}}>Day 12 of 36 · Week 2 of 9</div>
-            <div style={{fontSize:13,fontWeight:700,color:WW.primary}}>33%</div>
-          </div>
-          <div style={{height:8,borderRadius:4,background:WW.elevated,overflow:'hidden',marginBottom:6}}>
-            <div style={{height:'100%',width:'33%',background:`linear-gradient(90deg,${WW.primary},${WW.lavender})`,borderRadius:4}}/>
-          </div>
-          <div style={{display:'flex',gap:14}}>
-            <div style={{fontSize:11,color:WW.textSec}}><span style={{fontWeight:700,color:WW.teal}}>9</span> completed</div>
-            <div style={{fontSize:11,color:WW.textSec}}><span style={{fontWeight:700,color:WW.amber}}>1</span> missed</div>
-            <div style={{fontSize:11,color:WW.textSec}}><span style={{fontWeight:700,color:WW.textSec}}>26</span> remaining</div>
-          </div>
-        </div>
-
-        {/* Missed alert */}
-        <a href="S-45-Missed-Workout-Checkin.html" style={{textDecoration:'none',display:'block',marginBottom:12}}>
-          <div style={{background:'#FEF3C7',borderRadius:14,padding:'11px 13px',border:'0.5px solid #FDE68A',display:'flex',alignItems:'center',gap:10}}>
-            <Icon name="triangle-alert" size={17} color={WW.amber} style={{flexShrink:0}}/>
-            <div style={{flex:1}}>
-              <div style={{fontSize:13,fontWeight:700,color:'#92400E'}}>Missed: Day 3 on Wednesday</div>
-              <div style={{fontSize:12,color:'#B45309',marginTop:1}}>Tap to log what happened and adjust your plan.</div>
+      /* ── Icon system ── */
+      const PATHS = {
+        "chevron-left": "M15 18l-6-6 6-6",
+        "chevron-right": "M9 18l6-6-6-6",
+        star: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
+        scissors: [
+          "M6 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z",
+          "M18 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z",
+          "M8.47 8.47l7.06 7.06",
+          "M18 21a3 3 0 1 1 0-6 3 3 0 0 1 0 6z",
+          "M6 21a3 3 0 1 1 0-6 3 3 0 0 1 0 6z",
+          "M8.47 15.53l7.06-7.06",
+        ],
+        "pause-circle": [
+          "M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z",
+          "M10 15V9",
+          "M14 15V9",
+        ],
+        check: "M20 6L9 17l-5-5",
+        x: "M18 6L6 18M6 6l12 12",
+        minus: "M5 12h14",
+        dumbbell: "M6 4v16M18 4v16M8 8h8M8 16h8M3 8h3M18 8h3M3 16h3M18 16h3",
+        clock: ["M12 22A10 10 0 1 1 12 2a10 10 0 0 1 0 20z", "M12 6v6l4 2"],
+        tag: "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01",
+        "triangle-alert": [
+          "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z",
+          "M12 9v4",
+          "M12 17h.01",
+        ],
+        "rotate-ccw": "M1 4v6h6M3.51 15a9 9 0 1 0 .49-3.95",
+        "x-circle": [
+          "M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z",
+          "M15 9l-6 6",
+          "M9 9l6 6",
+        ],
+        "check-circle": "M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3",
+        info: [
+          "M12 22A10 10 0 1 1 12 2a10 10 0 0 1 0 20z",
+          "M12 16v-4",
+          "M12 8h.01",
+        ],
+        pause: "M10 4H6v16h4V4zM18 4h-4v16h4V4z",
+        moon: "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z",
+        calendar: [
+          "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z",
+          "M16 2v4",
+          "M8 2v4",
+          "M3 10h18",
+        ],
+        "minus-circle": [
+          "M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z",
+          "M8 12h8",
+        ],
+        "plus-circle": [
+          "M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0z",
+          "M12 8v8",
+          "M8 12h8",
+        ],
+      };
+      const Ico = {
+        home: (c) => (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M3 10.5L12 3l9 7.5V21a.5.5 0 01-.5.5H15V15a1 1 0 00-1-1h-4a1 1 0 00-1 1v6.5H3.5A.5.5 0 013 21V10.5z"
+              fill={c}
+            />
+          </svg>
+        ),
+        plans: (c) => (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="10" width="3.5" height="7" rx="1" fill={c} />
+            <rect x="20" y="10" width="3.5" height="7" rx="1" fill={c} />
+            <rect x="6.5" y="11.5" width="2" height="4" rx=".5" fill={c} />
+            <rect x="17.5" y="11.5" width="2" height="4" rx=".5" fill={c} />
+            <rect x="8.5" y="12" width="9" height="3" rx=".8" fill={c} />
+          </svg>
+        ),
+        coach: (c) => (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"
+              stroke={c}
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ),
+        club: (c) => (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <circle cx="9" cy="8" r="3" stroke={c} strokeWidth="1.5" />
+            <circle cx="17" cy="10" r="2.2" stroke={c} strokeWidth="1.5" />
+            <path
+              d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"
+              stroke={c}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M17.5 14c2.2.5 4 2.2 4 4.5"
+              stroke={c}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        ),
+        progress: (c) => (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 19V9M10 19V5M16 19v-7M22 19H2"
+              stroke={c}
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+          </svg>
+        ),
+      };
+      function Icon({
+        name,
+        size = 16,
+        color = "currentColor",
+        style: s,
+        className: cn,
+      }) {
+        if (name === "more-horizontal") {
+          return (
+            <svg
+              width={size}
+              height={size}
+              viewBox="0 0 24 24"
+              style={{ display: "inline-flex", flexShrink: 0, ...s }}
+              className={cn}
+            >
+              <circle cx="5" cy="12" r="1.5" fill={color} />
+              <circle cx="12" cy="12" r="1.5" fill={color} />
+              <circle cx="19" cy="12" r="1.5" fill={color} />
+            </svg>
+          );
+        }
+        const p = PATHS[name];
+        if (!p) return null;
+        const paths = Array.isArray(p) ? p : [p];
+        return (
+          <svg
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={color}
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ display: "inline-flex", flexShrink: 0, ...s }}
+            className={cn}
+          >
+            {paths.map((d, i) => (
+              <path key={i} d={d} />
+            ))}
+          </svg>
+        );
+      }
+      function StatusBar() {
+        return (
+          <div
+            style={{
+              height: 47,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0 28px",
+              fontSize: 15,
+              fontWeight: 600,
+              color: WW.text,
+              flexShrink: 0,
+              background: WW.card,
+            }}
+          >
+            <span style={{ paddingTop: 10 }}>9:41</span>
+            <div
+              style={{
+                display: "flex",
+                gap: 6,
+                alignItems: "center",
+                paddingTop: 10,
+              }}
+            >
+              <svg width="17" height="11" viewBox="0 0 17 11">
+                <rect x="0" y="7" width="3" height="4" rx=".6" fill={WW.text} />
+                <rect
+                  x="4.5"
+                  y="5"
+                  width="3"
+                  height="6"
+                  rx=".6"
+                  fill={WW.text}
+                />
+                <rect
+                  x="9"
+                  y="2.5"
+                  width="3"
+                  height="8.5"
+                  rx=".6"
+                  fill={WW.text}
+                />
+                <rect
+                  x="13.5"
+                  y="0"
+                  width="3"
+                  height="11"
+                  rx=".6"
+                  fill={WW.text}
+                />
+              </svg>
+              <svg width="24" height="11" viewBox="0 0 24 11">
+                <rect
+                  x=".5"
+                  y=".5"
+                  width="20"
+                  height="10"
+                  rx="3"
+                  stroke={WW.text}
+                  strokeOpacity=".4"
+                  fill="none"
+                />
+                <rect
+                  x="2"
+                  y="2"
+                  width="17"
+                  height="7"
+                  rx="1.5"
+                  fill={WW.text}
+                />
+                <rect
+                  x="21"
+                  y="3.5"
+                  width="1.5"
+                  height="4"
+                  rx=".5"
+                  fill={WW.text}
+                  opacity=".4"
+                />
+              </svg>
             </div>
-            <span style={{fontSize:12,fontWeight:600,color:WW.amber,flexShrink:0}}>Check in →</span>
           </div>
-        </a>
-
-        {/* Premium adaptive controls or break banner */}
-        {breakActive?(
-          <div style={{background:'#F0EEFE',borderRadius:12,padding:'11px 13px',border:'0.5px solid #D8D0F4',marginBottom:12,display:'flex',alignItems:'center',gap:10}}>
-            <Icon name="pause" size={15} color={WW.lavender} style={{flexShrink:0}}/>
-            <div style={{flex:1,fontSize:13,color:WW.lavenderDark,lineHeight:1.4}}>Break Mode active · {breakDays} days remaining · Resumes {resumeDate(breakDays)}</div>
-            <button onClick={endBreak} style={{fontSize:12,fontWeight:600,color:WW.primary,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',flexShrink:0,padding:0}}>End early</button>
-          </div>
-        ):(
-          <>
-            <div style={{display:'flex',gap:8,marginBottom:4}}>
-              <button onClick={()=>setShowCompress(true)} style={{flex:1,height:42,borderRadius:12,background:WW.elevated,border:`1px solid ${WW.primary}`,display:'flex',alignItems:'center',justifyContent:'center',gap:5,cursor:'pointer',fontFamily:'inherit',padding:'0 8px'}}>
-                <Icon name="scissors" size={14} color={WW.primary}/>
-                <span style={{fontSize:12,fontWeight:600,color:WW.primary}}>Compress</span>
-                <GoldPill/>
-              </button>
-              <button onClick={()=>setShowBreak(true)} style={{flex:1,height:42,borderRadius:12,background:WW.elevated,border:`1px solid ${WW.lavender}`,display:'flex',alignItems:'center',justifyContent:'center',gap:5,cursor:'pointer',fontFamily:'inherit',padding:'0 8px'}}>
-                <Icon name="pause-circle" size={14} color={WW.lavender}/>
-                <span style={{fontSize:12,fontWeight:600,color:WW.lavender}}>Break Mode</span>
-                <GoldPill/>
-              </button>
-            </div>
-            <div style={{fontSize:10,color:WW.textSec,fontStyle:'italic',textAlign:'center',marginBottom:12}}>Compress shortens today's session. Break Mode pauses your plan 1–14 days.</div>
-          </>
-        )}
-
-        {/* This week calendar */}
-        <div style={{fontSize:14,fontWeight:600,color:WW.text,marginBottom:8}}>This week</div>
-        <div style={{background:WW.card,borderRadius:12,padding:'10px 8px',border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,marginBottom:12,display:'flex',justifyContent:'space-between'}}>
-          {THIS_WEEK.map((w,i)=>(
-            <div key={i} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,width:38}}>
-              <span style={{fontSize:10,fontWeight:600,color:WW.textSec}}>{w.day}</span>
-              <DayCircle w={w}/>
-              <span style={{fontSize:8,color:WW.textSec,textAlign:'center',lineHeight:1.2,maxWidth:36}}>{w.label}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Today's session */}
-        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
-          <span style={{fontSize:14,fontWeight:600,color:WW.text}}>Today — Thursday</span>
-          <span style={{background:'#E6EAFE',color:WW.primary,fontSize:11,fontWeight:600,padding:'3px 8px',borderRadius:20}}>Day 4</span>
-        </div>
-
-        {breakActive?(
-          <div style={{background:'#F0EEFE',borderRadius:14,padding:'20px',border:'0.5px solid #D8D0F4',marginBottom:16,display:'flex',flexDirection:'column',alignItems:'center',gap:10}}>
-            <Icon name="moon" size={36} color={WW.lavender}/>
-            <div style={{fontSize:15,fontWeight:600,color:WW.lavender,textAlign:'center'}}>Plan paused · Enjoy your break</div>
-          </div>
-        ):(
-          <div style={{background:WW.card,borderRadius:14,padding:'13px 14px',border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,marginBottom:16}}>
-            <div style={{fontSize:16,fontWeight:700,color:WW.text,marginBottom:5}}>
-              Day 4{compressConfirmed&&<span style={{fontSize:13,fontWeight:500,color:WW.primary}}> (Compressed)</span>}
-            </div>
-            <div style={{display:'flex',gap:10,marginBottom:10,flexWrap:'wrap'}}>
-              {[{icon:'clock',t:'45 min est.'},{icon:'dumbbell',t:'5 exercises'},{icon:'tag',t:'Chest · Shoulders'}].map((m,i)=>(
-                <div key={i} style={{display:'flex',alignItems:'center',gap:4}}>
-                  <Icon name={m.icon} size={11} color={WW.textSec}/><span style={{fontSize:11,color:WW.textSec}}>{m.t}</span>
-                </div>
-              ))}
-            </div>
-            {TODAY_EXERCISES.map(e=>{
-              const removed=compressConfirmed&&e.accessory;
-              return(
-                <div key={e.id} style={{display:'flex',alignItems:'center',gap:8,padding:'5px 0',borderBottom:'0.5px solid #F2F2F7',opacity:removed?.4:1}}>
-                  <div style={{width:22,height:22,borderRadius:7,background:WW.elevated,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,color:WW.textSec,flexShrink:0}}>{e.id}</div>
-                  <span style={{flex:1,fontSize:13,color:WW.text,textDecoration:removed?'line-through':'none'}}>{e.name}</span>
-                  {e.accessory&&<span style={{fontSize:9,fontWeight:500,background:'#FEF3C7',color:WW.amber,padding:'2px 5px',borderRadius:6}}>Accessory</span>}
-                  <span style={{fontSize:12,color:WW.textSec,flexShrink:0}}>{e.sets}</span>
-                </div>
+        );
+      }
+      const NAV = [
+        { id: "home", label: "Home", icon: Ico.home, href: "S-09-Home.html" },
+        {
+          id: "plans",
+          label: "Plans",
+          icon: Ico.plans,
+          href: "S-10-Plans-Hub.html",
+        },
+        {
+          id: "coach",
+          label: "Coach",
+          icon: Ico.coach,
+          href: "S-25-Coach-Chat.html",
+        },
+        {
+          id: "club",
+          label: "Club",
+          icon: Ico.club,
+          href: "S-28-Club-Tab.html",
+        },
+        {
+          id: "progress",
+          label: "Progress",
+          icon: Ico.progress,
+          href: "S-32-Progress-Tab.html",
+        },
+      ];
+      function BottomNav() {
+        return (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 84,
+              background: WW.card,
+              borderTop: "0.5px solid #E8EAF8",
+              display: "flex",
+              zIndex: 30,
+            }}
+          >
+            {NAV.map((n) => {
+              const c = WW.textSec;
+              return (
+                <a
+                  key={n.id}
+                  href={n.href}
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 4,
+                    textDecoration: "none",
+                    paddingBottom: 8,
+                  }}
+                >
+                  {n.icon(c)}
+                  <span style={{ fontSize: 10, fontWeight: 600, color: c }}>
+                    {n.label}
+                  </span>
+                </a>
               );
             })}
           </div>
-        )}
+        );
+      }
 
-        {/* Week tabs */}
-        <div style={{display:'flex',gap:6,overflowX:'auto',marginBottom:10,paddingBottom:2}}>
-          {WEEKS_DATA.map((w,i)=>(
-            <button key={i} onClick={()=>setWeekIdx(i)} style={{padding:'6px 14px',borderRadius:20,border:`1.5px solid ${weekIdx===i?WW.primary:WW.border}`,background:weekIdx===i?WW.chipBg:'transparent',color:weekIdx===i?WW.primary:WW.textSec,fontSize:13,fontWeight:700,cursor:'pointer',flexShrink:0,fontFamily:'inherit'}}>Week {w.week}</button>
-          ))}
-          <div style={{padding:'6px 11px',borderRadius:20,border:`1.5px dashed ${WW.border}`,color:WW.textSec,fontSize:12,fontWeight:500,flexShrink:0}}>+6 more</div>
-        </div>
+      /* ── Plan data with Day 1/Day 2 naming ── */
+      const WEEKS_DATA = [
+        {
+          week: 1,
+          days: [
+            {
+              day: "Mon",
+              session: "Day 1",
+              status: "completed",
+              exercises: [
+                "Bench Press 4×8",
+                "Overhead Press 3×10",
+                "Lateral Raise 3×15",
+                "Tricep Pushdown 3×12",
+              ],
+            },
+            {
+              day: "Tue",
+              session: "Day 2",
+              status: "completed",
+              exercises: [
+                "Pull-ups 4×8",
+                "Barbell Row 3×10",
+                "Face Pull 3×15",
+                "Bicep Curl 3×12",
+              ],
+            },
+            {
+              day: "Wed",
+              session: "Day 3",
+              status: "completed",
+              exercises: [
+                "Squat 4×8",
+                "Romanian Deadlift 3×10",
+                "Leg Press 3×12",
+                "Calf Raise 4×15",
+              ],
+            },
+            {
+              day: "Thu",
+              session: "Day 4",
+              status: "completed",
+              exercises: [
+                "Incline Press 4×8",
+                "DB Chest Press 3×10",
+                "Overhead Tricep 3×12",
+              ],
+            },
+            { day: "Fri", session: null, status: "rest", exercises: [] },
+            { day: "Sat", session: null, status: "rest", exercises: [] },
+            { day: "Sun", session: null, status: "rest", exercises: [] },
+          ],
+        },
+        {
+          week: 2,
+          days: [
+            {
+              day: "Mon",
+              session: "Day 1",
+              status: "done",
+              exercises: [
+                "Bench Press 4×8",
+                "Overhead Press 3×10",
+                "Lateral Raise 3×15",
+                "Tricep Pushdown 3×12",
+              ],
+            },
+            {
+              day: "Tue",
+              session: "Day 2",
+              status: "done",
+              exercises: [
+                "Pull-ups 4×8",
+                "Barbell Row 3×10",
+                "Face Pull 3×15",
+                "Bicep Curl 3×12",
+              ],
+            },
+            {
+              day: "Wed",
+              session: "Day 3",
+              status: "missed",
+              exercises: [
+                "Squat 4×8",
+                "Romanian Deadlift 3×10",
+                "Leg Press 3×12",
+                "Calf Raise 4×15",
+              ],
+            },
+            {
+              day: "Thu",
+              session: "Day 4",
+              status: "today",
+              exercises: [
+                "Bench Press 4×8",
+                "Incline DB Press 3×10",
+                "Overhead Press 3×10",
+                "Lateral Raise 3×15",
+                "Tricep Pushdown 3×12",
+              ],
+            },
+            {
+              day: "Fri",
+              session: "Day 5",
+              status: "scheduled",
+              exercises: [
+                "Pull-ups 4×8",
+                "Barbell Row 3×10",
+                "Face Pull 3×15",
+                "Bicep Curl 3×12",
+              ],
+            },
+            { day: "Sat", session: null, status: "rest", exercises: [] },
+            { day: "Sun", session: null, status: "rest", exercises: [] },
+          ],
+        },
+      ];
 
-        {/* Session rows */}
-        <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,padding:'4px 12px',boxShadow:WW.shadow,marginBottom:20}}>
-          {currentWeek.days.map((s,i)=><SessionRow key={i} s={s}/>)}
-        </div>
+      /* Current week calendar (always shows Week 2 = current) */
+      const THIS_WEEK = [
+        { day: "M", state: "done", label: "Day 1" },
+        { day: "T", state: "done", label: "Day 2" },
+        { day: "W", state: "missed", label: "Day 3" },
+        { day: "T", state: "today", label: "Day 4" },
+        { day: "F", state: "scheduled", label: "Day 5" },
+        { day: "S", state: "rest", label: "Rest" },
+        { day: "S", state: "rest", label: "Rest" },
+      ];
 
-        {/* Plan options */}
-        <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,overflow:'hidden',marginBottom:8}}>
-          <button onClick={()=>alert('Restart plan from Day 1?')} style={{width:'100%',display:'flex',alignItems:'center',gap:12,padding:'13px 14px',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',borderBottom:'0.5px solid #F2F2F7'}}>
-            <Icon name="rotate-ccw" size={15} color={WW.textSec}/>
-            <span style={{flex:1,textAlign:'left',fontSize:13,color:WW.text}}>Restart plan from Day 1</span>
-            <Icon name="chevron-right" size={15} color={WW.textSec}/>
-          </button>
-          <button onClick={()=>alert('Stop tracking this plan?')} style={{width:'100%',display:'flex',alignItems:'center',gap:12,padding:'13px 14px',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
-            <Icon name="x-circle" size={15} color="#EF4444"/>
-            <span style={{flex:1,textAlign:'left',fontSize:13,color:'#EF4444'}}>Stop tracking this plan</span>
-            <Icon name="chevron-right" size={15} color="#EF4444"/>
-          </button>
-        </div>
-      </div>
+      const TODAY_EXERCISES = [
+        { id: 1, name: "Bench Press", sets: "4×8", accessory: false },
+        { id: 2, name: "Incline DB Press", sets: "3×10", accessory: false },
+        { id: 3, name: "Overhead Press", sets: "3×10", accessory: false },
+        { id: 4, name: "Lateral Raise", sets: "3×15", accessory: true },
+        { id: 5, name: "Tricep Pushdown", sets: "3×12", accessory: true },
+      ];
 
-      {/* Action bar */}
-      <div style={{position:'absolute',bottom:84,left:0,right:0,padding:'10px 16px',background:WW.card,borderTop:`0.5px solid ${WW.border}`,display:'flex',gap:8,zIndex:20}}>
-        <a href="S-17-Gym-Session-Active.html" style={{flex:2,height:46,borderRadius:12,background:WW.primary,color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 12px rgba(108,126,232,.35)'}}>Start Today's Session</a>
-        <button onClick={()=>alert('Marked as rest day.')} style={{flex:1,height:46,borderRadius:12,border:`1.5px solid ${WW.border}`,background:'transparent',color:WW.textSec,fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Mark Rest</button>
-        <button onClick={()=>alert('Day skipped.')} style={{flex:1,height:46,borderRadius:12,border:`1.5px solid ${WW.border}`,background:'transparent',color:WW.textSec,fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Skip Day</button>
-      </div>
+      function GoldPill() {
+        return (
+          <span
+            style={{
+              background: "#FFFBEB",
+              border: "1px solid #FDE68A",
+              color: "#92400E",
+              fontSize: 9,
+              fontWeight: 700,
+              padding: "2px 5px",
+              borderRadius: 8,
+              flexShrink: 0,
+            }}
+          >
+            Premium
+          </span>
+        );
+      }
 
-      <BottomNav/>
-
-      {/* ── COMPRESS MODAL ── */}
-      <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:50,pointerEvents:showCompress?'auto':'none'}}>
-        <div onClick={()=>setShowCompress(false)} style={{position:'absolute',top:0,left:0,right:0,bottom:0,background:'rgba(26,26,26,0.4)',opacity:showCompress?1:0,transition:'opacity .3s'}}/>
-        <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,borderRadius:'20px 20px 0 0',transform:showCompress?'translateY(0)':'translateY(100%)',transition:'transform .3s ease-out',maxHeight:'80%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-          <div style={{display:'flex',justifyContent:'center',padding:'8px 0 4px'}}><div style={{width:32,height:4,borderRadius:2,background:'#E8EAF8'}}/></div>
-          <div style={{padding:'0 20px 24px',overflowY:'auto'}}>
-            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:4}}>
-              <div>
-                <div style={{fontSize:16,fontWeight:600,color:WW.primaryDark}}>Compress Workout</div>
-                <div style={{fontSize:13,color:WW.textSec,marginTop:3,lineHeight:1.4}}>Removes accessory exercises. You can undo before confirming.</div>
+      function SessionRow({ s }) {
+        const isRest = s.status === "rest";
+        const statusColor = {
+          completed: WW.teal,
+          done: WW.teal,
+          today: WW.primary,
+          scheduled: WW.border,
+          rest: WW.border,
+          missed: WW.amber,
+        }[s.status];
+        return (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "9px 0",
+              borderBottom: `0.5px solid #F2F2F7`,
+            }}
+          >
+            <div
+              style={{
+                width: 3,
+                height: 36,
+                borderRadius: 2,
+                background: statusColor,
+                flexShrink: 0,
+              }}
+            />
+            <div style={{ flex: 1 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: isRest ? WW.textSec : WW.text,
+                }}
+              >
+                {isRest ? "Rest Day" : s.session}
               </div>
-              <button onClick={()=>setShowCompress(false)} style={{background:'none',border:'none',cursor:'pointer',padding:4,marginLeft:8,flexShrink:0}}><Icon name="x" size={20} color={WW.textSec}/></button>
+              {!isRest && s.exercises.length > 0 && (
+                <div style={{ fontSize: 11, color: WW.textSec }}>
+                  {s.exercises.length} exercises
+                </div>
+              )}
             </div>
-            <div style={{fontSize:10,fontWeight:600,color:WW.textSec,letterSpacing:.5,textTransform:'uppercase',marginTop:14,marginBottom:8}}>Session after compress</div>
-            {emptyState?(
-              <div style={{textAlign:'center',padding:'20px 0'}}><Icon name="info" size={18} color={WW.textSec} style={{marginBottom:8}}/><div style={{fontSize:13,color:WW.textSec,lineHeight:1.5}}>Your session is already at minimum. Nothing more can be removed.</div></div>
-            ):(
-              <div style={{background:WW.card,borderRadius:12,padding:'10px 13px',border:`0.5px solid ${WW.border}`,marginBottom:10}}>
-                {[{n:'Bench Press',s:'4×8',r:false},{n:'Incline DB Press',s:'3×10',r:false},{n:'Overhead Press',s:'3×10',r:false},{n:'Lateral Raise',s:'3×15',r:true},{n:'Tricep Pushdown',s:'3×12',r:true}].map((e,i)=>(
-                  <div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 0',borderBottom:i<4?'0.5px solid #F2F2F7':'none'}}>
-                    {e.r?<Icon name="x" size={13} color="#EF4444"/>:<Icon name="check" size={13} color="#22C55E"/>}
-                    <span style={{flex:1,fontSize:13,color:e.r?'#EF4444':WW.text,textDecoration:e.r?'line-through':'none'}}>{e.n}</span>
-                    {e.r?<span style={{fontSize:10,background:'#FEE2E2',color:'#EF4444',padding:'2px 6px',borderRadius:8,flexShrink:0}}>Accessory — removed</span>:<span style={{fontSize:12,color:WW.textSec}}>{e.s}</span>}
+            {(s.status === "completed" || s.status === "done") && (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" fill={WW.tealBg} />
+                <path
+                  d="M8 12l3 3 5-5"
+                  stroke={WW.teal}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            )}
+            {s.status === "today" && (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: WW.primary,
+                  background: WW.chipBg,
+                  padding: "3px 8px",
+                  borderRadius: 10,
+                }}
+              >
+                TODAY
+              </span>
+            )}
+            {s.status === "missed" && (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: WW.amber,
+                  background: WW.amberBg,
+                  padding: "3px 8px",
+                  borderRadius: 10,
+                }}
+              >
+                MISSED
+              </span>
+            )}
+          </div>
+        );
+      }
+
+      function App() {
+        const [weekIdx, setWeekIdx] = React.useState(1); // default = Week 2 (current)
+        const [showCompress, setShowCompress] = React.useState(false);
+        const [showBreak, setShowBreak] = React.useState(false);
+        const [compressConfirmed, setCompressConfirmed] = React.useState(false);
+        const [breakActive, setBreakActive] = React.useState(false);
+        const [breakDays, setBreakDays] = React.useState(3);
+        const [emptyState, setEmptyState] = React.useState(false);
+        const [toast, setToast] = React.useState(null);
+
+        function showToastMsg(msg) {
+          setToast(msg);
+          setTimeout(() => setToast(null), 3000);
+        }
+        function confirmCompress() {
+          setShowCompress(false);
+          setCompressConfirmed(true);
+          showToastMsg("Session compressed — 2 exercises removed. Good luck!");
+        }
+        function startBreak() {
+          setShowBreak(false);
+          setBreakActive(true);
+          showToastMsg("Break Mode active. Plan paused.");
+        }
+        function endBreak() {
+          if (window.confirm("End break mode now?")) setBreakActive(false);
+        }
+
+        const PROTO_TODAY = new Date(2026, 4, 14);
+        function resumeDate(days) {
+          const d = new Date(PROTO_TODAY);
+          d.setDate(d.getDate() + days + 1);
+          return d.toLocaleDateString("en-US", {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+          });
+        }
+
+        function DayCircle({ w }) {
+          const s = w.state;
+          const isCompressed = s === "today" && compressConfirmed;
+          let bg,
+            content,
+            border = "none";
+          if (isCompressed) {
+            bg = "#E6EAFE";
+            content = <Icon name="scissors" size={11} color={WW.primary} />;
+            border = `1px solid ${WW.primary}`;
+          } else if (s === "done" || s === "completed") {
+            bg = WW.teal;
+            content = <Icon name="check" size={13} color="#fff" />;
+          } else if (s === "today") {
+            bg = WW.primary;
+            content = (
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>
+                4
+              </span>
+            );
+          } else if (s === "missed") {
+            bg = "#FEF3C7";
+            content = <Icon name="x" size={11} color={WW.amber} />;
+            border = `1px solid ${WW.amber}`;
+          } else if (s === "rest") {
+            bg: "#F7F8FF";
+            content = <Icon name="minus" size={11} color={WW.border} />;
+            border = `1px solid ${WW.border}`;
+            bg = "#F7F8FF";
+          } else {
+            bg = WW.card;
+            content = (
+              <span style={{ fontSize: 11, color: WW.textSec }}>{w.day}</span>
+            );
+            border = `1px solid ${WW.border}`;
+          }
+          return (
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                background: bg,
+                border,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              {content}
+            </div>
+          );
+        }
+
+        const currentWeek = WEEKS_DATA[weekIdx];
+
+        return (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              background: WW.bg,
+              fontFamily: "'Inter',system-ui,sans-serif",
+              position: "relative",
+            }}
+          >
+            <StatusBar />
+
+            {/* Top bar */}
+            <div
+              style={{
+                height: 52,
+                display: "flex",
+                alignItems: "center",
+                padding: "0 16px",
+                background: WW.card,
+                borderBottom: "0.5px solid #E8EAF8",
+                flexShrink: 0,
+                position: "relative",
+              }}
+            >
+              <a
+                href="S-10-Plans-Hub.html"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 34,
+                  height: 34,
+                  borderRadius: 10,
+                  background: WW.elevated,
+                  textDecoration: "none",
+                  flexShrink: 0,
+                }}
+              >
+                <Icon name="chevron-left" size={18} color={WW.textSec} />
+              </a>
+              <div
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 700,
+                    color: WW.primaryDark,
+                  }}
+                >
+                  Beginner Push-Pull-Legs
+                </div>
+              </div>
+              <button
+                onClick={() => alert("Plan menu")}
+                style={{
+                  marginLeft: "auto",
+                  width: 34,
+                  height: 34,
+                  borderRadius: 10,
+                  background: WW.elevated,
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                }}
+              >
+                <Icon name="more-horizontal" size={16} color={WW.textSec} />
+              </button>
+            </div>
+
+            {/* Premium banner */}
+            <div
+              style={{
+                height: 34,
+                background: "#FFFBEB",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                borderBottom: "0.5px solid #FDE68A",
+                flexShrink: 0,
+              }}
+            >
+              <Icon name="star" size={13} color={WW.amber} />
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#92400E" }}>
+                Premium plan features active
+              </span>
+            </div>
+
+            {/* Scroll body */}
+            <div
+              style={{
+                flex: 1,
+                overflowY: "auto",
+                padding: "12px 16px 0",
+                paddingBottom: 168,
+              }}
+            >
+              {/* Plan overview */}
+              <div
+                style={{
+                  background: WW.card,
+                  borderRadius: 14,
+                  padding: "12px 14px",
+                  border: `0.5px solid ${WW.border}`,
+                  boxShadow: WW.shadow,
+                  marginBottom: 12,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 4,
+                  }}
+                >
+                  <div
+                    style={{ fontSize: 13, fontWeight: 700, color: WW.text }}
+                  >
+                    Day 12 of 36 · Week 2 of 9
+                  </div>
+                  <div
+                    style={{ fontSize: 13, fontWeight: 700, color: WW.primary }}
+                  >
+                    33%
+                  </div>
+                </div>
+                <div
+                  style={{
+                    height: 8,
+                    borderRadius: 4,
+                    background: WW.elevated,
+                    overflow: "hidden",
+                    marginBottom: 6,
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      width: "33%",
+                      background: `linear-gradient(90deg,${WW.primary},${WW.lavender})`,
+                      borderRadius: 4,
+                    }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: 14 }}>
+                  <div style={{ fontSize: 11, color: WW.textSec }}>
+                    <span style={{ fontWeight: 700, color: WW.teal }}>9</span>{" "}
+                    completed
+                  </div>
+                  <div style={{ fontSize: 11, color: WW.textSec }}>
+                    <span style={{ fontWeight: 700, color: WW.amber }}>1</span>{" "}
+                    missed
+                  </div>
+                  <div style={{ fontSize: 11, color: WW.textSec }}>
+                    <span style={{ fontWeight: 700, color: WW.textSec }}>
+                      26
+                    </span>{" "}
+                    remaining
+                  </div>
+                </div>
+              </div>
+
+              {/* Missed alert */}
+              <a
+                href="S-45-Missed-Workout-Checkin.html"
+                style={{
+                  textDecoration: "none",
+                  display: "block",
+                  marginBottom: 12,
+                }}
+              >
+                <div
+                  style={{
+                    background: "#FEF3C7",
+                    borderRadius: 14,
+                    padding: "11px 13px",
+                    border: "0.5px solid #FDE68A",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <Icon
+                    name="triangle-alert"
+                    size={17}
+                    color={WW.amber}
+                    style={{ flexShrink: 0 }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "#92400E",
+                      }}
+                    >
+                      Missed: Day 3 on Wednesday
+                    </div>
+                    <div
+                      style={{ fontSize: 12, color: "#B45309", marginTop: 1 }}
+                    >
+                      Tap to log what happened and adjust your plan.
+                    </div>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: WW.amber,
+                      flexShrink: 0,
+                    }}
+                  >
+                    Check in →
+                  </span>
+                </div>
+              </a>
+
+              {/* Premium adaptive controls or break banner */}
+              {breakActive ? (
+                <div
+                  style={{
+                    background: "#F0EEFE",
+                    borderRadius: 12,
+                    padding: "11px 13px",
+                    border: "0.5px solid #D8D0F4",
+                    marginBottom: 12,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <Icon
+                    name="pause"
+                    size={15}
+                    color={WW.lavender}
+                    style={{ flexShrink: 0 }}
+                  />
+                  <div
+                    style={{
+                      flex: 1,
+                      fontSize: 13,
+                      color: WW.lavenderDark,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    Break Mode active · {breakDays} days remaining · Resumes{" "}
+                    {resumeDate(breakDays)}
+                  </div>
+                  <button
+                    onClick={endBreak}
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: WW.primary,
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                      flexShrink: 0,
+                      padding: 0,
+                    }}
+                  >
+                    End early
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
+                    <button
+                      onClick={() => setShowCompress(true)}
+                      style={{
+                        flex: 1,
+                        height: 42,
+                        borderRadius: 12,
+                        background: WW.elevated,
+                        border: `1px solid ${WW.primary}`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 5,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        padding: "0 8px",
+                      }}
+                    >
+                      <Icon name="scissors" size={14} color={WW.primary} />
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: WW.primary,
+                        }}
+                      >
+                        Compress
+                      </span>
+                      <GoldPill />
+                    </button>
+                    <button
+                      onClick={() => setShowBreak(true)}
+                      style={{
+                        flex: 1,
+                        height: 42,
+                        borderRadius: 12,
+                        background: WW.elevated,
+                        border: `1px solid ${WW.lavender}`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 5,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        padding: "0 8px",
+                      }}
+                    >
+                      <Icon name="pause-circle" size={14} color={WW.lavender} />
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: WW.lavender,
+                        }}
+                      >
+                        Break Mode
+                      </span>
+                      <GoldPill />
+                    </button>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      color: WW.textSec,
+                      fontStyle: "italic",
+                      textAlign: "center",
+                      marginBottom: 12,
+                    }}
+                  >
+                    Compress shortens today's session. Break Mode pauses your
+                    plan 1–14 days.
+                  </div>
+                </>
+              )}
+
+              {/* This week calendar */}
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: WW.text,
+                  marginBottom: 8,
+                }}
+              >
+                This week
+              </div>
+              <div
+                style={{
+                  background: WW.card,
+                  borderRadius: 12,
+                  padding: "10px 8px",
+                  border: `0.5px solid ${WW.border}`,
+                  boxShadow: WW.shadow,
+                  marginBottom: 12,
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                {THIS_WEEK.map((w, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 3,
+                      width: 38,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        color: WW.textSec,
+                      }}
+                    >
+                      {w.day}
+                    </span>
+                    <DayCircle w={w} />
+                    <span
+                      style={{
+                        fontSize: 8,
+                        color: WW.textSec,
+                        textAlign: "center",
+                        lineHeight: 1.2,
+                        maxWidth: 36,
+                      }}
+                    >
+                      {w.label}
+                    </span>
                   </div>
                 ))}
               </div>
+
+              {/* Today's session */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 8,
+                }}
+              >
+                <span style={{ fontSize: 14, fontWeight: 600, color: WW.text }}>
+                  Today — Thursday
+                </span>
+                <span
+                  style={{
+                    background: "#E6EAFE",
+                    color: WW.primary,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    padding: "3px 8px",
+                    borderRadius: 20,
+                  }}
+                >
+                  Day 4
+                </span>
+              </div>
+
+              {breakActive ? (
+                <div
+                  style={{
+                    background: "#F0EEFE",
+                    borderRadius: 14,
+                    padding: "20px",
+                    border: "0.5px solid #D8D0F4",
+                    marginBottom: 16,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <Icon name="moon" size={36} color={WW.lavender} />
+                  <div
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 600,
+                      color: WW.lavender,
+                      textAlign: "center",
+                    }}
+                  >
+                    Plan paused · Enjoy your break
+                  </div>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    background: WW.card,
+                    borderRadius: 14,
+                    padding: "13px 14px",
+                    border: `0.5px solid ${WW.border}`,
+                    boxShadow: WW.shadow,
+                    marginBottom: 16,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: WW.text,
+                      marginBottom: 5,
+                    }}
+                  >
+                    Day 4
+                    {compressConfirmed && (
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 500,
+                          color: WW.primary,
+                        }}
+                      >
+                        {" "}
+                        (Compressed)
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 10,
+                      marginBottom: 10,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {[
+                      { icon: "clock", t: "45 min est." },
+                      { icon: "dumbbell", t: "5 exercises" },
+                      { icon: "tag", t: "Chest · Shoulders" },
+                    ].map((m, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 4,
+                        }}
+                      >
+                        <Icon name={m.icon} size={11} color={WW.textSec} />
+                        <span style={{ fontSize: 11, color: WW.textSec }}>
+                          {m.t}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  {TODAY_EXERCISES.map((e) => {
+                    const removed = compressConfirmed && e.accessory;
+                    return (
+                      <div
+                        key={e.id}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          padding: "5px 0",
+                          borderBottom: "0.5px solid #F2F2F7",
+                          opacity: removed ? 0.4 : 1,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 22,
+                            height: 22,
+                            borderRadius: 7,
+                            background: WW.elevated,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 10,
+                            fontWeight: 700,
+                            color: WW.textSec,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {e.id}
+                        </div>
+                        <span
+                          style={{
+                            flex: 1,
+                            fontSize: 13,
+                            color: WW.text,
+                            textDecoration: removed ? "line-through" : "none",
+                          }}
+                        >
+                          {e.name}
+                        </span>
+                        {e.accessory && (
+                          <span
+                            style={{
+                              fontSize: 9,
+                              fontWeight: 500,
+                              background: "#FEF3C7",
+                              color: WW.amber,
+                              padding: "2px 5px",
+                              borderRadius: 6,
+                            }}
+                          >
+                            Accessory
+                          </span>
+                        )}
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: WW.textSec,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {e.sets}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Week tabs */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: 6,
+                  overflowX: "auto",
+                  marginBottom: 10,
+                  paddingBottom: 2,
+                }}
+              >
+                {WEEKS_DATA.map((w, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setWeekIdx(i)}
+                    style={{
+                      padding: "6px 14px",
+                      borderRadius: 20,
+                      border: `1.5px solid ${weekIdx === i ? WW.primary : WW.border}`,
+                      background: weekIdx === i ? WW.chipBg : "transparent",
+                      color: weekIdx === i ? WW.primary : WW.textSec,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      flexShrink: 0,
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    Week {w.week}
+                  </button>
+                ))}
+                <div
+                  style={{
+                    padding: "6px 11px",
+                    borderRadius: 20,
+                    border: `1.5px dashed ${WW.border}`,
+                    color: WW.textSec,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    flexShrink: 0,
+                  }}
+                >
+                  +6 more
+                </div>
+              </div>
+
+              {/* Session rows */}
+              <div
+                style={{
+                  background: WW.card,
+                  borderRadius: 14,
+                  border: `0.5px solid ${WW.border}`,
+                  padding: "4px 12px",
+                  boxShadow: WW.shadow,
+                  marginBottom: 20,
+                }}
+              >
+                {currentWeek.days.map((s, i) => (
+                  <SessionRow key={i} s={s} />
+                ))}
+              </div>
+
+              {/* Plan options */}
+              <div
+                style={{
+                  background: WW.card,
+                  borderRadius: 14,
+                  border: `0.5px solid ${WW.border}`,
+                  boxShadow: WW.shadow,
+                  overflow: "hidden",
+                  marginBottom: 8,
+                }}
+              >
+                <button
+                  onClick={() => alert("Restart plan from Day 1?")}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "13px 14px",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    borderBottom: "0.5px solid #F2F2F7",
+                  }}
+                >
+                  <Icon name="rotate-ccw" size={15} color={WW.textSec} />
+                  <span
+                    style={{
+                      flex: 1,
+                      textAlign: "left",
+                      fontSize: 13,
+                      color: WW.text,
+                    }}
+                  >
+                    Restart plan from Day 1
+                  </span>
+                  <Icon name="chevron-right" size={15} color={WW.textSec} />
+                </button>
+                <button
+                  onClick={() => alert("Stop tracking this plan?")}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "13px 14px",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  <Icon name="x-circle" size={15} color="#EF4444" />
+                  <span
+                    style={{
+                      flex: 1,
+                      textAlign: "left",
+                      fontSize: 13,
+                      color: "#EF4444",
+                    }}
+                  >
+                    Stop tracking this plan
+                  </span>
+                  <Icon name="chevron-right" size={15} color="#EF4444" />
+                </button>
+              </div>
+            </div>
+
+            {/* Action bar */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: 84,
+                left: 0,
+                right: 0,
+                padding: "10px 16px",
+                background: WW.card,
+                borderTop: `0.5px solid ${WW.border}`,
+                display: "flex",
+                gap: 8,
+                zIndex: 20,
+              }}
+            >
+              <a
+                href="S-17-Gym-Session-Active.html"
+                style={{
+                  flex: 2,
+                  height: 46,
+                  borderRadius: 12,
+                  background: WW.primary,
+                  color: "#fff",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 3px 12px rgba(108,126,232,.35)",
+                }}
+              >
+                Start Today's Session
+              </a>
+              <button
+                onClick={() => alert("Marked as rest day.")}
+                style={{
+                  flex: 1,
+                  height: 46,
+                  borderRadius: 12,
+                  border: `1.5px solid ${WW.border}`,
+                  background: "transparent",
+                  color: WW.textSec,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
+              >
+                Mark Rest
+              </button>
+              <button
+                onClick={() => alert("Day skipped.")}
+                style={{
+                  flex: 1,
+                  height: 46,
+                  borderRadius: 12,
+                  border: `1.5px solid ${WW.border}`,
+                  background: "transparent",
+                  color: WW.textSec,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
+              >
+                Skip Day
+              </button>
+            </div>
+
+            <BottomNav />
+
+            {/* ── COMPRESS MODAL ── */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 50,
+                pointerEvents: showCompress ? "auto" : "none",
+              }}
+            >
+              <div
+                onClick={() => setShowCompress(false)}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: "rgba(26,26,26,0.4)",
+                  opacity: showCompress ? 1 : 0,
+                  transition: "opacity .3s",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: WW.card,
+                  borderRadius: "20px 20px 0 0",
+                  transform: showCompress
+                    ? "translateY(0)"
+                    : "translateY(100%)",
+                  transition: "transform .3s ease-out",
+                  maxHeight: "80%",
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    padding: "8px 0 4px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 32,
+                      height: 4,
+                      borderRadius: 2,
+                      background: "#E8EAF8",
+                    }}
+                  />
+                </div>
+                <div style={{ padding: "0 20px 24px", overflowY: "auto" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      justifyContent: "space-between",
+                      marginBottom: 4,
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 16,
+                          fontWeight: 600,
+                          color: WW.primaryDark,
+                        }}
+                      >
+                        Compress Workout
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 13,
+                          color: WW.textSec,
+                          marginTop: 3,
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        Removes accessory exercises. You can undo before
+                        confirming.
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setShowCompress(false)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 4,
+                        marginLeft: 8,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Icon name="x" size={20} color={WW.textSec} />
+                    </button>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 600,
+                      color: WW.textSec,
+                      letterSpacing: 0.5,
+                      textTransform: "uppercase",
+                      marginTop: 14,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Session after compress
+                  </div>
+                  {emptyState ? (
+                    <div style={{ textAlign: "center", padding: "20px 0" }}>
+                      <Icon
+                        name="info"
+                        size={18}
+                        color={WW.textSec}
+                        style={{ marginBottom: 8 }}
+                      />
+                      <div
+                        style={{
+                          fontSize: 13,
+                          color: WW.textSec,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        Your session is already at minimum. Nothing more can be
+                        removed.
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        background: WW.card,
+                        borderRadius: 12,
+                        padding: "10px 13px",
+                        border: `0.5px solid ${WW.border}`,
+                        marginBottom: 10,
+                      }}
+                    >
+                      {[
+                        { n: "Bench Press", s: "4×8", r: false },
+                        { n: "Incline DB Press", s: "3×10", r: false },
+                        { n: "Overhead Press", s: "3×10", r: false },
+                        { n: "Lateral Raise", s: "3×15", r: true },
+                        { n: "Tricep Pushdown", s: "3×12", r: true },
+                      ].map((e, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            padding: "6px 0",
+                            borderBottom:
+                              i < 4 ? "0.5px solid #F2F2F7" : "none",
+                          }}
+                        >
+                          {e.r ? (
+                            <Icon name="x" size={13} color="#EF4444" />
+                          ) : (
+                            <Icon name="check" size={13} color="#22C55E" />
+                          )}
+                          <span
+                            style={{
+                              flex: 1,
+                              fontSize: 13,
+                              color: e.r ? "#EF4444" : WW.text,
+                              textDecoration: e.r ? "line-through" : "none",
+                            }}
+                          >
+                            {e.n}
+                          </span>
+                          {e.r ? (
+                            <span
+                              style={{
+                                fontSize: 10,
+                                background: "#FEE2E2",
+                                color: "#EF4444",
+                                padding: "2px 6px",
+                                borderRadius: 8,
+                                flexShrink: 0,
+                              }}
+                            >
+                              Accessory — removed
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: 12, color: WW.textSec }}>
+                              {e.s}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      background: "#DCFCE7",
+                      borderRadius: 10,
+                      padding: "8px 12px",
+                      marginBottom: 14,
+                    }}
+                  >
+                    <Icon name="clock" size={13} color="#22C55E" />
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color: "#22C55E",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Saves approximately 12 minutes
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <button
+                      onClick={() => setShowCompress(false)}
+                      style={{
+                        flex: 1,
+                        height: 46,
+                        borderRadius: 12,
+                        border: `1.5px solid ${WW.primary}`,
+                        background: "transparent",
+                        color: WW.primary,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                      }}
+                    >
+                      Undo — keep original
+                    </button>
+                    <button
+                      onClick={confirmCompress}
+                      style={{
+                        flex: 1,
+                        height: 46,
+                        borderRadius: 12,
+                        border: "none",
+                        background: WW.primary,
+                        color: "#fff",
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                      }}
+                    >
+                      Confirm Compress
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setEmptyState(!emptyState)}
+                    style={{
+                      display: "block",
+                      margin: "10px auto 0",
+                      fontSize: 11,
+                      color: WW.textSec,
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    Toggle empty state (demo)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* ── BREAK MODE MODAL ── */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 50,
+                pointerEvents: showBreak ? "auto" : "none",
+              }}
+            >
+              <div
+                onClick={() => setShowBreak(false)}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: "rgba(26,26,26,0.4)",
+                  opacity: showBreak ? 1 : 0,
+                  transition: "opacity .3s",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: WW.card,
+                  borderRadius: "20px 20px 0 0",
+                  transform: showBreak ? "translateY(0)" : "translateY(100%)",
+                  transition: "transform .3s ease-out",
+                  maxHeight: "75%",
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    padding: "8px 0 4px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 32,
+                      height: 4,
+                      borderRadius: 2,
+                      background: "#E8EAF8",
+                    }}
+                  />
+                </div>
+                <div style={{ padding: "0 20px 24px", overflowY: "auto" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 4,
+                    }}
+                  >
+                    <Icon name="pause-circle" size={20} color={WW.lavender} />
+                    <span
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 600,
+                        color: WW.primaryDark,
+                      }}
+                    >
+                      Break Mode
+                    </span>
+                    <button
+                      onClick={() => setShowBreak(false)}
+                      style={{
+                        marginLeft: "auto",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 4,
+                      }}
+                    >
+                      <Icon name="x" size={20} color={WW.textSec} />
+                    </button>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: WW.textSec,
+                      lineHeight: 1.4,
+                      marginBottom: 14,
+                    }}
+                  >
+                    Pause your plan without losing progress. All notifications
+                    pause during your break.
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: WW.text,
+                      marginBottom: 10,
+                    }}
+                  >
+                    How many days do you need?
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 18,
+                      marginBottom: 4,
+                    }}
+                  >
+                    <button
+                      onClick={() => setBreakDays((d) => Math.max(1, d - 1))}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 4,
+                      }}
+                    >
+                      <Icon name="minus-circle" size={28} color={WW.lavender} />
+                    </button>
+                    <div style={{ textAlign: "center", minWidth: 60 }}>
+                      <div
+                        style={{
+                          fontSize: 36,
+                          fontWeight: 700,
+                          color: WW.primaryDark,
+                          lineHeight: 1,
+                        }}
+                      >
+                        {breakDays}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 14,
+                          color: WW.textSec,
+                          marginTop: 3,
+                        }}
+                      >
+                        days
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setBreakDays((d) => Math.min(14, d + 1))}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 4,
+                      }}
+                    >
+                      <Icon name="plus-circle" size={28} color={WW.lavender} />
+                    </button>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: WW.textSec,
+                      textAlign: "center",
+                      marginBottom: 12,
+                    }}
+                  >
+                    Maximum 14 days
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      background: "#F0EEFE",
+                      borderRadius: 12,
+                      padding: "9px 13px",
+                      marginBottom: 12,
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Icon name="calendar" size={13} color={WW.lavender} />
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color: WW.lavenderDark,
+                        fontWeight: 500,
+                      }}
+                    >
+                      Your plan resumes on {resumeDate(breakDays)}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      background: WW.elevated,
+                      borderRadius: 12,
+                      padding: "11px 13px",
+                      marginBottom: 14,
+                      display: "flex",
+                      gap: 10,
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <Icon
+                      name="info"
+                      size={13}
+                      color={WW.primary}
+                      style={{ marginTop: 1, flexShrink: 0 }}
+                    />
+                    <span
+                      style={{ fontSize: 13, color: WW.text, lineHeight: 1.5 }}
+                    >
+                      Your progress is safe. Day 12 stays saved. All
+                      notifications pause until you return.
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <button
+                      onClick={() => setShowBreak(false)}
+                      style={{
+                        flex: 1,
+                        height: 46,
+                        borderRadius: 12,
+                        border: `1.5px solid ${WW.lavender}`,
+                        background: "transparent",
+                        color: WW.lavender,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={startBreak}
+                      style={{
+                        flex: 1,
+                        height: 46,
+                        borderRadius: 12,
+                        border: "none",
+                        background: WW.lavender,
+                        color: "#fff",
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                      }}
+                    >
+                      Start Break
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Toast */}
+            {toast && (
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 168,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "#1C1C2E",
+                  color: "#fff",
+                  padding: "10px 16px",
+                  borderRadius: 20,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  whiteSpace: "nowrap",
+                  zIndex: 80,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  animation: "toastIn .3s ease",
+                }}
+              >
+                <Icon name="check-circle" size={14} color="#22C55E" />
+                {toast}
+              </div>
             )}
-            <div style={{display:'flex',alignItems:'center',gap:6,background:'#DCFCE7',borderRadius:10,padding:'8px 12px',marginBottom:14}}>
-              <Icon name="clock" size={13} color="#22C55E"/><span style={{fontSize:13,color:'#22C55E',fontWeight:500}}>Saves approximately 12 minutes</span>
-            </div>
-            <div style={{display:'flex',gap:10}}>
-              <button onClick={()=>setShowCompress(false)} style={{flex:1,height:46,borderRadius:12,border:`1.5px solid ${WW.primary}`,background:'transparent',color:WW.primary,fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Undo — keep original</button>
-              <button onClick={confirmCompress} style={{flex:1,height:46,borderRadius:12,border:'none',background:WW.primary,color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Confirm Compress</button>
-            </div>
-            <button onClick={()=>setEmptyState(!emptyState)} style={{display:'block',margin:'10px auto 0',fontSize:11,color:WW.textSec,background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>Toggle empty state (demo)</button>
           </div>
-        </div>
-      </div>
-
-      {/* ── BREAK MODE MODAL ── */}
-      <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,zIndex:50,pointerEvents:showBreak?'auto':'none'}}>
-        <div onClick={()=>setShowBreak(false)} style={{position:'absolute',top:0,left:0,right:0,bottom:0,background:'rgba(26,26,26,0.4)',opacity:showBreak?1:0,transition:'opacity .3s'}}/>
-        <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,borderRadius:'20px 20px 0 0',transform:showBreak?'translateY(0)':'translateY(100%)',transition:'transform .3s ease-out',maxHeight:'75%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-          <div style={{display:'flex',justifyContent:'center',padding:'8px 0 4px'}}><div style={{width:32,height:4,borderRadius:2,background:'#E8EAF8'}}/></div>
-          <div style={{padding:'0 20px 24px',overflowY:'auto'}}>
-            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
-              <Icon name="pause-circle" size={20} color={WW.lavender}/>
-              <span style={{fontSize:16,fontWeight:600,color:WW.primaryDark}}>Break Mode</span>
-              <button onClick={()=>setShowBreak(false)} style={{marginLeft:'auto',background:'none',border:'none',cursor:'pointer',padding:4}}><Icon name="x" size={20} color={WW.textSec}/></button>
-            </div>
-            <div style={{fontSize:13,color:WW.textSec,lineHeight:1.4,marginBottom:14}}>Pause your plan without losing progress. All notifications pause during your break.</div>
-            <div style={{fontSize:14,fontWeight:600,color:WW.text,marginBottom:10}}>How many days do you need?</div>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:18,marginBottom:4}}>
-              <button onClick={()=>setBreakDays(d=>Math.max(1,d-1))} style={{background:'none',border:'none',cursor:'pointer',padding:4}}><Icon name="minus-circle" size={28} color={WW.lavender}/></button>
-              <div style={{textAlign:'center',minWidth:60}}><div style={{fontSize:36,fontWeight:700,color:WW.primaryDark,lineHeight:1}}>{breakDays}</div><div style={{fontSize:14,color:WW.textSec,marginTop:3}}>days</div></div>
-              <button onClick={()=>setBreakDays(d=>Math.min(14,d+1))} style={{background:'none',border:'none',cursor:'pointer',padding:4}}><Icon name="plus-circle" size={28} color={WW.lavender}/></button>
-            </div>
-            <div style={{fontSize:11,color:WW.textSec,textAlign:'center',marginBottom:12}}>Maximum 14 days</div>
-            <div style={{display:'flex',alignItems:'center',gap:8,background:'#F0EEFE',borderRadius:12,padding:'9px 13px',marginBottom:12,justifyContent:'center'}}>
-              <Icon name="calendar" size={13} color={WW.lavender}/><span style={{fontSize:13,color:WW.lavenderDark,fontWeight:500}}>Your plan resumes on {resumeDate(breakDays)}</span>
-            </div>
-            <div style={{background:WW.elevated,borderRadius:12,padding:'11px 13px',marginBottom:14,display:'flex',gap:10,alignItems:'flex-start'}}>
-              <Icon name="info" size={13} color={WW.primary} style={{marginTop:1,flexShrink:0}}/><span style={{fontSize:13,color:WW.text,lineHeight:1.5}}>Your progress is safe. Day 12 stays saved. All notifications pause until you return.</span>
-            </div>
-            <div style={{display:'flex',gap:10}}>
-              <button onClick={()=>setShowBreak(false)} style={{flex:1,height:46,borderRadius:12,border:`1.5px solid ${WW.lavender}`,background:'transparent',color:WW.lavender,fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Cancel</button>
-              <button onClick={startBreak} style={{flex:1,height:46,borderRadius:12,border:'none',background:WW.lavender,color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Start Break</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Toast */}
-      {toast&&<div style={{position:'absolute',bottom:168,left:'50%',transform:'translateX(-50%)',background:'#1C1C2E',color:'#fff',padding:'10px 16px',borderRadius:20,fontSize:13,fontWeight:500,whiteSpace:'nowrap',zIndex:80,display:'flex',alignItems:'center',gap:8,animation:'toastIn .3s ease'}}><Icon name="check-circle" size={14} color="#22C55E"/>{toast}</div>}
-    </div>
-  );
-}
-ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
-</script>
-</body></html>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+    </script>
+  </body>
+</html>
