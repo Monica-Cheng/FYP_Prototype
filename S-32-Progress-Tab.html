@@ -77,6 +77,11 @@ a.activity-card:active{background:#F7F8FF;}
 .weight-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid #E8EAF8;font-size:13px;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:4px 0;}
 .cal-cell{border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;position:relative;cursor:pointer;}
+#recap-restore-row{display:none;padding:12px 4px;border-bottom:.5px solid #E8EAF8;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;}
+#month-selector-row{display:none;align-items:center;justify-content:center;gap:12px;background:#fff;border-radius:12px;padding:8px 16px;margin-bottom:8px;border:.5px solid #C8C8D8;}
+.vs-pill-pos{background:#DCFCE7;color:#166534;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px;}
+.vs-pill-neg{background:#FEE2E2;color:#991B1B;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px;}
+.vs-pill-neu{background:#F2F2F7;color:#8A8A9E;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:600;}
 </style>
 </head>
 <body>
@@ -115,29 +120,33 @@ a.activity-card:active{background:#F7F8FF;}
         <div class="tab-content active" id="tab-charts">
 
           <!-- Monthly Recap Card -->
-          <div class="card card-pad" id="recap-card" style="border-color:#E6EAFE;position:relative;">
+          <div id="recap-card" class="card card-pad" style="border-color:#E6EAFE;position:relative;overflow:hidden;transition:max-height 0.3s ease,opacity 0.3s ease,margin-bottom 0.3s ease,padding-top 0.3s ease,padding-bottom 0.3s ease;max-height:400px;opacity:1;margin-bottom:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
               <div style="display:flex;align-items:center;gap:8px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#6C7EE8" stroke-width="1.6"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#6C7EE8" stroke-width="1.6" stroke-linecap="round"/></svg>
-                <span style="font-size:15px;font-weight:600;color:#3D3D5C;">April recap</span>
+                <span id="recap-card-title" style="font-size:15px;font-weight:600;color:#3D3D5C;">April recap</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="#8A8A9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <span style="font-size:12px;color:#8A8A9E;">Share</span>
-                <button onclick="document.getElementById('recap-card').style.display='none'" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;">
+                <button onclick="toggleRecapCard()" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#8A8A9E" stroke-width="1.8" stroke-linecap="round"/></svg>
                 </button>
               </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 8px;margin-bottom:12px;">
-              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#4BB8CC"/><rect x="18" y="10" width="3.5" height="7" rx="1" fill="#4BB8CC"/><rect x="8" y="11" width="8" height="5" rx="1" fill="#4BB8CC"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">12 workouts</div><div style="font-size:11px;color:#8A8A9E;">Sessions</div></div></div>
-              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#6C7EE8" stroke-width="1.6"/><path d="M12 7v5l3 3" stroke="#6C7EE8" stroke-width="1.6" stroke-linecap="round"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">8h 45m</div><div style="font-size:11px;color:#8A8A9E;">Total time</div></div></div>
-              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M23 6l-9.5 9.5-5-5L1 18" stroke="#6C7EE8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 6h6v6" stroke="#6C7EE8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">14,700 kg</div><div style="font-size:11px;color:#8A8A9E;">Volume lifted</div></div></div>
-              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#4BB8CC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">31.2 km</div><div style="font-size:11px;color:#8A8A9E;">Distance</div></div></div>
-              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#F59E0B"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">4 new PRs</div><div style="font-size:11px;color:#8A8A9E;">Records</div></div></div>
-              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><div><div style="font-size:14px;font-weight:600;color:#3D3D5C;">Chest + Back</div><div style="font-size:11px;color:#8A8A9E;">Most trained</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="3.5" height="7" rx="1" fill="#4BB8CC"/><rect x="18" y="10" width="3.5" height="7" rx="1" fill="#4BB8CC"/><rect x="8" y="11" width="8" height="5" rx="1" fill="#4BB8CC"/></svg><div><div id="recap-stat-workouts" style="font-size:14px;font-weight:600;color:#3D3D5C;">12 workouts</div><div style="font-size:11px;color:#8A8A9E;">Sessions</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#6C7EE8" stroke-width="1.6"/><path d="M12 7v5l3 3" stroke="#6C7EE8" stroke-width="1.6" stroke-linecap="round"/></svg><div><div id="recap-stat-time" style="font-size:14px;font-weight:600;color:#3D3D5C;">8h 45m</div><div style="font-size:11px;color:#8A8A9E;">Total time</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M23 6l-9.5 9.5-5-5L1 18" stroke="#6C7EE8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 6h6v6" stroke="#6C7EE8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><div id="recap-stat-volume" style="font-size:14px;font-weight:600;color:#3D3D5C;">14,700 kg</div><div style="font-size:11px;color:#8A8A9E;">Volume lifted</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#4BB8CC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><div id="recap-stat-distance" style="font-size:14px;font-weight:600;color:#3D3D5C;">31.2 km</div><div style="font-size:11px;color:#8A8A9E;">Distance</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#F59E0B"/></svg><div><div id="recap-stat-prs" style="font-size:14px;font-weight:600;color:#3D3D5C;">4 new PRs</div><div style="font-size:11px;color:#8A8A9E;">Records</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z" stroke="#8A8A9E" stroke-width="1.5" stroke-linejoin="round"/></svg><div><div id="recap-stat-muscle" style="font-size:14px;font-weight:600;color:#3D3D5C;">Chest + Back</div><div style="font-size:11px;color:#8A8A9E;">Most trained</div></div></div>
             </div>
-            <div style="text-align:right;"><a href="#" style="font-size:12px;color:#6C7EE8;text-decoration:none;font-weight:500;">View full recap &gt;</a></div>
+            <div style="text-align:right;"><a href="#" onclick="openRecapSheet();return false;" style="font-size:12px;color:#6C7EE8;text-decoration:none;font-weight:500;">View recap &gt;</a></div>
+          </div>
+          <!-- Slim restore row -->
+          <div id="recap-restore-row" onclick="toggleRecapCard()" style="display:none;padding:12px 4px;border-bottom:.5px solid #E8EAF8;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#6C7EE8" stroke-width="1.6"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#6C7EE8" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <span id="recap-restore-label" style="font-size:13px;color:#6C7EE8;font-weight:500;flex:1;">April recap</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#8A8A9E" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
 
           <!-- Time filter -->
@@ -147,6 +156,12 @@ a.activity-card:active{background:#F7F8FF;}
             <button class="filter-pill inactive" id="tf-y" onclick="setTimeFilter('y')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Y</button>
           </div>
           <div id="premium-tip" class="premium-tip">Unlock with Premium — <a href="#">Upgrade</a></div>
+          <!-- Month selector for M/Y filter -->
+          <div id="month-selector-row" style="display:none;align-items:center;justify-content:center;gap:12px;background:#fff;border-radius:12px;padding:8px 16px;margin-bottom:8px;border:.5px solid #C8C8D8;">
+            <button onclick="switchRecapMonth(-1)" style="background:none;border:none;cursor:pointer;padding:4px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#3D3D5C" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+            <span id="month-selector-label" style="font-size:14px;font-weight:600;color:#3D3D5C;min-width:100px;text-align:center;">April 2026</span>
+            <button onclick="switchRecapMonth(1)" style="background:none;border:none;cursor:pointer;padding:4px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#3D3D5C" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          </div>
 
           <!-- Sport toggle -->
           <div class="sport-row">
@@ -512,6 +527,16 @@ a.activity-card:active{background:#F7F8FF;}
         </a>
       </div>
 
+      <!-- Recap bottom sheet -->
+      <div id="recap-sheet-overlay" onclick="closeRecapSheet()" style="display:none;position:absolute;inset:0;background:rgba(10,10,18,0.4);z-index:100;border-radius:47px;"></div>
+      <div id="recap-sheet" style="position:absolute;left:0;right:0;bottom:0;background:#F7F8FF;border-radius:24px 24px 0 0;z-index:101;transform:translateY(100%);transition:transform 0.35s ease-out;max-height:90%;overflow:hidden;display:flex;flex-direction:column;">
+        <div style="padding:12px 16px 0;display:flex;justify-content:center;" onclick="event.stopPropagation()">
+          <div style="width:40px;height:4px;background:#C8C8D8;border-radius:2px;"></div>
+        </div>
+        <div onclick="event.stopPropagation()" style="overflow-y:auto;flex:1;padding:12px 16px 0;">
+          <div id="recap-sheet-content"></div>
+        </div>
+      </div>
     </div><!-- phone-inner -->
   </div><!-- phone-shell -->
 </div><!-- stage -->
@@ -701,6 +726,19 @@ function setTimeFilter(t) {
   currentTime = t;
   ['w','m','y'].forEach(x => document.getElementById('tf-'+x).className = 'filter-pill ' + (x === t ? 'active' : 'inactive'));
   document.getElementById('premium-tip').style.display = t === 'w' ? 'none' : 'block';
+  const mRow = document.getElementById('month-selector-row');
+  if (t === 'm') {
+    mRow.style.display = 'flex';
+    recapMonth = 'april';
+    document.getElementById('month-selector-label').textContent = 'April 2026';
+    updateRecapCard();
+  } else if (t === 'y') {
+    mRow.style.display = 'none';
+    updateRecapCardYear();
+  } else {
+    mRow.style.display = 'none';
+    updateRecapCard();
+  }
 }
 function setSport(s) {
   currentSport = s;
@@ -938,6 +976,176 @@ function toggleMeasurements(e) {
   e.preventDefault();
   const el = document.getElementById('measurements-expand');
   el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// ── Recap data ──────────────────────────────────────────────
+const recapData = {
+  april: { title:'April recap', workouts:'12 workouts', time:'8h 45m', volume:'14,700 kg', distance:'31.2 km', prs:'4 new PRs', muscle:'Chest + Back',
+    bestEffort:'Bench Press 80 kg × 5', split:[{label:'Gym',pct:65,col:'#6C7EE8'},{label:'Cardio',pct:28,col:'#4BB8CC'},{label:'Manual',pct:7,col:'#C8C8D8'}],
+    topMuscle:'Chest', insight:'Great month — 12 workouts and 4 PRs. Volume up 18% vs March. Keep it up!',
+    vs:{ workouts:{val:'12',prev:'10',delta:'+2',pos:true}, time:{val:'8h 45m',prev:'7h 20m',delta:'+85 min',pos:true}, volume:{val:'14,700 kg',prev:'12,400 kg',delta:'+2,300 kg',pos:true} } },
+  march: { title:'March recap', workouts:'10 workouts', time:'7h 20m', volume:'12,400 kg', distance:'24.6 km', prs:'2 new PRs', muscle:'Back + Shoulders',
+    bestEffort:'Deadlift 95 kg × 3', split:[{label:'Gym',pct:70,col:'#6C7EE8'},{label:'Cardio',pct:22,col:'#4BB8CC'},{label:'Manual',pct:8,col:'#C8C8D8'}],
+    topMuscle:'Back', insight:'Solid month — consistency building. Deadlift progress is strong. Volume slightly below target.',
+    vs:{ workouts:{val:'10',prev:'8',delta:'+2',pos:true}, time:{val:'7h 20m',prev:'6h 10m',delta:'+70 min',pos:true}, volume:{val:'12,400 kg',prev:'11,200 kg',delta:'+1,200 kg',pos:true} } },
+};
+const recapDataYear = {
+  title:'2026 year to date', workouts:'42 workouts', time:'31h 15m', volume:'54,800 kg', distance:'98.4 km', prs:'11 new PRs', muscle:'Chest + Back',
+  bestEffort:'Bench Press 80 kg × 5', split:[{label:'Gym',pct:67,col:'#6C7EE8'},{label:'Cardio',pct:26,col:'#4BB8CC'},{label:'Manual',pct:7,col:'#C8C8D8'}],
+  topMuscle:'Chest', insight:'Great start to 2026 — 42 workouts in 5 months. On track for 100+ workouts this year.',
+  vs:{ workouts:{val:'42',prev:'31',delta:'+11',pos:true}, time:{val:'31h 15m',prev:'22h 40m',delta:'+8h 35m',pos:true}, volume:{val:'54,800 kg',prev:'39,200 kg',delta:'+15,600 kg',pos:true} }
+};
+
+let isRecapHidden = false;
+let recapMonth = 'april';
+
+function vsPill(d) {
+  if (d.pos) return `<span class="vs-pill-pos">&#9650; ${d.delta}</span>`;
+  if (d.delta === '0' || d.delta === '—') return `<span class="vs-pill-neu">${d.delta}</span>`;
+  return `<span class="vs-pill-neg">&#9660; ${d.delta}</span>`;
+}
+
+function toggleRecapCard() {
+  const card = document.getElementById('recap-card');
+  const restore = document.getElementById('recap-restore-row');
+  if (!isRecapHidden) {
+    card.style.maxHeight = '0px';
+    card.style.opacity = '0';
+    card.style.marginBottom = '0px';
+    card.style.paddingTop = '0px';
+    card.style.paddingBottom = '0px';
+    restore.style.display = 'flex';
+    isRecapHidden = true;
+  } else {
+    card.style.maxHeight = '400px';
+    card.style.opacity = '1';
+    card.style.marginBottom = '8px';
+    card.style.paddingTop = '';
+    card.style.paddingBottom = '';
+    restore.style.display = 'none';
+    isRecapHidden = false;
+  }
+}
+
+function openRecapSheet() {
+  renderRecapSheet();
+  const overlay = document.getElementById('recap-sheet-overlay');
+  const sheet = document.getElementById('recap-sheet');
+  overlay.style.display = 'block';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    sheet.style.transform = 'translateY(0)';
+  }));
+}
+
+function closeRecapSheet() {
+  const sheet = document.getElementById('recap-sheet');
+  sheet.style.transform = 'translateY(100%)';
+  setTimeout(() => { document.getElementById('recap-sheet-overlay').style.display = 'none'; }, 350);
+}
+
+function switchRecapMonth(dir) {
+  const months = ['march','april'];
+  const idx = months.indexOf(recapMonth) + dir;
+  if (idx < 0 || idx >= months.length) return;
+  recapMonth = months[idx];
+  const labels = { march:'March 2026', april:'April 2026' };
+  document.getElementById('month-selector-label').textContent = labels[recapMonth];
+  updateRecapCard();
+  if (document.getElementById('recap-sheet-overlay').style.display === 'block') renderRecapSheet();
+}
+
+function sheetSwitchMonth(dir) { switchRecapMonth(dir); }
+
+function updateRecapCard() {
+  const d = recapData[recapMonth] || recapData.april;
+  document.getElementById('recap-card-title').textContent = d.title;
+  document.getElementById('recap-stat-workouts').textContent = d.workouts;
+  document.getElementById('recap-stat-time').textContent = d.time;
+  document.getElementById('recap-stat-volume').textContent = d.volume;
+  document.getElementById('recap-stat-distance').textContent = d.distance;
+  document.getElementById('recap-stat-prs').textContent = d.prs;
+  document.getElementById('recap-stat-muscle').textContent = d.muscle;
+  document.getElementById('recap-restore-label').textContent = d.title;
+}
+
+function updateRecapCardYear() {
+  const d = recapDataYear;
+  document.getElementById('recap-card-title').textContent = d.title;
+  document.getElementById('recap-stat-workouts').textContent = d.workouts;
+  document.getElementById('recap-stat-time').textContent = d.time;
+  document.getElementById('recap-stat-volume').textContent = d.volume;
+  document.getElementById('recap-stat-distance').textContent = d.distance;
+  document.getElementById('recap-stat-prs').textContent = d.prs;
+  document.getElementById('recap-stat-muscle').textContent = d.muscle;
+  document.getElementById('recap-restore-label').textContent = d.title;
+}
+
+function renderRecapSheet() {
+  const isYear = currentTime === 'y';
+  const d = isYear ? recapDataYear : (recapData[recapMonth] || recapData.april);
+  const months = ['march','april'];
+  const monthLabels = { march:'March 2026', april:'April 2026' };
+  const canPrev = !isYear && months.indexOf(recapMonth) > 0;
+  const canNext = !isYear && months.indexOf(recapMonth) < months.length - 1;
+  const splitBars = d.split.map(s => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <span style="font-size:12px;color:#8A8A9E;width:52px;">${s.label}</span>
+      <div style="flex:1;height:8px;background:#F2F2F7;border-radius:4px;overflow:hidden;">
+        <div style="width:${s.pct}%;height:100%;background:${s.col};border-radius:4px;"></div>
+      </div>
+      <span style="font-size:12px;color:#3D3D5C;font-weight:500;width:28px;text-align:right;">${s.pct}%</span>
+    </div>`).join('');
+  const vsRows = Object.entries(d.vs).map(([k,v]) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:.5px solid #E8EAF8;">
+      <span style="font-size:13px;color:#8A8A9E;text-transform:capitalize;">${k}</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;font-weight:600;color:#3D3D5C;">${v.val}</span>
+        ${vsPill(v)}
+      </div>
+    </div>`).join('');
+  document.getElementById('recap-sheet-content').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <button onclick="sheetSwitchMonth(-1)" style="background:none;border:none;cursor:pointer;padding:6px;opacity:${canPrev?1:0.3};" ${canPrev?'':'disabled'}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#3D3D5C" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <span style="font-size:16px;font-weight:700;color:#2D3A8C;">${isYear ? '2026 Year to Date' : monthLabels[recapMonth]}</span>
+      <button onclick="sheetSwitchMonth(1)" style="background:none;border:none;cursor:pointer;padding:6px;opacity:${canNext?1:0.3};" ${canNext?'':'disabled'}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#3D3D5C" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="background:#F7F8FF;border-radius:12px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:700;color:#3D3D5C;">${d.workouts.split(' ')[0]}</div><div style="font-size:11px;color:#8A8A9E;">Workouts</div></div>
+      <div style="background:#F7F8FF;border-radius:12px;padding:10px;text-align:center;"><div style="font-size:16px;font-weight:700;color:#3D3D5C;">${d.time}</div><div style="font-size:11px;color:#8A8A9E;">Time</div></div>
+      <div style="background:#F7F8FF;border-radius:12px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:700;color:#3D3D5C;">${d.prs.split(' ')[0]}</div><div style="font-size:11px;color:#8A8A9E;">New PRs</div></div>
+      <div style="background:#F7F8FF;border-radius:12px;padding:10px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#3D3D5C;">${d.volume}</div><div style="font-size:11px;color:#8A8A9E;">Volume</div></div>
+      <div style="background:#F7F8FF;border-radius:12px;padding:10px;text-align:center;"><div style="font-size:14px;font-weight:700;color:#3D3D5C;">${d.distance}</div><div style="font-size:11px;color:#8A8A9E;">Distance</div></div>
+      <div style="background:#F7F8FF;border-radius:12px;padding:10px;text-align:center;"><div style="font-size:13px;font-weight:700;color:#3D3D5C;">${d.topMuscle}</div><div style="font-size:11px;color:#8A8A9E;">Top Muscle</div></div>
+    </div>
+    <div class="card card-pad" style="margin-bottom:10px;">
+      <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:6px;">Best Effort</div>
+      <div style="font-size:15px;font-weight:700;color:#6C7EE8;">${d.bestEffort}</div>
+    </div>
+    <div class="card card-pad" style="margin-bottom:10px;">
+      <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:10px;">Activity Split</div>
+      ${splitBars}
+    </div>
+    <div class="card card-pad" style="background:#F0EEFE;border-color:#D4C9F8;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+        <div style="width:22px;height:22px;background:#9B84E8;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2l1.5 4.5L18 8l-3.5 3 1 4.5L12 13l-3.5 2.5 1-4.5L6 8l4.5-1.5z" fill="#fff"/></svg></div>
+        <span style="font-size:11px;font-weight:700;color:#7B5CB8;">WiseCoach</span>
+      </div>
+      <p style="font-size:13px;color:#5B3F9E;line-height:1.6;margin:0;">${d.insight}</p>
+    </div>
+    <div class="card card-pad" style="margin-bottom:10px;">
+      <div style="font-size:13px;font-weight:600;color:#3D3D5C;margin-bottom:4px;">vs Previous ${isYear ? 'Year' : 'Month'}</div>
+      ${vsRows}
+    </div>
+    <button onclick="closeRecapSheet()" style="width:100%;background:#6C7EE8;color:#fff;border:none;border-radius:14px;height:48px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Share recap
+    </button>
+    <div style="height:24px;"></div>
+  `;
 }
 
 // Boot

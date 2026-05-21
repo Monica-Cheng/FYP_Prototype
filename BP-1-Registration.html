@@ -106,7 +106,7 @@ function App(){
       <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:WW.bg,position:'relative'}}>
         <StatusBar/>
         <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'0 28px',textAlign:'center'}}>
-          <div style={{width:72,height:72,borderRadius:36,background:'#D1FAE5',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16,fontSize:32}}>✅</div>
+          <div style={{width:72,height:72,borderRadius:36,background:'#D1FAE5',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16,fontSize:32}}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" style={{display:'inline-block',verticalAlign:'middle'}}><path d="M5 12.5l4.2 4.2L19 7.5" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
           <div style={{fontSize:20,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>Application submitted!</div>
           <div style={{fontSize:14,color:WW.textSec,lineHeight:1.6,marginBottom:28}}>We'll review your application and notify you by email within 3–5 business days.</div>
           <a href="S-38-BP-Status.html" style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:52,borderRadius:14,background:WW.primary,color:'#fff',fontSize:15,fontWeight:700,textDecoration:'none',boxShadow:'0 4px 14px rgba(108,126,232,.3)'}}>View Application Status</a>
@@ -198,7 +198,7 @@ function App(){
 
         {attempted&&certs.some(c=>!c.name||!c.issuer||!c.expiry)&&(
           <div style={{background:'#FEE2E2',borderRadius:10,padding:'8px 12px',marginBottom:10,fontSize:12,color:'#DC2626',fontWeight:600}}>
-            ⚠️ Please complete all certification fields. Minimum 1 required.
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{display:'inline-block',verticalAlign:'-2px',marginRight:6}}><path d="M12 3l9 16H3l9-16z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/><path d="M12 9v4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/><circle cx="12" cy="16.5" r="1" fill="currentColor"/></svg>Please complete all certification fields. Minimum 1 required.
           </div>
         )}
 

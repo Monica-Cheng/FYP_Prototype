@@ -193,7 +193,7 @@ function App(){
       {deleteModal&&(
         <div style={{position:'fixed',inset:0,background:'rgba(10,10,18,.5)',zIndex:100,display:'flex',alignItems:'center',justifyContent:'center'}}>
           <div style={{background:WW.card,borderRadius:20,padding:'28px',width:400,boxShadow:'0 20px 60px rgba(20,25,60,.25)',textAlign:'center'}}>
-            <div style={{fontSize:32,marginBottom:10}}>⚠️</div>
+            <div style={{fontSize:32,marginBottom:10}}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" style={{display:'inline-block',verticalAlign:'middle'}}><path d="M12 3l9 16H3l9-16z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/><path d="M12 9v4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/><circle cx="12" cy="16.5" r="1" fill="currentColor"/></svg></div>
             <div style={{fontSize:18,fontWeight:800,color:WW.primaryDark,marginBottom:8}}>Delete account?</div>
             <div style={{fontSize:13,color:WW.textSec,marginBottom:20}}>This will permanently delete <strong>{selected?.name}</strong>'s account and all data. This cannot be undone.</div>
             <div style={{display:'flex',gap:10}}>
