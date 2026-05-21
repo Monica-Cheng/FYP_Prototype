@@ -329,7 +329,7 @@ function App(){
             <div style={{fontSize:12,color:WW.textSec,fontWeight:600,marginBottom:12}}>{filtered.length} plan{filtered.length!==1?'s':''} found</div>
             {filtered.length===0?(
               <div style={{textAlign:'center',padding:'40px 20px'}}>
-                <div style={{fontSize:40,marginBottom:12}}>🔍</div>
+                <div style={{fontSize:40,marginBottom:12}}><svg width="40" height="40" viewBox="0 0 24 24" fill="none" style={{display:'inline-block',verticalAlign:'middle'}}><circle cx="11" cy="11" r="6" stroke="currentColor" strokeWidth="1.7"/><path d="M16 16l5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg></div>
                 <div style={{fontSize:15,fontWeight:700,color:WW.primaryDark,marginBottom:6}}>No plans match</div>
                 <div style={{fontSize:13,color:WW.textSec,lineHeight:1.5}}>Try adjusting your filters or search term.</div>
                 <button onClick={clearFilters} style={{marginTop:16,padding:'10px 22px',borderRadius:12,background:WW.primary,color:'#fff',border:'none',fontSize:14,fontWeight:700,cursor:'pointer'}}>Clear Filters</button>
