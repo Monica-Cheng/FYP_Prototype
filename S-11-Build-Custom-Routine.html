@@ -9,6 +9,7 @@
   .phone-shell{width:390px;height:844px;border-radius:52px;background:#0A0A12;padding:5px;box-shadow:0 30px 70px rgba(20,25,60,.20),0 0 0 1px rgba(0,0,0,.12);position:relative;box-sizing:content-box}
   .phone-inner{width:390px;height:844px;border-radius:47px;overflow:hidden;background:#F7F8FF;position:relative}
   .island{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:33px;border-radius:20px;background:#000;z-index:60;pointer-events:none}
+  .picker-scroll::-webkit-scrollbar{display:none}
 </style>
 </head><body>
 <div class="stage">
@@ -21,7 +22,6 @@
 <script type="text/babel">
 const WW={bg:'#F7F8FF',card:'#FFFFFF',elevated:'#EEF0FB',primary:'#6C7EE8',primaryDark:'#2D3A8C',lavender:'#9B84E8',lavenderBg:'#F0EEFE',teal:'#4BB8CC',tealBg:'#E0F4F8',text:'#3D3D5C',textSec:'#8A8A9E',border:'#C8C8D8',chipBg:'#E6EAFE',gold:'#F59E0B',shadow:'0 2px 8px rgba(45,58,140,.06)'};
 
-/* ── Colour map per muscle ───────────────────────────────── */
 const MC={
   Chest:    {bg:'#EEF0FB',c:WW.primary},
   Back:     {bg:WW.tealBg,c:WW.teal},
@@ -33,7 +33,6 @@ const MC={
 };
 const mc=(m)=>MC[m]||{bg:WW.elevated,c:WW.textSec};
 
-/* ── Set types ──────────────────────────────────────────── */
 const SET_TYPES=[
   {id:'W',label:'W',color:'#8A8A9E',bg:'#F2F2F7',title:'Warmup'},
   {id:'N',label:'N',color:WW.primary,bg:WW.chipBg,title:'Normal'},
@@ -41,7 +40,6 @@ const SET_TYPES=[
 ];
 const nextType=t=>SET_TYPES[(SET_TYPES.findIndex(s=>s.id===t)+1)%SET_TYPES.length].id;
 
-/* ── Exercise library ────────────────────────────────────── */
 const MUSCLES=['All','Chest','Back','Shoulders','Arms','Legs','Core','Glutes'];
 const EXERCISE_LIBRARY=[
   {name:'Bench Press',muscle:'Chest'},{name:'Incline DB Press',muscle:'Chest'},{name:'Cable Fly',muscle:'Chest'},{name:'Dips',muscle:'Chest'},
@@ -53,43 +51,26 @@ const EXERCISE_LIBRARY=[
   {name:'Hip Thrust',muscle:'Glutes'},{name:'Glute Bridge',muscle:'Glutes'},
 ];
 
-/* ── Exercise detail data ────────────────────────────────── */
-const EX_DETAIL={
-  'Bench Press':{
-    secondary:['Triceps','Front Delts'],equipment:'Barbell',difficulty:'Intermediate',
-    desc:'Lie flat on a bench, feet firm on the floor. Grip the bar slightly wider than shoulder-width, retract your shoulder blades, and lower the bar to mid-chest with control. Press back to full extension, keeping your wrists stacked over your elbows.',
-    mistakes:['Bouncing the bar off the chest','Elbows flared out past 90°','Losing contact between back and bench','Bar path drifting toward the face'],
-  },
-  'Overhead Press':{
-    secondary:['Triceps','Upper Chest'],equipment:'Barbell',difficulty:'Intermediate',
-    desc:'Start with the bar at collarbone height, hands just outside shoulder-width. Brace your core, squeeze your glutes, and press the bar directly overhead. Move your head back slightly as the bar passes, then return it once the bar clears your forehead.',
-    mistakes:['Excessive lower back arch','Bar drifting forward rather than straight up','Not locking out elbows at the top'],
-  },
-  'Pull-up':{
-    secondary:['Biceps','Rear Delts'],equipment:'Bodyweight',difficulty:'Intermediate',
-    desc:'Hang from the bar with an overhand grip slightly wider than shoulder-width. Initiate the pull by depressing your shoulder blades and driving your elbows down toward your hips. Pull until your chin clears the bar, then lower with control.',
-    mistakes:['Kipping momentum to cheat reps','Not achieving full extension at the bottom','Shrugging the shoulders at the top'],
-  },
-};
-const DEFAULT_DETAIL={
-  secondary:['Synergists'],equipment:'Various',difficulty:'Intermediate',
-  desc:'Perform this exercise through its full range of motion with control. Focus on the target muscle group and maintain proper posture throughout the movement.',
-  mistakes:['Using momentum instead of muscle control','Rushing the eccentric (lowering) phase','Incorrect joint alignment'],
-};
+/* ── Rest timer values: Off, 5s, 10s … 5m (every 5s) ── */
+const REST_VALS = [0, ...Array.from({length:60}, (_,i)=>(i+1)*5)];
+function fmtRest(s){
+  if(s===0) return 'Off';
+  if(s<60) return `${s}s`;
+  const m=Math.floor(s/60), r=s%60;
+  return r===0?`${m}m`:`${m}m ${r}s`;
+}
 
-/* ── Initial day data ────────────────────────────────────── */
 const mk=(id,t,prev)=>({id,type:t,prev:prev||'—',kg:'',reps:'',done:false});
 const INIT_DAYS=[
   {id:1,label:'Push A',open:true,exercises:[
     {id:1,name:'Bench Press',muscle:'Chest',restTime:90,note:'',showNote:false,sets:[mk(101,'W'),mk(102,'N','80 kg × 8'),mk(103,'N','80 kg × 8'),mk(104,'N','80 kg × 8')]},
     {id:2,name:'Overhead Press',muscle:'Shoulders',restTime:60,note:'',showNote:false,sets:[mk(201,'W'),mk(202,'N','50 kg × 10'),mk(203,'N','50 kg × 10')]},
-  ],cardio:[]},
+  ]},
   {id:2,label:'Pull A',open:false,exercises:[
-    {id:3,name:'Pull-up',muscle:'Back',restTime:90,note:'',showNote:false,sets:[mk(301,'N','BW × 8'),mk(302,'N','BW × 8'),mk(303,'N','BW × 8'),mk(304,'N','BW × 8')]},
-  ],cardio:[]},
+    {id:3,name:'Pull-up',muscle:'Back',restTime:0,note:'',showNote:false,sets:[mk(301,'N','BW × 8'),mk(302,'N','BW × 8'),mk(303,'N','BW × 8'),mk(304,'N','BW × 8')]},
+  ]},
 ];
 
-/* ── StatusBar ───────────────────────────────────────────── */
 function StatusBar(){
   return(
     <div style={{height:47,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',fontSize:15,fontWeight:600,color:WW.text,flexShrink:0}}>
@@ -102,7 +83,6 @@ function StatusBar(){
   );
 }
 
-/* ── SetRow ──────────────────────────────────────────────── */
 function SetRow({s,rowNum,onUpdate,onCycleType,onToggleDone}){
   const ti=SET_TYPES.find(t=>t.id===s.type)||SET_TYPES[1];
   const rowBg=s.done?'rgba(16,185,129,0.07)':'transparent';
@@ -124,9 +104,115 @@ function SetRow({s,rowNum,onUpdate,onCycleType,onToggleDone}){
   );
 }
 
-/* ── ExerciseCard ────────────────────────────────────────── */
+/* ── RestTimerPicker ─── iOS-style drum roll ── */
+function RestTimerPicker({current, onSelect, onClose}){
+  const ITEM_H = 44;
+  const VISIBLE = 5;
+  const CONTAINER_H = ITEM_H * VISIBLE;
+  const PAD = (CONTAINER_H / 2) - (ITEM_H / 2);
+
+  const initIdx = Math.max(0, REST_VALS.indexOf(current));
+  const [selIdx, setSelIdx] = React.useState(initIdx);
+  const scrollRef = React.useRef(null);
+
+  React.useEffect(()=>{
+    if(scrollRef.current){
+      scrollRef.current.scrollTop = initIdx * ITEM_H;
+    }
+  },[]);
+
+  const handleScroll = (e) => {
+    const idx = Math.round(e.target.scrollTop / ITEM_H);
+    setSelIdx(Math.max(0, Math.min(REST_VALS.length-1, idx)));
+  };
+
+  const tapItem = (i) => {
+    setSelIdx(i);
+    scrollRef.current.scrollTo({top: i * ITEM_H, behavior:'smooth'});
+  };
+
+  const selected = REST_VALS[selIdx];
+
+  return(
+    <>
+      <div onClick={onClose} style={{position:'absolute',inset:0,background:'rgba(0,0,0,0.45)',zIndex:40}}/>
+      <div style={{position:'absolute',bottom:0,left:0,right:0,background:WW.card,borderRadius:'22px 22px 0 0',zIndex:50}}>
+        <div style={{width:36,height:4,borderRadius:2,background:WW.border,margin:'10px auto 0'}}/>
+        {/* Header */}
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 20px 4px'}}>
+          <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',fontSize:14,fontWeight:600,color:WW.textSec,fontFamily:'inherit',padding:0}}>Cancel</button>
+          <div style={{fontSize:15,fontWeight:800,color:WW.primaryDark}}>Rest Timer</div>
+          <button onClick={()=>{onSelect(selected);onClose();}} style={{background:'none',border:'none',cursor:'pointer',fontSize:14,fontWeight:700,color:WW.primary,fontFamily:'inherit',padding:0}}>Set</button>
+        </div>
+
+        {/* Drum roll picker */}
+        <div style={{position:'relative',height:CONTAINER_H,overflow:'hidden',margin:'8px 0 4px'}}>
+          {/* Selection highlight band */}
+          <div style={{position:'absolute',top:'50%',left:16,right:16,height:ITEM_H,transform:'translateY(-50%)',background:'rgba(108,126,232,0.09)',borderRadius:10,border:`1px solid rgba(108,126,232,0.18)`,pointerEvents:'none',zIndex:1}}/>
+          {/* Top fade */}
+          <div style={{position:'absolute',top:0,left:0,right:0,height:PAD,background:`linear-gradient(to bottom,${WW.card},transparent)`,pointerEvents:'none',zIndex:3}}/>
+          {/* Bottom fade */}
+          <div style={{position:'absolute',bottom:0,left:0,right:0,height:PAD,background:`linear-gradient(to top,${WW.card},transparent)`,pointerEvents:'none',zIndex:3}}/>
+          {/* Scroll container */}
+          <div
+            ref={scrollRef}
+            className="picker-scroll"
+            onScroll={handleScroll}
+            style={{
+              height:'100%',
+              overflowY:'scroll',
+              scrollSnapType:'y mandatory',
+              paddingTop:PAD,
+              paddingBottom:PAD,
+              boxSizing:'content-box',
+              scrollbarWidth:'none',
+              msOverflowStyle:'none',
+              position:'relative',
+              zIndex:2,
+            }}
+          >
+            {REST_VALS.map((v,i)=>{
+              const active = i===selIdx;
+              return(
+                <div key={v} onClick={()=>tapItem(i)} style={{
+                  height:ITEM_H,
+                  display:'flex',alignItems:'center',justifyContent:'center',
+                  scrollSnapAlign:'center',
+                  cursor:'pointer',
+                  fontSize:active?22:16,
+                  fontWeight:active?700:400,
+                  color:active?WW.primaryDark:WW.textSec,
+                  letterSpacing:active?'-0.3px':'0',
+                  transition:'font-size 0.1s,color 0.1s',
+                  userSelect:'none',
+                }}>
+                  {fmtRest(v)}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Confirm */}
+        <div style={{padding:'8px 20px 32px'}}>
+          <button onClick={()=>{onSelect(selected);onClose();}} style={{
+            width:'100%',height:52,borderRadius:14,
+            background:WW.primary,color:'#fff',
+            fontSize:16,fontWeight:700,border:'none',cursor:'pointer',
+            boxShadow:'0 4px 14px rgba(108,126,232,.35)',fontFamily:'inherit',
+          }}>
+            {selected===0?'Turn Off Rest Timer':`Confirm — Rest ${fmtRest(selected)}`}
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ── ExerciseCard ── */
 function ExerciseCard({ex,onUpdate,onDelete}){
   const [menuOpen,setMenuOpen]=React.useState(false);
+  const [showPicker,setShowPicker]=React.useState(false);
   const col=mc(ex.muscle);
 
   const updSet=(sid,f,v)=>onUpdate({...ex,sets:ex.sets.map(s=>s.id===sid?{...s,[f]:v}:s)});
@@ -142,8 +228,6 @@ function ExerciseCard({ex,onUpdate,onDelete}){
      action:()=>onUpdate({...ex,showNote:!ex.showNote}),color:WW.text},
     {label:'Add to Superset',icon:()=><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M8 6h8M8 12h8M8 18h4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/><circle cx="19" cy="18" r="3" stroke="currentColor" strokeWidth="1.7"/><path d="M19 16.5v3M17.5 18h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
      action:()=>{},color:WW.text},
-    {label:'Rest Timer',icon:()=><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" stroke="currentColor" strokeWidth="1.7"/><path d="M12 9v4l2.5 2.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/><path d="M9 3h6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>,
-     action:()=>{},color:WW.text},
     {label:'Warmup Calculator',icon:()=><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2C9 2 6 5 6 8c0 4 6 12 6 12s6-8 6-12c0-3-3-6-6-6z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/></svg>,
      action:()=>{},color:WW.text},
     {label:'Replace Exercise',icon:()=><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M17 1l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/><path d="M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/><path d="M21 13v2a4 4 0 01-4 4H3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>,
@@ -152,16 +236,16 @@ function ExerciseCard({ex,onUpdate,onDelete}){
      action:onDelete,color:'#EF4444'},
   ];
 
+  const isOff = ex.restTime === 0;
+
   return(
     <div style={{background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,marginBottom:10,position:'relative'}}>
 
       {/* ─ Header ─ */}
       <div style={{display:'flex',alignItems:'center',padding:'10px 10px 8px',gap:7}}>
-        {/* Drag handle */}
         <div style={{display:'flex',flexDirection:'column',gap:3,padding:'2px 3px',cursor:'grab',flexShrink:0,opacity:0.4}}>
           {[0,1,2].map(i=><div key={i} style={{width:14,height:2.5,borderRadius:1.5,background:WW.text}}/>)}
         </div>
-        {/* Thumbnail */}
         <div style={{width:40,height:40,borderRadius:10,background:col.bg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:`0.5px solid ${col.c}22`}}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <rect x="7" y="10" width="10" height="4" rx="2" fill={col.c} fillOpacity="0.25" stroke={col.c} strokeWidth="1.4"/>
@@ -171,16 +255,13 @@ function ExerciseCard({ex,onUpdate,onDelete}){
             <rect x="21" y="10" width="2" height="4" rx="1" fill={col.c}/>
           </svg>
         </div>
-        {/* Name */}
         <div style={{flex:1,minWidth:0}}>
           <div style={{fontSize:14,fontWeight:800,color:WW.text,marginBottom:1}}>{ex.name}</div>
           <div style={{fontSize:11,fontWeight:700,color:col.c}}>{ex.muscle}</div>
         </div>
-        {/* INFO btn */}
         <a href="S-11b-Exercise-Detail-Sheet.html" style={{width:28,height:28,borderRadius:14,border:`1.5px solid ${WW.border}`,background:'transparent',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',flexShrink:0,textDecoration:'none'}}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={WW.textSec} strokeWidth="1.6"/><path d="M12 11v5M12 8v.5" stroke={WW.textSec} strokeWidth="1.8" strokeLinecap="round"/></svg>
         </a>
-        {/* 3-dot */}
         <button onClick={()=>setMenuOpen(m=>!m)} style={{width:28,height:28,borderRadius:14,background:'transparent',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill={WW.textSec}><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
         </button>
@@ -207,9 +288,23 @@ function ExerciseCard({ex,onUpdate,onDelete}){
 
       {/* ─ Rest timer pill ─ */}
       <div style={{padding:'0 12px 6px',display:'flex',alignItems:'center',gap:6}}>
-        <div style={{display:'inline-flex',alignItems:'center',gap:5,padding:'5px 12px',borderRadius:20,background:WW.tealBg,border:`0.5px solid ${WW.teal}44`,cursor:'pointer'}}>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" stroke={WW.teal} strokeWidth="1.8"/><path d="M12 9v4l2.5 2.5" stroke={WW.teal} strokeWidth="1.6" strokeLinecap="round"/><path d="M9 3h6" stroke={WW.teal} strokeWidth="1.6" strokeLinecap="round"/></svg>
-          <span style={{fontSize:11,fontWeight:700,color:WW.teal}}>Rest {ex.restTime}s</span>
+        <div
+          onClick={()=>setShowPicker(true)}
+          style={{
+            display:'inline-flex',alignItems:'center',gap:5,padding:'5px 12px',
+            borderRadius:20,cursor:'pointer',
+            background: isOff ? WW.elevated : WW.tealBg,
+            border: isOff ? `0.5px solid ${WW.border}` : `0.5px solid ${WW.teal}44`,
+          }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="13" r="8" stroke={isOff?WW.textSec:WW.teal} strokeWidth="1.8"/>
+            <path d="M12 9v4l2.5 2.5" stroke={isOff?WW.textSec:WW.teal} strokeWidth="1.6" strokeLinecap="round"/>
+            <path d="M9 3h6" stroke={isOff?WW.textSec:WW.teal} strokeWidth="1.6" strokeLinecap="round"/>
+          </svg>
+          <span style={{fontSize:11,fontWeight:700,color:isOff?WW.textSec:WW.teal}}>
+            {isOff ? 'Rest Timer: Off' : `Rest ${fmtRest(ex.restTime)}`}
+          </span>
         </div>
       </div>
 
@@ -242,11 +337,20 @@ function ExerciseCard({ex,onUpdate,onDelete}){
             style={{width:'100%',minHeight:52,borderRadius:8,border:`1px solid ${WW.border}`,background:WW.bg,fontSize:12,color:WW.text,padding:'7px 10px',boxSizing:'border-box',outline:'none',fontFamily:'inherit',resize:'none'}}/>
         </div>
       )}
+
+      {/* ─ Rest Timer Picker overlay ─ */}
+      {showPicker&&(
+        <RestTimerPicker
+          current={ex.restTime}
+          onSelect={v=>onUpdate({...ex,restTime:v})}
+          onClose={()=>setShowPicker(false)}
+        />
+      )}
     </div>
   );
 }
 
-/* ── ExerciseSearchSheet ─────────────────────────────────── */
+/* ── ExerciseSearchSheet ── */
 function ExerciseSearchSheet({onAdd,onClose}){
   const [query,setQuery]=React.useState('');
   const [muscleFilter,setMuscleFilter]=React.useState('All');
@@ -309,25 +413,23 @@ function ExerciseSearchSheet({onAdd,onClose}){
   );
 }
 
-/* ── DayCard ─────────────────────────────────────────────── */
-function DayCard({day,onUpdate,onDelete,onOpenSearch}){
+/* ── DayCard ── */
+function DayCard({day, dayNum, onUpdate, onDelete, onOpenSearch}){
   const [open,setOpen]=React.useState(day.open);
   const updEx=ex=>onUpdate({...day,exercises:day.exercises.map(e=>e.id===ex.id?ex:e)});
   const delEx=id=>onUpdate({...day,exercises:day.exercises.filter(e=>e.id!==id)});
-  const delCardio=id=>onUpdate({...day,cardio:day.cardio.filter(c=>c.id!==id)});
-  const addCardio=()=>onUpdate({...day,cardio:[...day.cardio,{id:Date.now(),type:'Run',target:'5 km'}]});
 
   return(
     <div style={{background:WW.card,borderRadius:16,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,marginBottom:12}}>
       {/* Header */}
       <div onClick={()=>setOpen(o=>!o)} style={{display:'flex',alignItems:'center',padding:'13px 14px',cursor:'pointer',gap:10}}>
         <div style={{width:28,height:28,borderRadius:8,background:WW.chipBg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-          <span style={{fontSize:13,fontWeight:800,color:WW.primary}}>D{day.id}</span>
+          <span style={{fontSize:13,fontWeight:800,color:WW.primary}}>D{dayNum}</span>
         </div>
         <input value={day.label} onChange={e=>{e.stopPropagation();onUpdate({...day,label:e.target.value});}}
           onClick={e=>e.stopPropagation()}
           style={{flex:1,border:'none',background:'transparent',fontSize:14,fontWeight:700,color:WW.text,outline:'none',fontFamily:'inherit'}}/>
-        <span style={{fontSize:11,color:WW.textSec,whiteSpace:'nowrap'}}>{day.exercises.length} ex{day.cardio.length?` · ${day.cardio.length} cardio`:''}</span>
+        <span style={{fontSize:11,color:WW.textSec,whiteSpace:'nowrap'}}>{day.exercises.length} ex</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{transform:open?'rotate(180deg)':'rotate(0)',transition:'transform 0.22s',flexShrink:0}}><path d="M6 9l6 6 6-6" stroke={WW.textSec} strokeWidth="2" strokeLinecap="round"/></svg>
         <button onClick={e=>{e.stopPropagation();onDelete();}} style={{background:'none',border:'none',cursor:'pointer',padding:2,color:WW.textSec,flexShrink:0}}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -339,20 +441,10 @@ function DayCard({day,onUpdate,onDelete,onOpenSearch}){
           {day.exercises.map(ex=>(
             <ExerciseCard key={ex.id} ex={ex} onUpdate={updEx} onDelete={()=>delEx(ex.id)}/>
           ))}
-          {day.cardio.map(c=>(
-            <div key={c.id} style={{display:'flex',alignItems:'center',gap:8,padding:'10px 12px',background:WW.tealBg,borderRadius:10,border:`0.5px solid ${WW.teal}33`,marginBottom:8}}>
-              <div style={{flex:1}}>
-                <div style={{fontSize:13,fontWeight:700,color:WW.text}}>{c.type}</div>
-                <div style={{fontSize:11,color:WW.textSec}}>Target: {c.target}</div>
-              </div>
-              <button onClick={()=>delCardio(c.id)} style={{background:'none',border:'none',cursor:'pointer',padding:4,color:WW.textSec}}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-            </div>
-          ))}
-          <div style={{display:'flex',gap:8,marginTop:4}}>
-            <button onClick={()=>onOpenSearch(day.id)} style={{flex:1,height:36,borderRadius:10,border:`1.5px dashed ${WW.primary}`,background:'transparent',color:WW.primary,fontSize:12,fontWeight:700,cursor:'pointer'}}>+ Add Exercise</button>
-            <button onClick={addCardio} style={{flex:1,height:36,borderRadius:10,border:`1.5px dashed ${WW.teal}`,background:'transparent',color:WW.teal,fontSize:12,fontWeight:700,cursor:'pointer'}}>+ Add Cardio</button>
+          <div style={{marginTop:4}}>
+            <button onClick={()=>onOpenSearch(day.id)} style={{width:'100%',height:36,borderRadius:10,border:`1.5px dashed ${WW.primary}`,background:'transparent',color:WW.primary,fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>
+              + Add Exercise
+            </button>
           </div>
         </div>
       )}
@@ -360,7 +452,7 @@ function DayCard({day,onUpdate,onDelete,onOpenSearch}){
   );
 }
 
-/* ── App ─────────────────────────────────────────────────── */
+/* ── App ── */
 function App(){
   const [name,setName]=React.useState('My Custom Routine');
   const [days,setDays]=React.useState(INIT_DAYS);
@@ -368,11 +460,11 @@ function App(){
 
   const updDay=d=>setDays(ds=>ds.map(x=>x.id===d.id?d:x));
   const delDay=id=>setDays(ds=>ds.filter(d=>d.id!==id));
-  const addDay=()=>setDays(ds=>[...ds,{id:Date.now(),label:`Day ${ds.length+1}`,open:true,exercises:[],cardio:[]}]);
+  const addDay=()=>setDays(ds=>[...ds,{id:Date.now(),label:`Day ${ds.length+1}`,open:true,exercises:[]}]);
 
   const handleAddEx=ex=>{
     setDays(ds=>ds.map(d=>d.id===searchDayId?{...d,exercises:[...d.exercises,{
-      id:Date.now(),name:ex.name,muscle:ex.muscle,restTime:90,note:'',showNote:false,
+      id:Date.now(),name:ex.name,muscle:ex.muscle,restTime:0,note:'',showNote:false,
       sets:[{id:Date.now()+1,type:'N',prev:'—',kg:'',reps:'',done:false}],
     }]}:d));
   };
@@ -380,7 +472,6 @@ function App(){
   return(
     <div style={{width:'100%',height:'100%',background:WW.bg,display:'flex',flexDirection:'column',position:'relative'}}>
       <StatusBar/>
-      {/* Top bar */}
       <div style={{display:'flex',alignItems:'center',padding:'4px 16px 12px',gap:10,flexShrink:0}}>
         <a href="S-10-Plans-Hub.html" style={{width:38,height:38,borderRadius:19,background:'rgba(61,61,92,.07)',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none',flexShrink:0}}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke={WW.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -388,17 +479,6 @@ function App(){
         <div style={{fontSize:18,fontWeight:800,color:WW.primaryDark,letterSpacing:'-0.3px',flex:1}}>Build Routine</div>
       </div>
 
-      {/* Usage banner */}
-      <div style={{margin:'0 16px 12px',padding:'10px 13px',background:'#FEF3C7',borderRadius:12,border:'1px solid #FCD34D',display:'flex',alignItems:'center',gap:10,flexShrink:0}}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.2 6.6H21l-5.6 4 2.1 6.7L12 16.3l-5.5 4 2.1-6.7L3 9.6h6.8L12 3z" fill={WW.gold}/></svg>
-        <div style={{flex:1}}>
-          <div style={{fontSize:12,fontWeight:700,color:'#92400E'}}>2 / 3 saved routines used</div>
-          <div style={{height:4,borderRadius:2,background:'#FCD34D',marginTop:4}}><div style={{height:'100%',width:'66%',borderRadius:2,background:WW.gold}}/></div>
-        </div>
-        <span style={{fontSize:12,fontWeight:700,color:'#92400E',background:'#FCD34D',padding:'4px 8px',borderRadius:6,cursor:'pointer'}}>Upgrade</span>
-      </div>
-
-      {/* Scrollable */}
       <div style={{flex:1,overflowY:'auto',padding:'0 14px',paddingBottom:88}}>
         <div style={{marginBottom:14}}>
           <div style={{fontSize:10,fontWeight:700,color:WW.textSec,letterSpacing:'0.5px',textTransform:'uppercase',marginBottom:6}}>Routine Name</div>
@@ -406,20 +486,20 @@ function App(){
             style={{width:'100%',height:48,borderRadius:12,border:`1px solid ${WW.border}`,background:WW.card,fontSize:16,fontWeight:700,color:WW.text,padding:'0 14px',boxSizing:'border-box',outline:'none',fontFamily:'inherit'}}/>
         </div>
         <div style={{fontSize:10,fontWeight:700,color:WW.textSec,letterSpacing:'0.5px',textTransform:'uppercase',marginBottom:10}}>Days</div>
-        {days.map(d=><DayCard key={d.id} day={d} onUpdate={updDay} onDelete={()=>delDay(d.id)} onOpenSearch={setSearchDayId}/>)}
-        <button onClick={addDay} style={{width:'100%',height:44,borderRadius:12,border:`2px dashed ${WW.border}`,background:'transparent',color:WW.textSec,fontSize:14,fontWeight:700,cursor:'pointer',marginBottom:8}}>
+        {days.map((d,i)=>(
+          <DayCard key={d.id} day={d} dayNum={i+1} onUpdate={updDay} onDelete={()=>delDay(d.id)} onOpenSearch={setSearchDayId}/>
+        ))}
+        <button onClick={addDay} style={{width:'100%',height:44,borderRadius:12,border:`2px dashed ${WW.border}`,background:'transparent',color:WW.textSec,fontSize:14,fontWeight:700,cursor:'pointer',marginBottom:8,fontFamily:'inherit'}}>
           + Add Day
         </button>
       </div>
 
-      {/* Save CTA */}
       <div style={{position:'absolute',bottom:0,left:0,right:0,padding:'12px 16px 24px',background:WW.card,borderTop:`0.5px solid ${WW.border}`,zIndex:20}}>
-        <button style={{width:'100%',height:52,borderRadius:14,background:WW.primary,color:'#fff',fontSize:16,fontWeight:700,border:'none',cursor:'pointer',boxShadow:'0 4px 14px rgba(108,126,232,.35)'}}>
+        <button style={{width:'100%',height:52,borderRadius:14,background:WW.primary,color:'#fff',fontSize:16,fontWeight:700,border:'none',cursor:'pointer',boxShadow:'0 4px 14px rgba(108,126,232,.35)',fontFamily:'inherit'}}>
           Save Routine
         </button>
       </div>
 
-      {/* Overlays */}
       {searchDayId!=null&&<ExerciseSearchSheet onAdd={handleAddEx} onClose={()=>setSearchDayId(null)}/>}
     </div>
   );

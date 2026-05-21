@@ -136,6 +136,14 @@ function App(){
           <div style={{fontSize:11,fontWeight:700,color:WW.textSec,letterSpacing:'0.5px',textTransform:'uppercase'}}>My Plans</div>
           <a href="S-15-My-Plans-Library.html" style={{fontSize:13,color:WW.primary,fontWeight:700,textDecoration:'none'}}>See all</a>
         </div>
+        <div style={{marginBottom:12,padding:'10px 13px',background:'#FEF3C7',borderRadius:12,border:'1px solid #FCD34D',display:'flex',alignItems:'center',gap:10}}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.2 6.6H21l-5.6 4 2.1 6.7L12 16.3l-5.5 4 2.1-6.7L3 9.6h6.8L12 3z" fill={WW.gold}/></svg>
+          <div style={{flex:1}}>
+            <div style={{fontSize:12,fontWeight:700,color:'#92400E'}}>2 / 3 saved routines used</div>
+            <div style={{height:4,borderRadius:2,background:'#FCD34D',marginTop:4}}><div style={{height:'100%',width:'66%',borderRadius:2,background:WW.gold}}/></div>
+          </div>
+          <span style={{fontSize:12,fontWeight:700,color:'#92400E',background:'#FCD34D',padding:'4px 8px',borderRadius:6,cursor:'pointer'}}>Upgrade</span>
+        </div>
         <div style={{display:'flex',gap:12,overflowX:'auto',paddingBottom:8,marginBottom:4}}>
           {SAVED_PLANS.map(p=>(
             <a key={p.name} href="S-13-Plan-Detail.html" style={{minWidth:160,background:WW.card,borderRadius:14,border:`0.5px solid ${WW.border}`,boxShadow:WW.shadow,padding:'12px 13px',textDecoration:'none',flexShrink:0,display:'block'}}>

@@ -46,7 +46,6 @@ const PLAN={
   overview:'Each week alternates between two versions of each day (A and B) to keep your body adapting. The first 4 weeks focus on form and motor patterns at moderate volume. Weeks 5–8 progressively increase load and introduce intensity techniques. Every session ends with a core finisher.',
   equipment:['Barbell','Bench','Squat Rack','Pull-up Bar','Cable Machine','Dumbbells','Resistance Bands'],
   goals:['Build Muscle','Strength Foundation','Improved Posture','Compound Movements','Mind-Muscle Connection'],
-  wiseCoachNote:'This plan matches your goal of building muscle and fits your 3-day schedule. The beginner level aligns with your 6-month training history, and shoulder exercises have been pre-adjusted based on your health profile.',
 };
 
 const WEEKS=[
@@ -297,23 +296,6 @@ function App(){
           </div>
 
           {/* ⑨ WiseCoach match card */}
-          <div style={{marginBottom:20}}>
-            <div style={{background:WW.lavenderBg,borderRadius:14,border:`0.5px solid rgba(155,132,232,.25)`,borderLeft:`3px solid ${WW.lavender}`,padding:'12px 14px',boxShadow:WW.shadow}}>
-              <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:8}}>
-                <div style={{width:26,height:26,borderRadius:13,background:WW.lavender,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.5L12 14.5 7.1 17.2l.9-5.5L4 7.8 9.5 7z" fill="#fff"/></svg>
-                </div>
-                <div>
-                  <div style={{fontSize:11,fontWeight:800,color:WW.lavenderText,letterSpacing:'.3px'}}>WISECOACH</div>
-                  <div style={{fontSize:10,color:WW.lavenderText,opacity:.7,fontWeight:600}}>Why this plan matches you</div>
-                </div>
-              </div>
-              <div style={{fontSize:13,color:WW.lavenderBody,lineHeight:1.6}}>
-                {PLAN.wiseCoachNote}
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
 
